@@ -181,4 +181,42 @@
     right: 0;
     border-right-color: var(--border);
   }
+
+  /* Transición suave */
+.transition-navbar {
+  transition: all 0.3s ease;
+}
+
+/* Navbar transparente */
+.navbar-transparent {
+  background-color: transparent;
+}
+
+/* Navbar blanco al hacer scroll */
+.navbar-white {
+  background-color: white;
+}
+
+/* Cambiar color de texto según fondo */
+.navbar-transparent .nav-link {
+  color: white !important;
+}
+
+.navbar-white .nav-link {
+  color: black !important;
+}
+}
+
+.transition-navbar {
+  transition: all 0.3s ease;
+}
+
+/* TRANSPARENTE */
+.navbar-transparent {
+  background-color: transparent !important;
+}
+
+/* BLANCO */
+.navbar-white {
+  background-color: white !important;
 }

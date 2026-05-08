@@ -21,7 +21,7 @@ export default function Sidebar({ role }) {
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
         { name: "Evaluaciones", icon: "bi-star", path: "/profesor-evals" },
-        { name: "Mis Cursos", icon: "bi-book", path: "/profesor-cursos" },
+        { name: "Tutorias", icon: "bi-book", path: "/profesor-cursos" },
       ]
     },
     estudiante: {
@@ -30,6 +30,7 @@ export default function Sidebar({ role }) {
         { name: "Inicio", icon: "bi-house-door", path: "/inicio-estudiante" },
         { name: "Buscar Profe", icon: "bi-search", path: "/buscar-estudiante" },
         { name: "Mis Reseñas", icon: "bi-chat-left-text", path: "/resenas-estudiante" },
+        { name: "Buscar Tutorias", icon: "bi-mortarboard", path: "/tutorias-estudiante" },
       ]
     }
   };

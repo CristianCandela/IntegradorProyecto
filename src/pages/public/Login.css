@@ -1,7 +1,6 @@
-
 .login-card {
-  transition: all 0.4s ease;
   animation: fadeIn 0.6s ease-out;
+  transition: all 0.4s ease;
 }
 
 @keyframes fadeIn {
@@ -9,27 +8,19 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Botones Principales (Base) */
 .btn-auth {
-  color: #ffffff !important;
+  color: #fff !important;
   border: none;
   border-radius: 12px;
   font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
-.btn-admin-grad {
-  background: linear-gradient(135deg, #0f172a 0%, #5e78a1 100%);
-}
-
-.btn-prof-grad {
-  background: linear-gradient(135deg, #4f46e5 0%, #9193fa 100%);
-}
-
-.btn-estu-grad {
-  background: linear-gradient(135deg, #8b5cf6 0%, #baa6f5 100%);
-}
+/* Gradientes por Rol */
+.btn-admin-grad { background: linear-gradient(135deg, #180f2a 0%, #5e78a1 100%); }
+.btn-profesor-grad { background: linear-gradient(135deg, #1f1c64 0%, #989ae7 100%); }
+.btn-estudiante-grad { background: linear-gradient(135deg, #493774 0%, #ac9cdd 100%); }
 
 .btn-auth:hover {
   transform: translateY(-2px);
@@ -37,57 +28,40 @@
   filter: brightness(1.1);
 }
 
+/* UI Elements */
+.text-indigo { color: #4446ac; }
 .icon-badge-top {
-  width: 56px;
-  height: 56px;
-  background: #7c3aed; 
+  width: 56px; height: 56px;
+  background: #7c3aed;
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  font-size: 1.5rem;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto; font-size: 1.5rem;
 }
 
-/* "Crea una cuenta" */
-.hover-link {
-  color: #6366f1 !important; 
-  transition: all 0.3s ease;
-  position: relative;
-}
+/* Enlaces y Tags */
+.hover-link { color: #6366f1 !important; transition: 0.3s; }
+.hover-link:hover { color: #201b5e !important; transform: scale(1.05); text-decoration: underline !important; }
 
-.hover-link:hover {
-  color: #201b5e !important; 
-  text-decoration: underline !important;
-  transform: scale(1.05);
+.btn-tag {
+  background: #fff; border: 1px solid #e2e8f0;
+  padding: 4px 12px; border-radius: 8px;
+  font-size: 0.7rem; color: #475569; font-weight: 600;
+  transition: 0.2s;
 }
+.btn-tag:hover { border-color: #6366f1; color: #6366f1; transform: translateY(-1px); }
 
-/* prueba rápida */
+/* Sección Demo */
 .demo-section {
   background-color: #e0e0e0; 
-  border: 2px dashed #5f5f5f; 
+  border: 2px dashed #858686;
   margin-top: 20px;
 }
 
-.demo-label {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: #94a3b8;
-  letter-spacing: 1.2px;
-}
+/* Botones de cambio de rol */
 
-.btn-tag {
-  background: white;
-  border: 1px solid #e2e8f0;
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 0.7rem;
-  color: #475569;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.btn-tag:hover {
+.hover-effect:hover {
+  transform: translateY(-1px);
+  background-color: #f5f3ff;
   border-color: #6366f1;
   color: #6366f1;
 }

@@ -20,8 +20,8 @@ export default function Sidebar({ role }) {
       color: "#1f1c64",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
-        { name: "Evaluaciones", icon: "bi-star", path: "/profesor-evals" },
-        { name: "Tutorias", icon: "bi-book", path: "/profesor-cursos" },
+        { name: "Evaluaciones", icon: "bi-star", path: "/evaluaciones-profesor" },
+        { name: "Tutorias", icon: "bi-book", path: "/tutorias-profesor" },
       ]
     },
     estudiante: {

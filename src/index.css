@@ -167,3 +167,29 @@ body {
   font-weight: 700;
   letter-spacing: 0.5px;
 }
+
+/* Whatsapp boton - */
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  color: white !important;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  box-shadow: 2px 5px 15px rgba(0,0,0,0.3);
+  z-index: 9999; 
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  background-color: #128c7e;
+}

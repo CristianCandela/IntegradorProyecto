@@ -28,8 +28,8 @@ export default function Sidebar({ role }) {
       color: "#493774",
       items: [
         { name: "Inicio", icon: "bi-house-door", path: "/inicio-estudiante" },
-        { name: "Buscar Profe", icon: "bi-search", path: "/buscar" },
-        { name: "Mis Reseñas", icon: "bi-chat-left-text", path: "/mis-resenas" },
+        { name: "Buscar Profe", icon: "bi-search", path: "/buscar-estudiante" },
+        { name: "Mis Reseñas", icon: "bi-chat-left-text", path: "/resenas-estudiante" },
       ]
     }
   };

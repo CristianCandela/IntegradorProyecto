@@ -19,12 +19,10 @@ export default function Login() {
   const [role, setRole] = useState("admin");
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // --- NUEVA CARACTERÍSTICA: Redirección si ya está logueado ---
   useEffect(() => {
     const sessionActiva = localStorage.getItem("userSession");
     if (sessionActiva) {
       const { role: savedRole } = JSON.parse(sessionActiva);
-      // Si ya hay sesión, lo mandamos directo a su path sin que pase por el login
       navigate(roleData[savedRole].path);
     }
   }, [navigate]);
@@ -42,7 +40,7 @@ export default function Login() {
     const user = roleData[role];
 
     if (email === user.email && password === user.pass) {
-      // Guardar sesión
+      
       localStorage.setItem("userSession", JSON.stringify({ role: role, email: email }));
 
       Swal.fire({
@@ -63,7 +61,7 @@ export default function Login() {
 
   return (
     <main className="container-fluid p-0 vh-100 overflow-hidden">
-      {/* ... El resto de tu JSX se mantiene exactamente igual ... */}
+  
       <div className="row g-0 h-100">
         <div className="col-lg-6 d-none d-lg-block p-0">
           <LoginHero video={heroVideo} titulo="Bienvenido a" highlight="ProfeMatch" subtitulo="La plataforma perfecta para evaluar profesores." />

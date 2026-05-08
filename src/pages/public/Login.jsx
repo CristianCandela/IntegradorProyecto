@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import LoginHero from "../../components/LoginHero";
 import heroVideo from "../../images/hero.mp4";
+import WhatsappBtn from "../../components/WhatsappBtn"; 
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ export default function Login() {
             {/* Link de registro arriba */}
             <div className="position-absolute top-0 end-0 p-4">
                 <span className="text-muted small">¿Eres nuevo?</span>
-                <Link to="/registro" className="ms-2 fw-bold text-primary text-decoration-none small hover-link">
+                <Link to="/registro" className="ms-2 fw-bold text-decoration-none small hover-link">
                 Crea una cuenta
                 </Link>
             </div>
@@ -43,7 +44,7 @@ export default function Login() {
             <div className="login-card p-5 shadow-lg rounded-5 bg-white w-100" style={{ maxWidth: "460px", border: "1px solid #f1f5f9" }}>
                 <div className="text-center mb-4">
                 <div className="icon-badge-top mb-3 shadow-sm">
-                    <i className="bi bi-shield-lock-fill text-primary"></i>
+                    <i className="bi bi-shield-lock-fill text-white"></i>
                 </div>
                 <h2 className="fw-bold text-dark">¡Hola de nuevo!</h2>
                 <p className="text-muted small">Ingresa a tu cuenta de ProfeMatch</p>
@@ -93,19 +94,21 @@ export default function Login() {
                 </form>
 
                 {/* Sección Demo */}
-                <div className="demo-box p-3 rounded-4 bg-light border-0">
-                <div className="d-flex align-items-center mb-2 justify-content-center">
-                    <span className="extra-small fw-bold text-secondary text-uppercase tracking-wider">Prueba rápida</span>
-                </div>
-                <div className="d-flex justify-content-center gap-2">
-                    <button onClick={() => fillForm("admin@profematch.com", "admin123")} className="btn-tag">Admin</button>
-                    <button onClick={() => fillForm("prof@profematch.com", "prof123")} className="btn-tag">Prof</button>
-                    <button onClick={() => fillForm("estu@profematch.com", "estu123")} className="btn-tag">Estu</button>
-                </div>
+                <div className="demo-section p-3 rounded-4">
+                    <div className="text-center mb-2">
+                        <span className="demo-label">PRUEBA RÁPIDA</span>
+                    </div>
+                    <div className="d-flex justify-content-center gap-2">
+                        <button onClick={() => fillForm("admin@profematch.com", "admin123")} className="btn-tag">Admin</button>
+                        <button onClick={() => fillForm("prof@profematch.com", "prof123")} className="btn-tag">Prof</button>
+                        <button onClick={() => fillForm("estu@profematch.com", "estu123")} className="btn-tag">Estu</button>
+                    </div>
                 </div>
             </div>
             </div>
+            
       </div>
+      <WhatsappBtn /> 
     </main>
   );
 }

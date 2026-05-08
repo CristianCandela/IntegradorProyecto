@@ -15,6 +15,7 @@ import ReportesAdmin from "./pages/admin/ReportesAdmin";
 
 import BuscarEstudiante from "./pages/estudiante/BuscarEstudiante";
 import ReseñasEstudiante from "./pages/estudiante/ReseñasEstudiante";
+import TutoriasEstudiante from "./pages/estudiante/TutoriasEstudiante";
 
 function LayoutWrapper({ children }) {
 
@@ -30,6 +31,7 @@ function LayoutWrapper({ children }) {
   "/inicio-estudiante",
   "/buscar-estudiante",
   "/resenas-estudiante",
+  "/tutorias-estudiante",
 
   "/inicio-profesor"
   ].includes(location.pathname);
@@ -63,6 +65,7 @@ function App() {
           <Route path="/inicio-estudiante" element={<InicioEstudiante />} />
           <Route path="/buscar-estudiante" element={<BuscarEstudiante />} />
           <Route path="/resenas-estudiante" element={<ReseñasEstudiante />} />
+          <Route path="/tutorias-estudiante" element={<TutoriasEstudiante/>} />
 
           <Route path="/inicio-profesor" element={<InicioProfesor />} />
 

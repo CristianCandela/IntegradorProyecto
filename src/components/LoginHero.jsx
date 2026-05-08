@@ -1,4 +1,4 @@
-
+import { Link } from "react-router-dom"; 
 import logoHeader from "../images/Logo1.png";
 
 export default function LoginHero({ video, titulo, highlight, subtitulo }) {
@@ -16,8 +16,15 @@ export default function LoginHero({ video, titulo, highlight, subtitulo }) {
       </video>
       <div className="overlay"></div>
 
+      {/* LOGO  */}
       <div className="position-absolute top-0 start-0 p-5" style={{ zIndex: 10 }}>
-        <img src={logoHeader} alt="ProfeMatch Logo" style={{ height: "60px", width: "auto" }} />
+        <Link to="/" className="d-block transition-hover"> 
+          <img 
+            src={logoHeader} 
+            alt="ProfeMatch Logo" 
+            style={{ height: "60px", width: "auto", cursor: "pointer" }} 
+          />
+        </Link>
       </div>
       
       <div className="login-hero-content text-white p-5">
@@ -31,7 +38,6 @@ export default function LoginHero({ video, titulo, highlight, subtitulo }) {
         <div className="row g-3 mt-4">
           {benefits.map((b, i) => (
             <div className="col-6" key={i}>
-              {/* Nueva clase: benefit-card-glass */}
               <div className="benefit-card-glass p-4">
                 <div className="mb-2">
                   <i className={`${b.icon} fs-3 text-white`}></i>

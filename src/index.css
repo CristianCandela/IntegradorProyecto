@@ -169,7 +169,6 @@ body {
 }
 
 /* Whatsapp boton - */
-
 .whatsapp-float {
   position: fixed;
   bottom: 40px;
@@ -192,4 +191,102 @@ body {
 .whatsapp-float:hover {
   transform: scale(1.1);
   background-color: #128c7e;
+}
+
+/* sidebar- */
+.sidebar-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  overflow: hidden;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+.collapsed { width: 80px; }
+.expanded { width: 250px; }
+
+/* Header y Logo */
+.sidebar-header {
+  padding: 25px 20px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo-img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1); /* Vuelve el logo blanco si es oscuro */
+}
+
+.logo-text {
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+/* Navegación */
+.sidebar-nav {
+  flex-grow: 1;
+  padding: 15px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 18px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7); /* Blanco tenue */
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.nav-item i { font-size: 1.3rem; }
+
+/* Item Activo: Resaltado con fondo claro y texto blanco */
+.nav-item.active {
+  background: rgba(255, 255, 255, 0.2); /* Efecto cristalizado */
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  transform: translateX(5px);
+}
+
+/* Footer y Logout */
+.sidebar-footer {
+  padding: 15px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+  background: transparent;
+  border: none;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.logout-btn:hover {
+  background: #ff4757; /* Color de alerta para cerrar sesión */
+  color: white;
+}
+
+.nav-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
 }

@@ -9,8 +9,12 @@ import Registro from "./pages/public/Registro";
 import InicioAdmin from "./pages/admin/InicioAdmin";
 import InicioEstudiante from "./pages/estudiante/InicioEstudiante";
 import InicioProfesor from "./pages/profesor/InicioProfesor";
+
 import UsuariosAdmin from "./pages/admin/UsuariosAdmin";
 import ReportesAdmin from "./pages/admin/ReportesAdmin";
+
+import BuscarEstudiante from "./pages/estudiante/BuscarEstudiante";
+import ReseñasEstudiante from "./pages/estudiante/ReseñasEstudiante";
 
 function LayoutWrapper({ children }) {
 
@@ -22,7 +26,11 @@ function LayoutWrapper({ children }) {
   "/inicio-admin",
   "/usuarios-admin",
   "/reportes-admin",
+
   "/inicio-estudiante",
+  "/buscar-estudiante",
+  "/resenas-estudiante",
+
   "/inicio-profesor"
   ].includes(location.pathname);
 
@@ -53,10 +61,11 @@ function App() {
           <Route path="/reportes-admin" element={<ReportesAdmin />} />
 
           <Route path="/inicio-estudiante" element={<InicioEstudiante />} />
+          <Route path="/buscar-estudiante" element={<BuscarEstudiante />} />
+          <Route path="/resenas-estudiante" element={<ReseñasEstudiante />} />
+
           <Route path="/inicio-profesor" element={<InicioProfesor />} />
-          
-          <Route path="/inicio-estudiante" element={<InicioEstudiante />} />
-          <Route path="/inicio-profesor" element={<InicioProfesor />} />
+
         </Routes>
       </LayoutWrapper>
     </Router>

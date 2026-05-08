@@ -12,8 +12,8 @@ export default function Sidebar({ role }) {
       color: "#180f2a",
       items: [
         { name: "Dashboard", icon: "bi-speedometer2", path: "/inicio-admin" },
-        { name: "Usuarios", icon: "bi-people", path: "/admin-users" },
-        { name: "Reportes", icon: "bi-bar-chart", path: "/admin-reports" },
+        { name: "Usuarios", icon: "bi-people", path: "/usuarios-admin" },
+        { name: "Reportes", icon: "bi-bar-chart", path: "/reportes-admin" },
       ]
     },
     profesor: {

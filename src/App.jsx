@@ -16,6 +16,8 @@ import ReportesAdmin from "./pages/admin/ReportesAdmin";
 import BuscarEstudiante from "./pages/estudiante/BuscarEstudiante";
 import ReseñasEstudiante from "./pages/estudiante/ReseñasEstudiante";
 import TutoriasEstudiante from "./pages/estudiante/TutoriasEstudiante";
+import EvaluacionesProfesor from "./pages/profesor/EvaluacionesProfesor";
+import TutoriasProfesor from "./pages/profesor/TutoriasProfesor";
 
 function LayoutWrapper({ children }) {
 
@@ -33,7 +35,9 @@ function LayoutWrapper({ children }) {
   "/resenas-estudiante",
   "/tutorias-estudiante",
 
-  "/inicio-profesor"
+  "/inicio-profesor",
+  "/evaluaciones-profesor",
+  "/tutorias-profesor"
   ].includes(location.pathname);
 
   return (
@@ -68,6 +72,8 @@ function App() {
           <Route path="/tutorias-estudiante" element={<TutoriasEstudiante/>} />
 
           <Route path="/inicio-profesor" element={<InicioProfesor />} />
+          <Route path="/tutorias-profesor" element={<TutoriasProfesor />} />
+          <Route path="/evaluaciones-profesor" element={<EvaluacionesProfesor />} />
 
         </Routes>
       </LayoutWrapper>

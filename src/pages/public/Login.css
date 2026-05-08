@@ -16,25 +16,64 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .btn-admin-grad {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #5e78a1 100%);
 }
 
 .btn-prof-grad {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #4f46e5 0%, #9193fa 100%);
 }
 
 .btn-estu-grad {
-  background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+  background: linear-gradient(135deg, #8b5cf6 0%, #baa6f5 100%);
 }
 
 .btn-auth:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
   filter: brightness(1.1);
+}
+
+.icon-badge-top {
+  width: 56px;
+  height: 56px;
+  background: #7c3aed; 
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  font-size: 1.5rem;
+}
+
+/* "Crea una cuenta" */
+.hover-link {
+  color: #6366f1 !important; 
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.hover-link:hover {
+  color: #201b5e !important; 
+  text-decoration: underline !important;
+  transform: scale(1.05);
+}
+
+/* prueba rápida */
+.demo-section {
+  background-color: #e0e0e0; 
+  border: 2px dashed #5f5f5f; 
+  margin-top: 20px;
+}
+
+.demo-label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 1.2px;
 }
 
 .btn-tag {
@@ -51,16 +90,4 @@
 .btn-tag:hover {
   border-color: #6366f1;
   color: #6366f1;
-}
-
-.icon-badge-top {
-  width: 56px;
-  height: 56px;
-  background: #f8fafc;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-  font-size: 1.5rem;
 }

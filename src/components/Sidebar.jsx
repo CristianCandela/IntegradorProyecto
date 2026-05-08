@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-
+import Swal from "sweetalert2"; 
 
 export default function Sidebar({ role }) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -36,10 +36,28 @@ export default function Sidebar({ role }) {
 
   const config = menuConfig[role];
 
+  const handleLogout = () => {
+    Swal.fire({
+      title: "¿Cerrar Sesión?",
+      text: "Tendrás que volver a ingresar para acceder a tu panel.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: config.color,
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, salir",
+      cancelButtonText: "Cancelar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("userSession"); 
+        navigate("/login");
+      }
+    });
+  };
+
   return (
     <div 
       className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}
-      style={{ backgroundColor: config.color }} // Fondo característico
+      style={{ backgroundColor: config.color }} 
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
     >
@@ -62,7 +80,7 @@ export default function Sidebar({ role }) {
       </nav>
 
       <div className="sidebar-footer">
-        <button onClick={() => navigate("/login")} className="nav-item logout-btn">
+        <button onClick={handleLogout} className="nav-item logout-btn">
           <i className="bi bi-box-arrow-left"></i>
           {isExpanded && <span className="nav-text">Cerrar Sesión</span>}
         </button>

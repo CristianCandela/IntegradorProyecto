@@ -95,6 +95,65 @@
   font-size: 1.5rem;
 }
 
+/* --- CÓMO FUNCIONA --- */
+.how-it-works-display {
+  position: relative;
+  min-height: 300px;
+}
+
+.step-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.step-card.active {
+  position: relative; /* Para que ocupe espacio el activo */
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.step-icon-circle {
+  width: 80px;
+  height: 80px;
+  background: var(--gradient-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+}
+
+/* Indicadores de abajo */
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.step-dot.active {
+  width: 30px;
+  border-radius: 10px;
+  background: var(--violet-main);
+}
+
+.text-violet-main {
+  color: var(--violet-main);
+}
+
 /* responsive */
 @media (max-width: 576px) {
   .search-glass-wrapper {
@@ -104,4 +163,3 @@
   }
   .btn-search-action { width: 100%; margin-top: 10px; }
 }
-

@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Inicio.css";
 import Hero from "../../components/Hero";
 import heroVideo from "../../images/hero.mp4";
 
+
+//busqueda logica
 const DATA_MOCK = [
   { id: 1, nombre: "Juan Pérez", curso: "Cálculo I", univ: "ULIMA" },
   { id: 2, nombre: "Maria Garcia", curso: "Diseño de Patrones", univ: "UPC" },
@@ -31,6 +33,37 @@ export default function Inicio() {
       setResultados([]);
     }
   };
+
+  //cards logica
+
+  const [indexActivo, setIndexActivo] = useState(0);
+  const pasos = [
+    {
+      titulo: "Buscar",
+      subtitulo: "Explora profesores",
+      desc: "Accede a perfiles detallados con información académica, metodologías y puntuaciones reales.",
+      icon: "bi-search"
+    },
+    {
+      titulo: "Comparar",
+      subtitulo: "Compara experiencias",
+      desc: "Analiza reseñas verificadas y encuentra el docente que mejor se adapte a tu forma de aprender.",
+      icon: "bi-arrow-left-right"
+    },
+    {
+      titulo: "Elegir",
+      subtitulo: "Elige con confianza",
+      desc: "Reduce la incertidumbre académica y mejora tu experiencia universitaria desde el primer día.",
+      icon: "bi-check2-circle"
+    }
+  ];
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setIndexActivo((prev) => (prev + 1) % pasos.length);
+    }, 5000); 
+    return () => clearInterval(intervalo);
+  }, [pasos.length]);
 
   return (
     <main>
@@ -84,6 +117,54 @@ export default function Inicio() {
                       ))}
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+          </section>
+          {/* SECCIÓN CÓMO FUNCIONA */}
+          <section className="py-5 bg-white">
+            <div className="container">
+              <div className="text-center mb-5">
+                <h2 className="fw-bold text-indigo-deep">
+                  Tomar mejores decisiones académicas nunca fue tan fácil
+                </h2>
+              </div>
+
+              <div className="row justify-content-center">
+                <div className="col-lg-8">
+                  <div className="how-it-works-display">
+                    {pasos.map((paso, i) => (
+                      <div 
+                        key={i} 
+                        className={`step-card glass-effect round-xl shadow-purple p-5 ${i === indexActivo ? 'active' : 'inactive'}`}
+                      >
+                        <div className="row align-items-center">
+                          <div className="col-md-3 text-center">
+                            <div className="step-icon-circle mx-auto mb-3 mb-md-0">
+                              <i className={`bi ${paso.icon}`}></i>
+                            </div>
+                          </div>
+                          <div className="col-md-9">
+                            <span className="text-violet-main fw-bold text-uppercase fs-7">Paso {i + 1}</span>
+                            <h3 className="fw-bold mt-1">{paso.titulo}</h3>
+                            <h5 className="text-indigo-deep mb-3">{paso.subtitulo}</h5>
+                            <p className="text-muted mb-0 lead">{paso.desc}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                  
+                    <div className="d-flex justify-content-center mt-4 gap-2">
+                      {pasos.map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`step-dot ${i === indexActivo ? 'active' : ''}`}
+                          onClick={() => setIndexActivo(i)}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

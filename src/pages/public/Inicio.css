@@ -79,13 +79,13 @@
 
 /* --- SECCIÓN BENEFICIOS --- */
 .benefits-section { background: linear-gradient(to bottom, #f8fafc, #ffffff); }
-.benefit-card-student { background: #fdfdff !important; border: 1px solid rgba(124, 58, 237, 0.15); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); transition: all 0.3s ease; }
+.benefit-card-student { background: #fdfdff !important; border: 2px solid rgb(66, 49, 223); box-shadow: 0 15px 35px rgba(164, 69, 228, 0.5); transition: all 0.3s ease; }
 .bg-purple-soft { background: rgba(145, 121, 185, 0.774) !important; color: var(--violet-main); font-weight: 600; }
 .benefit-card-teacher { background: var(--indigo-deep) !important; border: 1px solid rgba(255, 255, 255, 0.1); color: white !important; position: relative; overflow: hidden; }
 .shadow-purple-sm { box-shadow: 0 10px 40px rgba(124, 58, 237, 0.06); }
 .check-icon-box { width: 28px; height: 28px; min-width: 28px; background: #f0ebff; color: var(--violet-main); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: bold; }
 .bg-white-transparent { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); }
-.mini-card-stat { background: white !important; color: var(--indigo-deep) !important; padding: 15px; border-radius: 15px; flex: 1; text-align: center; font-weight: 700; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
+.mini-card-stat { background: white !important; color: var(--indigo-deep) !important; padding: 15px; border-radius: 15px; flex: 1; text-align: center; font-weight: 700; box-shadow: 0 10px 20px rgba(197, 22, 197, 0.192); }
 .mini-card-stat i { font-size: 1.4rem; color: var(--violet-main); }
 .deco-circle { position: absolute; bottom: -50px; right: -50px; width: 200px; height: 200px; background: var(--violet-main); opacity: 0.2; border-radius: 50%; filter: blur(40px); }
 .benefits-list li { transition: transform 0.3s ease; }

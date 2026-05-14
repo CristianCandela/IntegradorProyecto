@@ -54,11 +54,10 @@
 .problem-section { background-color: var(--indigo-deep); position: relative; overflow: hidden; width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw; z-index: 1; }
 .problem-section::before { content: ""; position: absolute; top: -10%; right: -5%; width: 500px; height: 500px; background: var(--violet-main); filter: blur(150px); opacity: 0.15; z-index: -1; }
 .problem-stat-card { background: rgba(255, 255, 255, 0.05) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; transition: all 0.3s ease; }
-.problem-stat-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1) !important; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); }
+.problem-stat-card:hover { transform: translateY(-5px); background: rgba(248, 207, 253, 0.247) !important; box-shadow: 0 10px 20px rgba(225, 103, 255, 0.534); }
 
 .image-wrapper { perspective: 1000px; }
-.border-glass { border: 1px solid rgba(255, 255, 255, 0.15); }
-.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(134, 84, 252, 0.918); }
 .image-glow-effect { position: absolute; top: 50%; left: 50%; width: 80%; height: 80%; background: var(--violet-main); filter: blur(100px); opacity: 0.2; transform: translate(-50%, -50%); z-index: -1; }
 .image-wrapper img { transition: transform 0.5s ease; }
 .image-wrapper:hover img { transform: scale(1.02) rotate(0.5deg); }
@@ -66,14 +65,14 @@
 
 /* --- PROFESORES DESTACADOS --- */
 .bg-light-soft { background-color: #f8fafc; }
-.teacher-card { border: 1px solid rgba(124, 58, 237, 0.1) !important; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.teacher-card:hover { border-color: var(--violet-main) !important; box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15) !important; }
+.teacher-card { border: 2px solid rgba(124, 58, 237, 0.842) !important; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.teacher-card:hover { border-color: rgba(222, 58, 237, 0.829) !important; box-shadow: 0 20px 40px rgba(237, 58, 237, 0.541) !important; }
 .teacher-image-container { height: 220px; overflow: hidden; position: relative; background: #e2e8f0; }
 .teacher-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
 .teacher-card:hover .teacher-img { transform: scale(1.1); }
 .category-badge { position: absolute; top: 15px; right: 15px; background: var(--gradient-primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 .rating-pill { background: rgba(124, 58, 237, 0.1); color: var(--violet-main); width: fit-content; padding: 4px 14px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
-.testimonial-quote { position: relative; padding: 10px; background: rgba(0,0,0,0.02); border-radius: 12px; }
+.testimonial-quote { position: relative; padding: 10px; background: rgba(0, 0, 0, 0.164); border-radius: 12px; }
 .btn-view-profile { background: transparent; border: 2px solid var(--violet-main); color: var(--violet-main); padding: 8px; border-radius: 12px; font-weight: 600; transition: all 0.3s ease; }
 .btn-view-profile:hover { background: var(--violet-main); color: white; box-shadow: 0 8px 15px rgba(124, 58, 237, 0.2); }
 .italic { font-style: italic; }

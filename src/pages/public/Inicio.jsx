@@ -311,6 +311,66 @@ export default function Inicio() {
           </div>
         </section>
 
+        {/* SECCIÓN BENEFICIOS */}
+        <section className="benefits-section py-5">
+          <div className="container py-5">
+            <div className="row g-5 align-items-center">
+              
+              {/* BENEFICIOS ESTUDIANTES */}
+              <div className="col-lg-6">
+                <div className="benefit-card-student p-4 p-md-5 round-xl shadow-purple-sm">
+                  <span className="badge bg-purple-soft text-violet-main mb-3 px-3 py-2 round-pill">Para Estudiantes</span>
+                  <h2 className="fw-bold text-indigo-deep mb-4">Pensado para estudiantes</h2>
+                  
+                  <ul className="list-unstyled benefits-list">
+                    {[
+                      "Reduce la incertidumbre al matricularte",
+                      "Descubre metodologías de enseñanza",
+                      "Compara experiencias reales",
+                      "Encuentra tutorías fácilmente",
+                      "Mejora tu rendimiento académico"
+                    ].map((item, index) => (
+                      <li key={index} className="d-flex align-items-start mb-3">
+                        <div className="check-icon-box me-3">
+                          <i className="bi bi-check-lg"></i>
+                        </div>
+                        <span className="text-muted fw-medium">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* BENEFICIOS DOCENTES */}
+              <div className="col-lg-6">
+                <div className="benefit-card-teacher p-4 p-md-5 round-xl shadow-lg">
+                  <span className="badge bg-white-transparent text-white mb-3 px-3 py-2 round-pill">Para Docentes</span>
+                  <h2 className="fw-bold mb-4 text-white">Impulsa también la reputación docente</h2>
+                  <p className="opacity-75 mb-4 text-white">
+                    ProfeMatch permite que los docentes destaquen su experiencia, construyan una marca personal sólida y conecten con estudiantes interesados en sus cursos y tutorías.
+                  </p>
+                  
+                  <div className="d-flex gap-3 mt-5 position-relative" style={{ zIndex: 2 }}>
+                    {[
+                      { icon: "award", text: "Reputación" },
+                      { icon: "megaphone", text: "Alcance" },
+                      { icon: "people", text: "Conexión" }
+                    ].map((stat, i) => (
+                      <div key={i} className="mini-card-stat">
+                          <i className={`bi bi-${stat.icon}`}></i>
+                          <span className="d-block small mt-1">{stat.text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="deco-circle"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
           <div className="row g-4">
             {[
               { icon: "👥", val: "500+", label: "Profesores", color: "bg-indigo-soft" },

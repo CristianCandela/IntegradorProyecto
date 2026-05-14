@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from 'react-router-dom';
 import "./Inicio.css";
 import Hero from "../../components/Hero";
 import heroVideo from "../../images/hero.mp4";
@@ -389,12 +390,37 @@ export default function Inicio() {
         </div>
       </section>
 
-      <section className="py-5 text-center bg-light">
-        <div className="container py-4">
-          <h2 className="fw-bold">¿Por qué ProfeMatch?</h2>
-          <p className="text-muted mx-auto mt-3" style={{ maxWidth: "700px" }}>
-            Conectamos estudiantes con los mejores docentes mediante datos reales y tutorías personalizadas.
-          </p>
+      {/* SECCIÓN FINAL (CTA) */}
+      <section className="cta-final-section py-8">
+        <div className="container">
+          <div className="cta-gradient-card p-5 p-md-5 shadow-2xl text-center position-relative overflow-hidden">
+            
+            {/* Decoración de fondo */}
+            <div className="cta-blur-blob"></div>
+            
+            <div className="position-relative" style={{ zIndex: 2 }}>
+              <h2 className="display-5 fw-bold text-white mb-3">
+                Empieza a tomar mejores <br className="d-none d-md-block" /> decisiones académicas hoy
+              </h2>
+              <p className="text-white opacity-90 lead-sm mb-5 mx-auto" style={{ maxWidth: '700px' }}>
+                Únete a la comunidad estudiantil que está transformando la forma de elegir docentes universitarios.
+              </p>
+              
+              <div className="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                <Link to="/login" className="text-decoration-none">
+                  <button className="btn-cta-primary hover-lift w-100">
+                    Iniciar Sesión
+                  </button>
+                </Link>
+                
+                <Link to="/registro" className="text-decoration-none">
+                  <button className="btn-cta-outline hover-lift w-100">
+                    Registrarme
+                  </button>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </main>

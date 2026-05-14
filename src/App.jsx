@@ -25,7 +25,7 @@ function LayoutWrapper({ children }) {
 
   const hideLayout = [
   "/login",
-  "/registro",
+  /*"/registro",*/
   "/inicio-admin",
   "/usuarios-admin",
   "/reportes-admin",

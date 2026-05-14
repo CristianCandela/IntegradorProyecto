@@ -3,6 +3,9 @@ import "./Inicio.css";
 import Hero from "../../components/Hero";
 import heroVideo from "../../images/hero.mp4";
 import imagenProblema from "../../images/elproblema.png";
+import fotoMaria from "../../images/maria.png";
+import fotoCarlos from "../../images/carlos.png";
+import fotoAna from "../../images/ana.png";
 
 //busqueda logica
 const DATA_MOCK = [
@@ -211,6 +214,99 @@ export default function Inicio() {
                   <div className="image-glow-effect"></div>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECCIÓN PROFESORES DESTACADOS */}
+        <section className="py-5 bg-light-soft">
+          <div className="container py-5">
+            <div className="text-center mb-5">
+              <h2 className="fw-bold text-indigo-deep display-5">Docentes mejor valorados</h2>
+              <p className="text-muted mx-auto mt-3" style={{ maxWidth: "600px" }}>
+                Descubre profesores recomendados por la comunidad estudiantil gracias a su metodología, comunicación y desempeño académico.
+              </p>
+            </div>
+
+            <div className="row g-4 justify-content-center">
+
+              {/* CARD MARIA*/}
+              <div className="col-md-4 col-lg-3">
+                <div className="teacher-card glass-effect round-xl p-0 overflow-hidden shadow-purple hover-lift">
+                  <div className="teacher-image-container">
+                    <img src={fotoMaria} alt="Maria Garcia" className="teacher-img" />
+                    <div className="category-badge">Top Docente</div>
+                  </div>
+                  
+                  <div className="p-4 text-center">
+                    <h5 className="fw-bold mb-1">Maria Garcia</h5>
+                    <p className="text-violet-main small fw-semibold mb-2">Diseño de Patrones • UPC</p>
+                    
+                    <div className="rating-pill mx-auto mb-3">
+                      <i className="bi bi-star-fill me-1"></i>
+                      <span>4.9</span>
+                    </div>
+                    
+                    <div className="testimonial-quote mb-4">
+                      <p className="small italic text-muted mb-0">“Explica muy bien”</p>
+                    </div>
+                    
+                    <button className="btn-view-profile w-100">Ver perfil</button>
+                  </div>
+                </div>
+              </div>
+              {/* CARD ANA*/}
+              <div className="col-md-4 col-lg-3">
+                <div className="teacher-card glass-effect round-xl p-0 overflow-hidden shadow-purple hover-lift">
+                  <div className="teacher-image-container">
+                    <img src={fotoAna} alt="Maria Garcia" className="teacher-img" />
+                    <div className="category-badge">Top Docente</div>
+                  </div>
+                  
+                  <div className="p-4 text-center">
+                    <h5 className="fw-bold mb-1">Ana Aguirre</h5>
+                    <p className="text-violet-main small fw-semibold mb-2">Desarrollo Web • UNMSM</p>
+                    
+                    <div className="rating-pill mx-auto mb-3">
+                      <i className="bi bi-star-fill me-1"></i>
+                      <span>4.9</span>
+                    </div>
+                    
+                    <div className="testimonial-quote mb-4">
+                      <p className="small italic text-muted mb-0">“Clases dinámicas”</p>
+                    </div>
+                    
+                    <button className="btn-view-profile w-100">Ver perfil</button>
+                  </div>
+                </div>
+              </div>
+              {/* CARD CARLOS*/}
+              <div className="col-md-4 col-lg-3">
+                <div className="teacher-card glass-effect round-xl p-0 overflow-hidden shadow-purple hover-lift">
+                  <div className="teacher-image-container">
+                    <img src={fotoCarlos} alt="Maria Garcia" className="teacher-img" />
+                    <div className="category-badge">Top Docente</div>
+                  </div>
+                  
+                  <div className="p-4 text-center">
+                    <h5 className="fw-bold mb-1">Carlos Rojas</h5>
+                    <p className="text-violet-main small fw-semibold mb-2">Base de Datos • PUCP</p>
+                    
+                    <div className="rating-pill mx-auto mb-3">
+                      <i className="bi bi-star-fill me-1"></i>
+                      <span>4.9</span>
+                    </div>
+                    
+                    <div className="testimonial-quote mb-4">
+                      <p className="small italic text-muted mb-0">“Excelente metodologia”</p>
+                    </div>
+                    
+                    <button className="btn-view-profile w-100">Ver perfil</button>
+                  </div>
+                </div>
+              </div>
+
+              
             </div>
           </div>
         </section>

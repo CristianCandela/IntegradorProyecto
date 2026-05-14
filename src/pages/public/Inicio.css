@@ -340,7 +340,6 @@
   overflow: hidden;
 }
 
-
 .shadow-purple-sm { box-shadow: 0 10px 40px rgba(124, 58, 237, 0.06); }
 
 .check-icon-box {
@@ -383,6 +382,82 @@
 
 .benefits-list li { transition: transform 0.3s ease; }
 .benefits-list li:hover { transform: translateX(10px); }
+
+/* --- SECCIÓN FINAL CTA --- */
+.py-8 {
+  padding-top: 8rem;
+  padding-bottom: 8rem;
+}
+
+.cta-gradient-card {
+  background: linear-gradient(-45deg, #282569, #9e30b4, #373ad4, #9b4bbb);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Blur decorativo interno */
+.cta-blur-blob {
+  position: absolute;
+  top: -50%;
+  left: -10%;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.2);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* Botones Personalizados  CTA */
+.btn-cta-primary {
+  background: white;
+  color: var(--violet-main);
+  border: none;
+  padding: 14px 35px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.btn-cta-primary:hover {
+  background: #f8fafc;
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cta-outline {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 12px 35px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.btn-cta-outline:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  transform: translateY(-3px);
+}
+
+.opacity-90 {
+  opacity: 0.9;
+}
 
 /* responsive */
 @media (max-width: 576px) {

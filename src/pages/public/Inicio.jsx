@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Inicio.css";
 import Hero from "../../components/Hero";
 import heroVideo from "../../images/hero.mp4";
-
+import imagenProblema from "../../images/elproblema.png";
 
 //busqueda logica
 const DATA_MOCK = [
@@ -121,6 +121,7 @@ export default function Inicio() {
               </div>
             </div>
           </section>
+
           {/* SECCIÓN CÓMO FUNCIONA */}
           <section className="py-5 bg-white">
             <div className="container">
@@ -169,6 +170,50 @@ export default function Inicio() {
               </div>
             </div>
           </section>
+
+        {/* SECCION EL PROBLEMA */}
+        <section className="problem-section py-5 text-white">
+          <div className="container py-5">
+            <div className="row align-items-center g-5">
+              <div className="col-lg-6">
+                <h2 className="fw-bold mb-4 display-5">
+                  La elección incorrecta de un docente puede <span className="text-purple-light">afectar todo un ciclo</span> académico
+                </h2>
+                <p className="lead opacity-75 mb-5">
+                  Miles de estudiantes toman decisiones importantes basándose únicamente en rumores o comentarios dispersos en redes sociales. ProfeMatch transforma esa información en una experiencia centralizada, transparente y confiable.
+                </p>
+
+                {/* Mini Estadísticas */}
+                <div className="row g-4">
+                  {[
+                    { icon: "bi-graph-down-arrow", label: "Retiros de cursos", color: "#ff4757" },
+                    { icon: "bi-cash-stack", label: "Pérdida económica", color: "#ffa502" },
+                    { icon: "bi-emoji-frown", label: "Estrés académico", color: "#a78bfa" }
+                  ].map((item, i) => (
+                    <div className="col-md-4" key={i}>
+                      <div className="problem-stat-card glass-effect round-xl p-3 text-center h-100">
+                        <i className={`bi ${item.icon} mb-2 d-block`} style={{ fontSize: '1.6rem', color: item.color }}></i>
+                        <span className="small fw-bold">{item.label}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Imagen a la Derecha */}
+              <div className="col-lg-6">
+                <div className="image-wrapper position-relative">
+                  <img 
+                    src={imagenProblema} 
+                    alt="Estudiante analizando cursos" 
+                    className="img-fluid round-xl shadow-2xl border-glass"
+                  />
+                  <div className="image-glow-effect"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
           <div className="row g-4">
             {[

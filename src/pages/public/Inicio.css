@@ -114,7 +114,7 @@
 }
 
 .step-card.active {
-  position: relative; /* Para que ocupe espacio el activo */
+  position: relative; 
   opacity: 1;
   transform: translateX(0);
   pointer-events: auto;
@@ -152,6 +152,83 @@
 
 .text-violet-main {
   color: var(--violet-main);
+}
+
+/* --- SECCIÓN EL PROBLEMA --- */
+.problem-section {
+  background-color: var(--indigo-deep); 
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  z-index: 1;
+}
+
+/* Efecto de resplandor*/
+.problem-section::before {
+  content: "";
+  position: absolute;
+  top: -10%;
+  right: -5%;
+  width: 500px;
+  height: 500px;
+  background: var(--violet-main);
+  filter: blur(150px);
+  opacity: 0.15;
+  z-index: -1;
+}
+
+.problem-stat-card {
+  background: rgba(255, 255, 255, 0.05) !important; 
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s ease;
+}
+
+.problem-stat-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilos de la Imagen */
+.image-wrapper {
+  perspective: 1000px;
+}
+
+.border-glass {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.image-glow-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  background: var(--violet-main);
+  filter: blur(100px);
+  opacity: 0.2;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
+
+.image-wrapper img {
+  transition: transform 0.5s ease;
+}
+
+.image-wrapper:hover img {
+  transform: scale(1.02) rotate(0.5deg);
+}
+
+.text-purple-light {
+  color: var(--purple-light);
 }
 
 /* responsive */

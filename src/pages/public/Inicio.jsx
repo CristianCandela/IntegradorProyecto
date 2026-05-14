@@ -17,6 +17,31 @@ export default function Inicio() {
       {/* CARDS */}
       <section className="py-5">
         <div className="container mt-n5">
+          {/* Busqueda*/}
+          <section className="search-section py-5">
+            <div className="container text-center">
+              <div className="search-content mx-auto" style={{ maxWidth: "800px" }}>
+                <h2 className="fw-bold mb-3 text-indigo-deep">
+                  Encuentra al docente ideal para tu próximo ciclo
+                </h2>
+                <p className="text-muted mb-4">
+                  Busca profesores por curso, carrera o universidad y descubre experiencias reales de otros estudiantes.
+                </p>
+                
+                <div className="search-bar-container">
+                  <div className="search-glass-wrapper">
+                    <i className="bi bi-search search-icon-main"></i>
+                    <input 
+                      type="text" 
+                      className="search-input-custom" 
+                      placeholder="Buscar profesor o curso..." 
+                    />
+                    <button className="btn-search-action">Buscar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
           <div className="row g-4">
             {[
               { icon: "👥", val: "500+", label: "Profesores", color: "bg-indigo-soft" },

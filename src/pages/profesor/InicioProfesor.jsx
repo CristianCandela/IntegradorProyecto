@@ -9,13 +9,15 @@ const InicioProfesor = () => {
   });
 
   useEffect(() => {
-    // Cargar datos de localStorage para el resumen
+    // 1. Obtener datos del LocalStorage (lo que guardas en las otras vistas)
     const tutorias = JSON.parse(localStorage.getItem("tutorias")) || [];
     const evaluaciones = JSON.parse(localStorage.getItem("evaluaciones")) || [];
     
+    // 2. Calcular el promedio de notas de forma automática
     const sumaNotas = evaluaciones.reduce((acc, curr) => acc + Number(curr.nota), 0);
     const promedio = evaluaciones.length > 0 ? (sumaNotas / evaluaciones.length).toFixed(1) : 0;
 
+    // 3. Actualizar el estado del tablero
     setResumen({
       totalTutorias: tutorias.length,
       totalEvaluaciones: evaluaciones.length,
@@ -25,53 +27,57 @@ const InicioProfesor = () => {
 
   return (
     <div className="d-flex">
-      <Sidebar />
+      {/* Se mantiene el Sidebar del pull con el rol asignado */}
+      <Sidebar role="profesor" />
+      
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         <h2 className="mb-4">Bienvenido, Profesor</h2>
+        
         <div className="row">
           
-          {/* Tarjeta 1: Tutorías */}
+          {/* Tarjeta de Tutorías: Se actualiza con el total de la lista */}
           <div className="col-md-4 mb-4">
             <div className="card border-0 shadow-sm bg-primary text-white">
-              <div className="card-body">
+              <div className="card-body text-center">
                 <h5 className="card-title">Tutorías Pendientes</h5>
-                <h2 className="display-4">{resumen.totalTutorias}</h2>
-                <p className="card-text">Sesiones programadas para esta semana.</p>
+                <h1 className="display-3 fw-bold">{resumen.totalTutorias}</h1>
+                <p className="card-text">Sesiones registradas en el sistema.</p>
               </div>
             </div>
           </div>
 
-          {/* Tarjeta 2: Evaluaciones */}
+          {/* Tarjeta de Evaluaciones: Muestra cuántas notas has subido */}
           <div className="col-md-4 mb-4">
             <div className="card border-0 shadow-sm bg-success text-white">
-              <div className="card-body">
+              <div className="card-body text-center">
                 <h5 className="card-title">Evaluaciones Realizadas</h5>
-                <h2 className="display-4">{resumen.totalEvaluaciones}</h2>
-                <p className="card-text">Total de registros en el sistema.</p>
+                <h1 className="display-3 fw-bold">{resumen.totalEvaluaciones}</h1>
+                <p className="card-text">Total de estudiantes calificados.</p>
               </div>
             </div>
           </div>
 
-          {/* Tarjeta 3: Rendimiento */}
+          {/* Tarjeta de Rendimiento: Calcula el promedio real de las notas */}
           <div className="col-md-4 mb-4">
             <div className="card border-0 shadow-sm bg-warning text-dark">
-              <div className="card-body">
+              <div className="card-body text-center">
                 <h5 className="card-title">Promedio General</h5>
-                <h2 className="display-4">{resumen.promedioNotas}</h2>
-                <p className="card-text">Calificación promedio de tus cursos.</p>
+                <h1 className="display-3 fw-bold">{resumen.promedioNotas}</h1>
+                <p className="card-text">Nivel de rendimiento de tus cursos.</p>
               </div>
             </div>
           </div>
 
         </div>
 
-        <div className="mt-4 p-5 bg-white rounded shadow-sm">
-          <h4>Acceso Rápido</h4>
-          <p className="text-muted">Selecciona una opción en la barra lateral para gestionar tus clases.</p>
+        {/* Sección de accesos rápidos para navegación */}
+        <div className="mt-2 p-5 bg-white rounded shadow-sm border">
+          <h4>Panel de Control</h4>
+          <p className="text-muted">Desde aquí puedes ver un resumen rápido de tu actividad académica.</p>
           <hr />
           <div className="d-flex gap-3">
-            <button className="btn btn-outline-primary">Ver Calendario</button>
-            <button className="btn btn-outline-secondary">Generar Reporte</button>
+            <button className="btn btn-outline-primary shadow-sm">Ver Calendario Académico</button>
+            <button className="btn btn-outline-secondary shadow-sm">Descargar Reporte PDF</button>
           </div>
         </div>
       </div>

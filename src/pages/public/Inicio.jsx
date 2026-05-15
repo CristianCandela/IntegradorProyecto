@@ -55,7 +55,7 @@ export default function Inicio() {
   const estadisticasFinales = [
     { icon: "👥", val: "500+", label: "Profesores", color: "bg-indigo-soft" },
     { icon: "⭐", val: "10k+", label: "Reseñas", color: "bg-violet-soft" },
-    { icon: "📈", val: "95%", label: "Satisfacción", color: "bg-purple-soft" }
+    { icon: "📈", val: "100%", label: "Satisfacción", color: "bg-purple-soft" }
   ];
 
   useEffect(() => {

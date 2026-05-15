@@ -1,0 +1,224 @@
+/* --- SECCIÓN EL PROBLEMA (LIGHT MODE) --- */
+.problem-light-section {
+  background: linear-gradient(to bottom, #ffffff, #f8fafc);
+  overflow: hidden;
+}
+
+.problem-card-light {
+  background: #ffffff;
+  border: 2px solid rgba(53, 55, 194, 0.678);
+  box-shadow: 0 15px 35px rgba(124, 58, 237, 0.06);
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 2;
+}
+
+.problem-card-light:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 25px 45px rgba(160, 24, 172, 0.404);
+  border-color: rgba(124, 58, 237, 0.15);
+}
+
+.icon-display {
+  font-size: 3rem;
+  filter: drop-shadow(0 8px 10px rgba(124, 58, 237, 0.15));
+  transition: transform 0.4s ease;
+  display: inline-block;
+}
+
+.problem-card-light:hover .icon-display {
+  transform: scale(1.15) translateY(-5px);
+}
+
+/* Esfera de luz  */
+.gradient-sphere-light {
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60vw;
+  height: 40vw;
+  max-width: 800px;
+  max-height: 500px;
+  background: radial-gradient(circle, rgba(189, 157, 245, 0.973) 0%, transparent 60%);
+  filter: blur(60px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.leading-relaxed {
+  line-height: 1.6;
+}
+
+/* --- SECCIÓN NUESTRA MISIÓN --- */
+.mission-section {
+  background-color: var(--indigo-deep);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mission-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 40px; 
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+}
+
+.mission-light-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(201, 58, 237, 0.397) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.text-purple-light {
+  color: #a78bfa; 
+}
+
+.mission-divider {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, var(--violet-main), transparent);
+  border-radius: 2px;
+}
+
+.mission-card .lead {
+  font-size: 1.4rem;
+  line-height: 1.8;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* --- SECCIÓN DIFERENCIACIÓN --- */
+
+
+.diff-visual-container {
+  height: 450px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* tarjetas flotantes */
+.floating-info-card {
+  width: 280px;
+  border-radius: 24px;
+  border: 2px solid rgba(120, 68, 218, 0.6);
+  position: absolute;
+  z-index: 2;
+  transition: all 0.5s ease;
+}
+
+/* Animación de flotado */
+.card-1 {
+  top: 10%;
+  right: 15%;
+  animation: floatDiff 5s ease-in-out infinite;
+}
+.card-2 {
+  bottom: 15%;
+  left: 10%;
+  animation: floatDiff 6s ease-in-out infinite reverse;
+}
+
+@keyframes floatDiff {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(2deg); }
+}
+
+
+/* Iconos de las tarjetas */
+.icon-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* Reutilización del Gradiente Principal si no está definido */
+.bg-gradient-primary {
+  background: var(--gradient-primary);
+}
+
+/* --- SECCIÓN EQUIPO --- */
+.team-section {
+  background-color: #f8fafc;
+}
+
+.team-card {
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.team-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.team-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(63, 24, 172, 0.781) !important;
+}
+
+.team-card:hover::before {
+  opacity: 1;
+}
+
+.avatar-placeholder {
+  width: 55px;
+  height: 55px;
+  background: var(--gradient-primary);
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.shadow-purple-sm {
+  box-shadow: 0 5px 15px rgba(57, 28, 161, 0.945);
+}
+
+.team-info h6 {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.team-section .container {
+  position: relative;
+}
+
+.team-section::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.03) 0%, transparent 70%);
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .mission-card .lead {
+    font-size: 1.15rem;
+  }
+}

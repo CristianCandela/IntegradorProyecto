@@ -1,5 +1,5 @@
 import Sidebar from "../../components/Sidebar";
-import ProfesorCard from "../../components/ProfesorCard"; // Importamos tu componente con modal
+import ProfesorCard from "../../components/ProfesorCard";
 import { profesoresData } from "../../data/profesoresData";
 
 export default function TutoriasEstudiante() {
@@ -32,15 +32,10 @@ export default function TutoriasEstudiante() {
           </div>
         </section>
 
-        {/* Grilla de Profesores para Tutoría */}
         <section className="row g-4">
           {profesoresData.map((profe) => (
             <div key={profe.id} className="col-md-6 col-lg-4">
               
-              {/* Aquí es donde sucede la magia: 
-                  Usamos el componente ProfesorCard con la prop isTutoria={true}.
-                  Esto reemplaza todo el HTML manual y activa el MODAL del perfil.
-              */}
               <ProfesorCard 
                 profesor={profe} 
                 isTutoria={true} 

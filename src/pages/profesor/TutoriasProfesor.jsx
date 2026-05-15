@@ -11,7 +11,7 @@ const TutoriasProfesor = () => {
 
   return (
     <div className="d-flex">
-      <Sidebar />
+      <Sidebar role="profesor"/>
       <div className="container-fluid p-4">
         <h2 className="mb-4 text-primary">Próximas Tutorías</h2>
         

@@ -27,9 +27,13 @@ const InicioProfesor = () => {
 
   return (
     <div className="d-flex">
+<<<<<<< HEAD
       {/* Se mantiene el Sidebar del pull con el rol asignado */}
       <Sidebar role="profesor" />
       
+=======
+      <Sidebar role="profesor" />
+>>>>>>> fafc95a80da91cdd52138ed3bbbbc80b30438de8
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         <h2 className="mb-4">Bienvenido, Profesor</h2>
         

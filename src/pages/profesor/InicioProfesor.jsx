@@ -25,7 +25,7 @@ const InicioProfesor = () => {
 
   return (
     <div className="d-flex">
-      <Sidebar />
+      <Sidebar role="profesor" />
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         <h2 className="mb-4">Bienvenido, Profesor</h2>
         <div className="row">

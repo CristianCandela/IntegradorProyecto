@@ -19,7 +19,7 @@ const EvaluacionesProfesor = () => {
 
   return (
     <div className="d-flex">
-      <Sidebar />
+      <Sidebar role="profesor"/>
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         <h2 className="mb-4">Portal de Evaluaciones</h2>
         <p className="text-muted">Gestión de calificaciones por curso y estudiante.</p>

@@ -220,3 +220,73 @@
 .navbar-white {
   background-color: white !important;
 }
+/* --- Identidad Visual ProfeMatch --- */
+.text-indigo {
+  color: #493774 !important;
+}
+
+.bg-indigo {
+  background-color: #493774 !important;
+}
+
+.btn-outline-indigo {
+  color: #493774;
+  border-color: #493774;
+}
+
+.btn-outline-indigo:hover {
+  background-color: #493774;
+  color: white;
+}
+
+/* --- Efectos --- */
+.hover-shadow {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-shadow:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1.5rem rgba(73, 55, 116, 0.15) !important;
+}
+
+/* --- Layout Global --- */
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.dashboard-content {
+  flex: 1;
+  margin-left: 80px;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-width: 0;
+  transition: margin-left 0.3s ease;
+}
+
+/* Sidebar hover seguro */
+.sidebar-container:hover ~ .dashboard-content {
+  margin-left: 280px;
+}
+
+/* Tablet */
+@media (max-width: 992px) {
+  .dashboard-content {
+    margin-left: 80px;
+    padding: 1.5rem;
+  }
+
+  .sidebar-container:hover ~ .dashboard-content {
+    margin-left: 80px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+  .dashboard-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+}

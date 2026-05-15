@@ -247,16 +247,16 @@ body {
   gap: 15px;
   padding: 12px 18px;
   text-decoration: none;
-  color: rgba(255, 255, 255, 0.7); /* Blanco tenue */
+  color: rgba(255, 255, 255, 0.7); 
   border-radius: 12px;
   transition: all 0.3s;
 }
 
 .nav-item i { font-size: 1.3rem; }
 
-/* Item Activo: Resaltado con fondo claro y texto blanco */
+
 .nav-item.active {
-  background: rgba(255, 255, 255, 0.2); /* Efecto cristalizado */
+  background: rgba(255, 255, 255, 0.2); 
   color: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
@@ -266,6 +266,68 @@ body {
   color: white;
   transform: translateX(5px);
 }
+
+/* CTA */
+.cta-final-section {
+  width: 100%;
+  padding: 80px 0;
+  overflow: hidden;
+}
+
+.cta-gradient-card {
+  background: linear-gradient(-45deg, #282569, #581cc2, #2d31f0, #b939ec);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  border-radius: 0; 
+  width: 100vw; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.cta-blur-blob {
+  position: absolute;
+  top: -50%;
+  left: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.15);
+  filter: blur(100px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.btn-cta-primary {
+  background: white;
+  color: #581cc2;
+  border: none;
+  padding: 14px 40px;
+  border-radius: 50px;
+  font-weight: 700;
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.btn-cta-outline {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  padding: 12px 40px;
+  border-radius: 50px;
+  font-weight: 600;
+  min-width: 200px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.btn-cta-primary:hover, .btn-cta-outline:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
 
 /* Footer y Logout */
 .sidebar-footer {

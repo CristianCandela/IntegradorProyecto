@@ -2,84 +2,75 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
 
 const EvaluacionesProfesor = () => {
-  const [evaluaciones, setEvaluaciones] = useState([]);
-  // --- NUEVA INFORMACIÓN AGREGADA ---
-  const [nombre, setNombre] = useState('');
-  const [curso, setCurso] = useState('');
-  const [nota, setNota] = useState('');
+  const [resenas, setResenas] = useState([]);
 
   useEffect(() => {
-    const datosGuardados = JSON.parse(localStorage.getItem("evaluaciones")) || [];
-    setEvaluaciones(datosGuardados);
+    // Simulamos datos que vendrían de la BD de alumnos calificando al profe
+    const iniciales = [
+      { id: 1, alumno: "Ana Silva", comentario: "Excelente metodología, muy paciente.", estrellas: 5, fecha: "12/05/2026" },
+      { id: 2, alumno: "Gerson Aldair", comentario: "Buen dominio del tema, pero falta material.", estrellas: 4, fecha: "14/05/2026" },
+    ];
+    
+    const datosGuardados = JSON.parse(localStorage.getItem("resenas_profe")) || iniciales;
+    setResenas(datosGuardados);
   }, []);
 
-  const guardarEvaluacion = (e) => {
-    e.preventDefault();
-    if (!nombre || !nota) return alert("Completa los datos");
-    const nueva = { estudiante: nombre, curso: curso || "General", nota: Number(nota) };
-    const lista = [...evaluaciones, nueva];
-    setEvaluaciones(lista);
-    localStorage.setItem("evaluaciones", JSON.stringify(lista));
-    setNombre(''); setCurso(''); setNota(''); // Limpiar
-  };
-  // ---------------------------------
-
-  const eliminarEvaluacion = (index) => {
-    const nuevasEvaluaciones = evaluaciones.filter((_, i) => i !== index);
-    setEvaluaciones(nuevasEvaluaciones);
-    localStorage.setItem("evaluaciones", JSON.stringify(nuevasEvaluaciones));
-  };
+  // Función para convertir el número en estrellas visuales
+  const mostrarEstrellas = (cantidad) => "⭐".repeat(cantidad);
 
   return (
     <div className="d-flex">
       <Sidebar role="profesor" />
     
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-        <h2 className="mb-4">Portal de Evaluaciones</h2>
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="fw-bold text-dark">Mis Reseñas y Calificaciones</h2>
+          <div className="bg-white p-2 rounded shadow-sm border">
+            <span className="text-muted small">Promedio:</span>
+            <span className="ms-2 fw-bold text-primary">4.5 / 5 ⭐</span>
+          </div>
+        </div>
         
-        {/* FORMULARIO AGREGADO */}
-        <div className="card shadow-sm mb-4 border-0 p-3">
-          <form onSubmit={guardarEvaluacion} className="row g-3">
-            <div className="col-md-4"><input type="text" className="form-control" placeholder="Estudiante" value={nombre} onChange={(e)=>setNombre(e.target.value)}/></div>
-            <div className="col-md-3"><input type="text" className="form-control" placeholder="Curso" value={curso} onChange={(e)=>setCurso(e.target.value)}/></div>
-            <div className="col-md-2"><input type="number" className="form-control" placeholder="Nota" value={nota} onChange={(e)=>setNota(e.target.value)}/></div>
-            <div className="col-md-3"><button type="submit" className="btn btn-primary w-100">Guardar</button></div>
-          </form>
+        <div className="row">
+          {resenas.length > 0 ? (
+            resenas.map((res, index) => (
+              <div className="col-md-6 mb-4" key={index}>
+                <div className="card border-0 shadow-sm h-100" style={{ borderRadius: '15px' }}>
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between">
+                      <h6 className="fw-bold mb-0">{res.alumno}</h6>
+                      <small className="text-muted">{res.fecha}</small>
+                    </div>
+                    <div className="my-2 text-warning">
+                      {mostrarEstrellas(res.estrellas)}
+                    </div>
+                    <p className="card-text text-secondary italic">
+                      "{res.comentario}"
+                    </p>
+                    <div className="d-flex align-items-center">
+                      <span className={`badge ${res.estrellas >= 4 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'} px-3`}>
+                        {res.estrellas >= 4 ? 'Recomendado' : 'Neutral'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-12">
+              <div className="alert alert-light text-center border shadow-sm">
+                No tienes reseñas registradas todavía.
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="card shadow-sm border-0">
-          <div className="card-body p-0">
-            <table className="table table-hover mb-0">
-              <thead className="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Estudiante</th>
-                  <th>Curso</th>
-                  <th>Nota Final</th>
-                  <th>Estado</th>
-                  <th className="text-center">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {evaluaciones.length > 0 ? (
-                  evaluaciones.map((eva, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td className="fw-bold">{eva.estudiante}</td>
-                      <td>{eva.curso}</td>
-                      <td><span className={`badge ${eva.nota >= 12 ? 'bg-success' : 'bg-danger'}`}>{eva.nota}</span></td>
-                      <td>{eva.nota >= 12 ? 'Aprobado' : 'Desaprobado'}</td>
-                      <td className="text-center">
-                        <button className="btn btn-sm btn-outline-danger" onClick={() => eliminarEvaluacion(index)}>Eliminar</button>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr><td colSpan="6" className="text-center py-4">No hay evaluaciones registradas.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* Sección informativa para el profesor */}
+        <div className="mt-4 p-4 bg-primary text-white rounded-4 shadow">
+          <h5>💡 Tip de Reputación</h5>
+          <p className="mb-0 opacity-75">
+            Responder a las reseñas de tus alumnos mejora tu visibilidad en ProfeMatch en un 20%.
+          </p>
         </div>
       </div>
     </div>

@@ -15,15 +15,7 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 
-// Registrar los componentes necesarios de Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const InicioProfesor = () => {
   const [resumen, setResumen] = useState({
@@ -32,9 +24,34 @@ const InicioProfesor = () => {
     promedioNotas: 0
   });
 
+  const [ultimasEvaluaciones, setUltimasEvaluaciones] = useState([]);
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
   useEffect(() => {
+    // 1. IDEA 1: MOCK DATA AUTOMATIZADO (Para asegurar que la demo nunca esté en cero)
+    const datosTutoriasPreinstalados = [
+      { id: 1, curso: "Cálculo Avanzado", fecha: "2026-05-25", estado: "Pendiente" },
+      { id: 2, curso: "Física de Campos", fecha: "2026-05-28", estado: "Pendiente" },
+      { id: 3, curso: "Diseño de Sistemas Web", fecha: "2026-05-29", estado: "Pendiente" },
+      { id: 4, curso: "Arquitectura de Software", fecha: "2026-06-02", estado: "Pendiente" }
+    ];
+
+    const datosEvaluacionesPreinstaladas = [
+      { id: 1, estudiante: "Ana Maria Gomez", curso: "Física de Campos", nota: 5, fecha: "2026-05-20" },
+      { id: 2, estudiante: "Guillermo Palacios", curso: "Diseño de Sistemas Web", nota: 4, fecha: "2026-05-24" },
+      { id: 3, estudiante: "Julio Cárdenas", curso: "Arquitectura de Software", nota: 5, fecha: "2026-05-26" },
+      { id: 4, estudiante: "Celia Benavides", curso: "Cálculo Avanzado", nota: 4, fecha: "2026-05-28" }
+    ];
+
+    // Verificar e inyectar si están vacíos
+    if (!localStorage.getItem("tutorias")) {
+      localStorage.setItem("tutorias", JSON.stringify(datosTutoriasPreinstalados));
+    }
+    if (!localStorage.getItem("evaluaciones")) {
+      localStorage.setItem("evaluaciones", JSON.stringify(datosEvaluacionesPreinstaladas));
+    }
+
+    // 2. LEER DATOS ACTUALIZADOS
     const tutorias = JSON.parse(localStorage.getItem("tutorias")) || [];
     const evaluaciones = JSON.parse(localStorage.getItem("evaluaciones")) || [];
     
@@ -46,6 +63,9 @@ const InicioProfesor = () => {
       totalEvaluaciones: evaluaciones.length,
       promedioNotas: promedio
     });
+
+    // Guardar las últimas 3 evaluaciones para mostrarlas en la tabla inferior (Idea 3)
+    setUltimasEvaluaciones(evaluaciones.slice(-3).reverse());
   }, []);
 
   // CONFIGURACIÓN DE DATOS PARA EL GRÁFICO
@@ -54,12 +74,11 @@ const InicioProfesor = () => {
     datasets: [
       {
         label: 'Métricas de Rendimiento',
-        // Multiplicamos el promedio por 10 (ej: 4.5 a 45) solo para que visualmente compita en altura con los otros valores en la barra
         data: [resumen.totalTutorias, resumen.totalEvaluaciones, resumen.promedioNotas * 10],
         backgroundColor: [
-          'rgba(0, 123, 255, 0.85)',  // Azul para tutorías
-          'rgba(40, 167, 69, 0.85)',   // Verde para evaluaciones
-          'rgba(255, 193, 7, 0.85)'    // Amarillo para promedio
+          'rgba(0, 123, 255, 0.85)',
+          'rgba(40, 167, 69, 0.85)',
+          'rgba(255, 193, 7, 0.85)'
         ],
         borderRadius: 8,
         borderWidth: 0,
@@ -71,7 +90,7 @@ const InicioProfesor = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: { display: false }, // Ocultamos la leyenda superior para un diseño más limpio
+      legend: { display: false },
       tooltip: { enabled: true }
     },
     scales: {
@@ -127,7 +146,6 @@ const InicioProfesor = () => {
     }
   };
 
-  // OBJETO CON ESTILOS INTERACTIVOS (CSS HOVER EFFECT)
   const estandarCardStyle = {
     transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
     cursor: "pointer"
@@ -150,7 +168,7 @@ const InicioProfesor = () => {
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         <h2 className="mb-4 fw-bold text-dark">Bienvenido, Profesor</h2>
         
-        {/* FILA DE TARJETAS DE MÉTRICAS CON EFECTO ANIMADO */}
+        {/* TARJETAS DE MÉTRICAS */}
         <div className="row">
           <div className="col-md-4 mb-4">
             <div 
@@ -198,10 +216,10 @@ const InicioProfesor = () => {
           </div>
         </div>
 
-        {/* SECCIÓN DIVIDIDA EN COLUMNAS */}
+        {/* SECCIÓN PRINCIPAL */}
         <div className="row mt-2">
           
-          {/* COLUMNA IZQUIERDA: PANEL DE CONTROL + INTEGRACIÓN DEL GRÁFICO */}
+          {/* COLUMNA IZQUIERDA: PANEL DE CONTROL COMPLETO */}
           <div className="col-md-8 mb-4">
             <div className="card border-0 shadow-sm bg-white h-100" style={{ borderRadius: '15px' }}>
               <div className="card-body p-4 d-flex flex-column justify-content-between">
@@ -209,24 +227,52 @@ const InicioProfesor = () => {
                   <h4 className="fw-bold text-dark">Panel de Control</h4>
                   <p className="text-muted mb-3">Resumen visual y acciones rápidas de tu actividad académica.</p>
                   
-                  {/* CONTENEDOR DEL GRÁFICO DINÁMICO */}
-                  <div style={{ height: '220px', width: '100%', marginBottom: '25px' }}>
+                  {/* GRÁFICO */}
+                  <div style={{ height: '200px', width: '100%', marginBottom: '25px' }}>
                     <Bar data={datosGrafico} options={opcionesGrafico} />
                   </div>
                   
+                  {/* IDEA 3: HISTORIAL DE ÚLTIMAS EVALUACIONES REGISTRADAS */}
+                  <div className="mt-4">
+                    <h6 className="fw-bold text-dark mb-3">📋 Últimas Calificaciones Emitidas</h6>
+                    <div className="table-responsive">
+                      <table className="table table-sm table-hover border-0 align-middle mb-0" style={{ fontSize: '0.85rem' }}>
+                        <thead>
+                          <tr className="text-secondary border-bottom">
+                            <th className="pb-2 border-0">Estudiante</th>
+                            <th className="pb-2 border-0">Curso</th>
+                            <th className="pb-2 border-0 text-center">Nota</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {ultimasEvaluaciones.map((evaluacion) => (
+                            <tr key={evaluacion.id} className="border-bottom-0">
+                              <td className="py-2 text-dark fw-medium">{evaluacion.estudiante}</td>
+                              <td className="py-2 text-muted">{evaluacion.curso}</td>
+                              <td className="py-2 text-center">
+                                <span className={`badge px-2 py-1 ${evaluacion.nota >= 4 ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}`}>
+                                  {evaluacion.nota} / 5
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
                   <hr className="my-3 text-muted opacity-25" />
                 </div>
-                <div className="d-flex gap-3">
+                
+                <div className="d-flex gap-3 mt-2">
                   <button 
                     className="btn btn-outline-primary shadow-sm px-4 fw-semibold"
-                    style={{ transition: "all 0.2s" }}
                     onClick={() => setMostrarCalendario(true)}
                   >
                     Ver Calendario Académico
                   </button>
                   <button 
                     className="btn btn-outline-secondary shadow-sm px-4 fw-semibold"
-                    style={{ transition: "all 0.2s" }}
                     onClick={descargarPDF}
                   >
                     Descargar Reporte PDF
@@ -288,7 +334,7 @@ const InicioProfesor = () => {
                   <table className="table table-hover border mb-0 align-middle">
                     <thead className="table-light">
                       <tr>
-                        <th>Evento Académico</th>
+                        <th>Event Académico</th>
                         <th>Fecha</th>
                         <th>Estado</th>
                       </tr>

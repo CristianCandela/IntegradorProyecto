@@ -138,7 +138,7 @@ const EvaluacionesProfesor = () => {
         <div className="mt-4 p-4 bg-primary text-white rounded-4 shadow">
           <h5>💡 Tip de Reputación</h5>
           <p className="mb-0 opacity-75">
-            Responder a las reseñas de tus alumnos mejora tu visibilidad en ProfeMatch en un 20%.
+            Responder a las reseñas de tus alumnos mejora tu visibilidad en ProfeMatch en un 20% 😀.
           </p>
         </div>
       </div>

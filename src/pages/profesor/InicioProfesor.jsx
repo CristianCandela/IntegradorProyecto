@@ -30,7 +30,6 @@ const InicioProfesor = () => {
       {/* Se mantiene el Sidebar del pull con el rol asignado */}
       <Sidebar role="profesor" />
       
-      <Sidebar role="profesor" />
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
         <h2 className="mb-4">Bienvenido, Profesor</h2>
         

@@ -3,6 +3,7 @@
   animation: fadeIn 0.6s ease-out; 
   transition: all 0.4s ease; 
   border-radius: 24px;
+  max-width: 520px;
 }
 
 @keyframes fadeIn {
@@ -10,14 +11,13 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 
-   BOTONES PRINCIPALES*/
+/* BOTONES PRINCIPALES */
 .btn-register { 
   color: #fff !important; 
   border: none; 
   border-radius: 12px; 
   font-weight: 600; 
-  transition: 0.3s; 
+  transition: all 0.3s ease;
 }
 
 .btn-register:hover:not(:disabled) { 
@@ -31,17 +31,7 @@
   cursor: not-allowed;
 }
 
-/* Gradientes por rol*/
-.btn-estudiante-grad { 
-  background: linear-gradient(135deg, #493774 0%, #ac9cdd 100%); 
-}
-
-.btn-profesor-grad { 
-  background: linear-gradient(135deg, #1f1c64 0%, #989ae7 100%); 
-}
-
-/* 
-   SELECTOR DE ROLES */
+/* SELECTOR DE ROLES */
 .role-btn {
   border-radius: 12px;
   font-weight: 600;
@@ -52,7 +42,7 @@
 .role-btn:hover:not(.active) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: #6366f1;
+  border-color: var(--violet-main);
 }
 
 .role-btn.active {
@@ -60,8 +50,7 @@
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-/* 
-   ICONO BADGE SUPERIOR*/
+/* ICONO BADGE SUPERIOR - CORREGIDO */
 .icon-badge-mx-auto { 
   width: 56px; 
   height: 56px; 
@@ -69,34 +58,33 @@
   display: flex; 
   align-items: center; 
   justify-content: center; 
-  margin: 0 auto; 
-  font-size: 1.5rem; 
-  transition: background-color 0.4s ease; 
+  margin: 0 auto 1rem auto;
+  transition: background-color 0.4s ease;
+  position: relative;
 }
 
-/* 
-   LINKS Y HOVERS */
+.icon-badge-mx-auto i {
+  font-size: 1.8rem;
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* LINKS */
 .hover-link { 
-  color: #6366f1 !important; 
-  transition: 0.3s; 
+  color: var(--violet-main) !important; 
+  transition: all 0.3s ease; 
 }
 
 .hover-link:hover { 
-  color: #201b5e !important; 
+  color: var(--indigo-deep) !important; 
   transform: scale(1.05); 
   text-decoration: underline !important; 
 }
 
-.text-indigo { 
-  color: #4446ac; 
-}
-
-.text-violet-main {
-  color: #6366f1;
-}
-
-/* 
-   ANIMACIÓN DE CAMBIO DE ROL */
+/* ANIMACIÓN DE CAMBIO DE ROL */
 .role-swap { 
   animation: swapEffect 0.5s ease-in-out; 
 }
@@ -109,78 +97,64 @@
   }
 }
 
-/* 
-   INPUTS Y FORMULARIOS
-   */
-.form-control:focus {
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-  border-color: #6366f1;
+/* INPUTS Y FORMULARIOS */
+.registro-card .form-control:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  border-color: var(--violet-main);
 }
 
-.input-group-text {
+.registro-card .input-group-text {
   min-width: 50px;
-  color: #6366f1;
+  color: var(--violet-main);
+  background-color: #f8f9fa;
+  border: none;
 }
 
-.form-label {
-  color: #1e1b4b;
+.registro-card .form-label {
+  color: var(--indigo-deep);
   font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
 
 /* Checkbox personalizado */
-.form-check-input:checked {
-  background-color: #6366f1;
-  border-color: #6366f1;
+.registro-card .form-check-input:checked {
+  background-color: var(--violet-main);
+  border-color: var(--violet-main);
 }
 
-.form-check-input:focus {
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+.registro-card .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
 }
 
-/* 
-   BOTONES SOCIALES */
-.btn-outline-secondary {
+/* BOTONES SOCIALES */
+.registro-card .btn-outline-secondary {
   border-radius: 12px;
   font-weight: 500;
   transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
 }
 
-.btn-outline-secondary:hover {
+.registro-card .btn-outline-secondary:hover {
   background-color: #f5f3ff;
-  border-color: #6366f1;
-  color: #6366f1;
+  border-color: var(--violet-main);
+  color: var(--violet-main);
   transform: translateY(-1px);
 }
 
-/* 
-   SECCIÓN INFORMATIVA */
+/* SECCIÓN INFORMATIVA */
 .bg-light-soft {
   background-color: #f8f7ff;
 }
 
-/*
-   HERO OVERLAY (Desktop) */
-.glass-effect {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.text-purple-light {
-  color: #a78bfa;
-}
-
-/*
-   SPINNER DE CARGA */
+/* SPINNER DE CARGA */
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
   border-width: 0.15em;
 }
 
-/* 
-   RESPONSIVE */
+/* RESPONSIVE */
 @media (max-width: 991px) {
   .registro-card {
     max-width: 100%;
@@ -190,7 +164,10 @@
   .icon-badge-mx-auto {
     width: 48px;
     height: 48px;
-    font-size: 1.3rem;
+  }
+  
+  .icon-badge-mx-auto i {
+    font-size: 1.5rem;
   }
 }
 
@@ -203,23 +180,13 @@
   .btn-register {
     padding: 0.75rem;
   }
-}
-
-/* 
-   SCROLLBAR  */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #6366f1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #4446ac;
+  
+  .icon-badge-mx-auto {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .icon-badge-mx-auto i {
+    font-size: 1.3rem;
+  }
 }

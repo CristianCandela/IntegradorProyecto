@@ -1,85 +1,439 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable'; // <-- Importación directa para evitar caídas en el constructor
+
+// IMPORTACIONES PARA EL GRÁFICO ESTADÍSTICO
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
 
 const InicioProfesor = () => {
-  const [resumen, setResumen] = useState({
-    totalTutorias: 0,
-    totalEvaluaciones: 0,
-    promedioNotas: 0
+  const [finanzas, setFinanzas] = useState({
+    ingresoBruto: 0,
+    comisionPlataforma: 0,
+    ingresoNeto: 0,
+    ingresosPendientes: 0,
+    perdidasCancelacion: 0
   });
 
-  useEffect(() => {
-    // 1. Obtener datos del LocalStorage (lo que guardas en las otras vistas)
-    const tutorias = JSON.parse(localStorage.getItem("tutorias")) || [];
-    const evaluaciones = JSON.parse(localStorage.getItem("evaluaciones")) || [];
-    
-    // 2. Calcular el promedio de notas de forma automática
-    const sumaNotas = evaluaciones.reduce((acc, curr) => acc + Number(curr.nota), 0);
-    const promedio = evaluaciones.length > 0 ? (sumaNotas / evaluaciones.length).toFixed(1) : 0;
+  const [historialTransacciones, setHistorialTransacciones] = useState([]);
+  const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
-    // 3. Actualizar el estado del tablero
-    setResumen({
-      totalTutorias: tutorias.length,
-      totalEvaluaciones: evaluaciones.length,
-      promedioNotas: promedio
+  // CONFIGURACIÓN DEL INCENTIVO / BONO AUTOMATIZADO
+  const META_CLASES = 10;
+  const MONTO_BONO = 100;
+  const [totalClasesDictadas, setTotalClasesDictadas] = useState(0);
+  const [isMetaAlcanzada, setIsMetaAlcanzada] = useState(false);
+
+  useEffect(() => {
+    const TARIFA_POR_HORA = 50;
+    const COMISION_PORCENTAJE = 0.15; // 15% comisión ProfeMatch
+
+    const datosTutoriasFinanzas = [
+      { id: 1, estudiante: "Ana Maria Gomez", curso: "Física de Campos", fecha: "2026-05-20", horas: 2, estado: "Completada" },
+      { id: 2, estudiante: "Guillermo Palacios", curso: "Diseño de Sistemas Web", fecha: "2026-05-24", horas: 1.5, estado: "Completada" },
+      { id: 3, estudiante: "Julio Cárdenas", curso: "Arquitectura de Software", fecha: "2026-05-26", horas: 2, estado: "Completada" },
+      { id: 4, estudiante: "Celia Benavides", curso: "Cálculo Avanzado", fecha: "2026-05-28", horas: 2, estado: "Completada" },
+      { id: 5, estudiante: "Luis carlos Mendez Chavez", curso: "Desarrollo de software", fecha: "2026-06-12", horas: 2, estado: "Pendiente" },
+      { id: 6, estudiante: "Carlos Mendoza", curso: "Física de Campos", fecha: "2026-06-02", horas: 1, estado: "Cancelada por Estudiante" },
+      { id: 7, estudiante: "Gerson Aldair", curso: "Diseño de Sistemas Web", fecha: "2026-06-04", horas: 2, estado: "Cancelada por Profesor" }
+    ];
+
+    if (!localStorage.getItem("tutorias_financieras")) {
+      localStorage.setItem("tutorias_financieras", JSON.stringify(datosTutoriasFinanzas));
+    }
+
+    const records = JSON.parse(localStorage.getItem("tutorias_financieras")) || datosTutoriasFinanzas;
+
+    let bruto = 0;
+    let pendientes = 0;
+    let perdidas = 0;
+    let contadorCompletadas = 0;
+
+    const listaProcesada = records.map(item => {
+      const horas = Number(item.horas) || 0;
+      const pagoBruto = horas * TARIFA_POR_HORA;
+      const comision = pagoBruto * COMISION_PORCENTAJE;
+      const pagoNeto = pagoBruto - comision;
+
+      if (item.estado === "Completada") {
+        bruto += pagoBruto;
+        contadorCompletadas += 1;
+      } else if (item.estado === "Pendiente") {
+        pendientes += pagoBruto;
+      } else if (item.estado && item.estado.startsWith("Cancelada")) {
+        perdidas += pagoBruto;
+      }
+
+      return {
+        ...item,
+        horas: horas,
+        tarifa: TARIFA_POR_HORA,
+        bruto: pagoBruto,
+        comision: comision,
+        neto: pagoNeto
+      };
     });
+
+    const comisionTotal = bruto * COMISION_PORCENTAJE;
+    const netoTotal = bruto - comisionTotal;
+
+    setTotalClasesDictadas(contadorCompletadas);
+    setIsMetaAlcanzada(contadorCompletadas >= META_CLASES);
+
+    setFinanzas({
+      ingresoBruto: bruto,
+      comisionPlataforma: comisionTotal,
+      ingresoNeto: netoTotal,
+      ingresosPendientes: pendientes,
+      perdidasCancelacion: perdidas
+    });
+
+    setHistorialTransacciones(listaProcesada.slice().reverse());
   }, []);
+
+  const porcentajeProgreso = Math.min((totalClasesDictadas / META_CLASES) * 100, 100);
+  const ingresoNetoFinal = isMetaAlcanzada ? finanzas.ingresoNeto + MONTO_BONO : finanzas.ingresoNeto;
+
+  const datosBarras = {
+    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'],
+    datasets: [
+      {
+        label: 'Ingresos Netos (S/.)',
+        data: [150, 220, 180, ingresoNetoFinal > 0 ? ingresoNetoFinal : 250],
+        backgroundColor: '#3F51B5',
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const datosLineas = {
+    labels: ['Abril', 'Mayo', 'Junio (Actual)'],
+    datasets: [
+      {
+        label: 'Evolución de Ganancias (S/.)',
+        data: [280, 340, ingresoNetoFinal],
+        borderColor: '#E91E63',
+        backgroundColor: 'rgba(233, 30, 99, 0.1)',
+        tension: 0.3,
+        fill: true,
+        pointBackgroundColor: '#7B1FA2'
+      },
+    ],
+  };
+
+  const opcionesGrafico = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.03)' } },
+      x: { grid: { display: false } }
+    }
+  };
+
+  // EXPORTACIÓN CORREGIDA CON ENFOQUE FUNCIONAL DIRECTO
+  const descargarPDF = () => {
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text("ProfeMatch - Reporte de Ingresos y Contabilidad", 14, 22);
+      
+      doc.setFontSize(10);
+      doc.text(`Fecha de corte: ${new Date().toLocaleDateString()}`, 14, 30);
+      doc.text("Profesor: Juan Jose Silva N.", 14, 36);
+
+      const columnas = ["Fecha", "Estudiante", "Horas", "Bruto", "Comisión (15%)", "Neto", "Estado"];
+      
+      const registrosSeguros = JSON.parse(localStorage.getItem("tutorias_financieras")) || [];
+      
+      const filas = registrosSeguros.map(t => {
+        const h = Number(t.horas) || 0;
+        const b = h * 50;
+        const c = b * 0.15;
+        const n = b - c;
+        
+        return [
+          String(t.fecha || ""), 
+          String(t.estudiante || ""), 
+          `${h}h`, 
+          `S/. ${b.toFixed(2)}`, 
+          `S/. ${c.toFixed(2)}`, 
+          `S/. ${n.toFixed(2)}`, 
+          String(t.estado || "")
+        ];
+      });
+
+      if (totalClasesDictadas >= META_CLASES) {
+        filas.push(["-", "¡BONO EXCELENCIA CUMPLIDO!", "-", "-", "-", `S/. ${MONTO_BONO.toFixed(2)}`, "Asignado"]);
+      }
+
+      // Solución definitiva al error: Llamar a autoTable pasándole el documento como parámetro de instancia
+      autoTable(doc, {
+        startY: 44,
+        head: [columnas],
+        body: filas,
+        theme: 'striped',
+        headStyles: { fillColor: [63, 81, 181] },
+        styles: { fontSize: 9 }
+      });
+
+      doc.save(`Reporte_Financiero_ProfeMatch.pdf`);
+    } catch (error) {
+      console.error("Error en jsPDF:", error);
+      alert("Error al construir el documento PDF. Por favor, limpia la consola.");
+    }
+  };
+
+  const cardStyle = {
+    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+    borderRadius: '15px'
+  };
+
+  const handleMouseEnter = (e) => {
+    e.currentTarget.style.transform = "translateY(-4px)";
+    e.currentTarget.style.boxShadow = "0 8px 15px rgba(0,0,0,0.1)";
+  };
+
+  const handleMouseLeave = (e) => {
+    e.currentTarget.style.transform = "translateY(0)";
+    e.currentTarget.style.boxShadow = "none";
+  };
 
   return (
     <div className="d-flex">
-      {/* Se mantiene el Sidebar del pull con el rol asignado */}
       <Sidebar role="profesor" />
       
       <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
-        <h2 className="mb-4">Bienvenido, Profesor</h2>
         
-        <div className="row">
-          
-          {/* Tarjeta de Tutorías: Se actualiza con el total de la lista */}
-          <div className="col-md-4 mb-4">
-            <div className="card border-0 shadow-sm bg-primary text-white">
-              <div className="card-body text-center">
-                <h5 className="card-title">Tutorías Pendientes</h5>
-                <h1 className="display-3 fw-bold">{resumen.totalTutorias}</h1>
-                <p className="card-text">Sesiones registradas en el sistema.</p>
-              </div>
-            </div>
+        {/* ENCABEZADO */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 className="fw-bold mb-1" style={{ color: '#3F51B5' }}>Dashboard Financiero</h2>
+            <p className="text-muted small mb-0">Monitorea tus ingresos reales, comisiones y costos de oportunidad de tu negocio educativo.</p>
           </div>
-
-          {/* Tarjeta de Evaluaciones: Muestra cuántas notas has subido */}
-          <div className="col-md-4 mb-4">
-            <div className="card border-0 shadow-sm bg-success text-white">
-              <div className="card-body text-center">
-                <h5 className="card-title">Evaluaciones Realizadas</h5>
-                <h1 className="display-3 fw-bold">{resumen.totalEvaluaciones}</h1>
-                <p className="card-text">Total de estudiantes calificados.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tarjeta de Rendimiento: Calcula el promedio real de las notas */}
-          <div className="col-md-4 mb-4">
-            <div className="card border-0 shadow-sm bg-warning text-dark">
-              <div className="card-body text-center">
-                <h5 className="card-title">Promedio General</h5>
-                <h1 className="display-3 fw-bold">{resumen.promedioNotas}</h1>
-                <p className="card-text">Nivel de rendimiento de tus cursos.</p>
-              </div>
-            </div>
-          </div>
-
+          <button className="btn text-white fw-semibold shadow-sm px-4" style={{ backgroundColor: '#7B1FA2' }} onClick={descargarPDF}>
+            🖨️ Exportar Balance Financiero
+          </button>
         </div>
 
-        {/* Sección de accesos rápidos para navegación */}
-        <div className="mt-2 p-5 bg-white rounded shadow-sm border">
-          <h4>Panel de Control</h4>
-          <p className="text-muted">Desde aquí puedes ver un resumen rápido de tu actividad académica.</p>
-          <hr />
-          <div className="d-flex gap-3">
-            <button className="btn btn-outline-primary shadow-sm">Ver Calendario Académico</button>
-            <button className="btn btn-outline-secondary shadow-sm">Descargar Reporte PDF</button>
+        {/* METAS DE INCENTIVOS */}
+        <div className="card border-0 shadow-sm mb-4 p-4" style={{ borderRadius: '15px', backgroundColor: '#ffffff' }}>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <h5 className="fw-bold m-0 text-dark">🎯 Meta de Incentivo Mensual</h5>
+              <p className="text-muted small m-0">Dicta {META_CLASES} clases completas en el ciclo y recibe un bono de excelencia docente.</p>
+            </div>
+            <span className={`badge px-3 py-2 fs-6 fw-bold ${isMetaAlcanzada ? 'bg-success text-white' : 'bg-warning text-dark'}`}>
+              {isMetaAlcanzada ? '¡Bono Activado! 🎉' : 'En Progreso ⏳'}
+            </span>
+          </div>
+
+          <div className="row align-items-center my-3">
+            <div className="col-md-9">
+              <div className="progress" style={{ height: '22px', borderRadius: '12px', backgroundColor: '#E0E0E0' }}>
+                <div 
+                  className="progress-bar progress-bar-striped progress-bar-animated bg-success" 
+                  role="progressbar" 
+                  style={{ width: `${porcentajeProgreso}%`, borderRadius: '12px', fontSize: '0.85rem', fontWeight: 'bold' }}
+                >
+                  {Math.round(porcentajeProgreso)}%
+                </div>
+              </div>
+            </div>
+            <div className="col-md-3 text-end">
+              <span className="fw-bold fs-5 text-dark">{totalClasesDictadas}</span> 
+              <span className="text-muted"> / {META_CLASES} Clases</span>
+            </div>
+          </div>
+
+          <div className="p-2 px-3 bg-light rounded d-flex justify-content-between align-items-center" style={{ fontSize: '0.85rem' }}>
+            <span className="text-secondary fw-semibold">📌 Recompensa extra acumulada por cumplimiento de pauta:</span>
+            <span className="fw-bold text-success fs-6">+ S/. {MONTO_BONO.toFixed(2)}</span>
           </div>
         </div>
+
+        {/* ANALISIS COSTO DE OPORTUNIDAD */}
+        <div className="alert border-0 text-white p-3 mb-4 d-flex justify-content-between align-items-center shadow-sm" style={{ backgroundColor: '#D32F2F', borderRadius: '12px' }}>
+          <div className="d-flex align-items-center gap-2">
+            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+            <div>
+              <strong className="d-block">Análisis del Costo de Oportunidad</strong>
+              <span className="small opacity-90">Podrías haber ganado S/. {(ingresoNetoFinal + finanzas.perdidasCancelacion).toFixed(2)} este mes si hubieras completado todas tus tutorías publicadas.</span>
+            </div>
+          </div>
+          <span className="fw-bold px-3 py-1 rounded bg-white text-danger shadow-sm">S/. {finanzas.perdidasCancelacion.toFixed(2)} perdidos</span>
+        </div>
+
+        {/* CARDS KPIs */}
+        <div className="row mb-2">
+          <div className="col-md-3 mb-4">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-success border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Ingreso Neto (+ Bono)</span>
+                <h3 className="fw-bold text-success mb-1">S/. {ingresoNetoFinal.toFixed(2)}</h3>
+                <small className="text-muted d-block mt-2">Clases: S/. {finanzas.ingresoNeto.toFixed(2)}</small>
+                <small className="text-success-subtle bg-success px-2 py-0.5 rounded text-white" style={{ fontSize: '0.7rem' }}>Bono incluido: {isMetaAlcanzada ? "SÍ" : "NO"}</small>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3 mb-4">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-danger border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Cancelaciones (Rojo)</span>
+                <h3 className="fw-bold text-danger mb-1">S/. {finanzas.perdidasCancelacion.toFixed(2)}</h3>
+                <small className="text-muted d-block mt-2">Comisión ProfeMatch: 15%</small>
+                <span className="badge bg-danger-subtle text-danger px-2 py-1" style={{ fontSize: '0.7rem' }}>Métrica Crítica</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3 mb-4">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-primary border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Proyección Próxima</span>
+                <h3 className="fw-bold text-primary mb-1">S/. {finanzas.ingresosPendientes.toFixed(2)}</h3>
+                <small className="text-muted d-block mt-2">Basado en reservas pendientes</small>
+                <span className="badge bg-primary-subtle text-primary px-2 py-1" style={{ fontSize: '0.7rem' }}>Pago estimado: 30/06</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3 mb-4">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-warning border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Ranking Rentabilidad</span>
+                <h3 className="fw-bold mb-1" style={{ color: '#D4AF37' }}>Top 30%</h3>
+                <small className="text-muted d-block mt-2">Área de Ciencias Exactas</small>
+                <span className="badge px-2 py-1" style={{ backgroundColor: 'rgba(212, 175, 55, 0.1)', color: '#D4AF37' }}>Desempeño Dorado</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* GRAFICOS */}
+        <div className="row mb-4">
+          <div className="col-md-6 mb-3">
+            <div className="card border-0 shadow-sm bg-white p-4" style={{ borderRadius: '15px' }}>
+              <h6 className="fw-bold text-dark mb-3">📊 Ingresos Semanales (Mes Actual)</h6>
+              <div style={{ height: '220px' }}>
+                <Bar data={datosBarras} options={opcionesGrafico} />
+              </div>
+            </div>
+          </div>
+          <div className="col-md-6 mb-3">
+            <div className="card border-0 shadow-sm bg-white p-4" style={{ borderRadius: '15px' }}>
+              <h6 className="fw-bold text-dark mb-3">📈 Tendencia de Ingresos (Últimos 3 Meses)</h6>
+              <div style={{ height: '220px' }}>
+                <Line data={datosLineas} options={opcionesGrafico} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* HISTORIAL DETALLADO */}
+        <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: '15px' }}>
+          <div className="card-body p-4">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="fw-bold text-dark mb-0">📋 Historial de Transacciones Contables</h5>
+              <button className="btn btn-sm btn-outline-secondary px-3" onClick={() => setMostrarCalendario(true)}>
+                📅 Ver Calendario de Cobros
+              </button>
+            </div>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.85rem' }}>
+                <thead className="table-light text-secondary">
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Estudiante</th>
+                    <th>Materia</th>
+                    <th>Horas</th>
+                    <th>Tarifa/h</th>
+                    <th>Comisión (15%)</th>
+                    <th>Neto Docente</th>
+                    <th className="text-center">Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historialTransacciones.map((t) => (
+                    <tr key={t.id}>
+                      <td className="py-2 text-muted fw-medium">{t.fecha}</td>
+                      <td className="py-2 text-dark fw-bold">{t.estudiante}</td>
+                      <td className="py-2 text-muted">{t.curso}</td>
+                      <td className="py-2 text-dark">{t.horas} hrs</td>
+                      <td className="py-2 text-muted">S/. {t.tarifa.toFixed(2)}</td>
+                      <td className="py-2 text-danger">- S/. {t.comision.toFixed(2)}</td>
+                      <td className="py-2 text-success fw-bold">S/. {t.neto.toFixed(2)}</td>
+                      <td className="py-2 text-center">
+                        <span className={`badge px-2 py-1 rounded ${
+                          t.estado === "Completada" ? "bg-success-subtle text-success" :
+                          t.estado === "Pendiente" ? "bg-primary-subtle text-primary" :
+                          "bg-danger-subtle text-danger"
+                        }`}>
+                          {t.estado}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* MODAL CALENDARIO */}
+        {mostrarCalendario && (
+          <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
+                <div className="modal-header text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px', backgroundColor: '#7B1FA2' }}>
+                  <h5 className="modal-title fw-bold">📅 Calendario Académico de Estados</h5>
+                  <button type="button" className="btn-close btn-close-white" onClick={() => setMostrarCalendario(false)}></button>
+                </div>
+                <div className="modal-body p-4">
+                  <table className="table table-hover border mb-0 align-middle">
+                    <thead className="table-light">
+                      <tr>
+                        <th>Estado Control</th>
+                        <th>Color Muestra</th>
+                        <th>Significado Financiero</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="fw-medium">Confirmada / Dictada</td>
+                        <td><span className="badge px-3 py-1 bg-success text-white">Verde</span></td>
+                        <td>Tutoría completada con éxito. Liquidación liberada.</td>
+                      </tr>
+                      <tr>
+                        <td className="fw-medium">Pendiente de Confirmación</td>
+                        <td><span className="badge px-3 py-1 bg-warning text-dark">Amarillo</span></td>
+                        <td>Horas reservadas. Ingreso proyectado en espera.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="modal-footer border-0">
+                  <button className="btn btn-secondary px-4" onClick={() => setMostrarCalendario(false)}>Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

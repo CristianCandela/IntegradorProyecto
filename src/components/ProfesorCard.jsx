@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false }) {
   
   const [showModal, setShowModal] = useState(false);
+  const [esPremium, setEsPremium] = useState(false);
 
   const {
     nombre,
@@ -17,9 +18,38 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
     metodologia   
   } = profesor;
 
+  // REQUISITO: Verificar si este profesor tiene el Plan Premium activo para destacarlo
+  useEffect(() => {
+    // Si es tu propio perfil simulado o si añadimos la propiedad en la base de datos
+    const planGuardado = localStorage.getItem("plan_profesor") || "Freemium";
+    
+    // Para la demo, si el nombre coincide con el tuyo o si el objeto ya viene marcado como destacado
+    if (planGuardado === "Premium" && (nombre.includes("Juan Jose") || profesor.isPremium)) {
+      setEsPremium(true);
+    }
+  }, [nombre, profesor]);
+
   return (
     <>
-      <div className="card h-100 border-0 rounded-4 overflow-hidden shadow-sm hover-shadow">
+      <div 
+        className={`card h-100 border-0 rounded-4 overflow-hidden shadow-sm hover-shadow position-relative ${
+          esPremium ? "border border-2" : ""
+        }`}
+        style={{ 
+          borderColor: esPremium ? "#7B1FA2" : "transparent",
+          boxShadow: esPremium ? "0 8px 20px rgba(123, 31, 162, 0.15)" : ""
+        }}
+      >
+        {/* INSIGNIA DE PERFIL DESTACADO PARA PLAN PREMIUM */}
+        {esPremium && (
+          <span 
+            className="position-absolute top-0 end-0 m-3 badge rounded-pill text-white shadow-sm d-flex align-items-center gap-1 px-3 py-2"
+            style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)", zIndex: 10, fontSize: "0.7rem" }}
+          >
+            <i className="bi bi-patch-check-fill"></i> Destacado
+          </span>
+        )}
+
         <div className="card-body p-4 d-flex flex-column text-center">
           
           {isTutoria ? (
@@ -41,7 +71,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               </div>
               <div className="mb-3 text-start">
                 <span className="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-3">
-                  ${precioHora}/hora
+                  S/. {precioHora}/hora
                 </span>
               </div>
               <p className="text-muted small mb-3 text-start" style={{ display: "-webkit-box", WebkitLineClamp: "2", WebkitBoxOrient: "vertical", overflow: "hidden" }}>
@@ -51,15 +81,16 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
           ) : (
             <>
               {/* Foto */}
-              <div className="mb-3">
+              <div className="mb-3 position-relative d-inline-block mx-auto">
                 <img
                   src={foto}
                   alt={nombre}
-                  className="rounded-circle shadow-sm border border-3 border-white mx-auto"
+                  className="rounded-circle shadow-sm border border-3 mx-auto"
                   style={{
                     width: "100px",
                     height: "100px",
-                    objectFit: "cover"
+                    objectFit: "cover",
+                    borderColor: esPremium ? "#7B1FA2" : "white"
                   }}
                 />
               </div>
@@ -117,7 +148,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                     className="badge text-bg-success w-100 p-2 rounded-3"
                     style={{ fontSize: "0.95rem" }}
                   >
-                    ${precioHora}/hora
+                    S/. {precioHora}/hora
                   </span>
                 </div>
               )}
@@ -136,7 +167,9 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
             <button
               className="btn btn-sm rounded-pill fw-bold py-2 text-white border-0"
               style={{
-                background: "linear-gradient(135deg, #493774 0%, #6b51a3 100%)"
+                background: esPremium 
+                  ? "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)" 
+                  : "linear-gradient(135deg, #493774 0%, #6b51a3 100%)"
               }}
             >
               Solicitar
@@ -165,10 +198,17 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               <img 
                 src={foto} 
                 className="rounded-circle shadow mb-3 mx-auto" 
-                style={{ width: "110px", height: "110px", objectFit: "cover", border: "4px solid white" }} 
+                style={{ 
+                  width: "110px", 
+                  height: "110px", 
+                  objectFit: "cover", 
+                  border: esPremium ? "4px solid #7B1FA2" : "4px solid white" 
+                }} 
                 alt={nombre} 
               />
-              <h4 className="fw-bold text-dark mb-0">{nombre}</h4>
+              <h4 className="fw-bold text-dark mb-0">
+                {nombre} {esPremium && "⭐"}
+              </h4>
               <p className="text-indigo fw-bold small mb-0">{departamento}</p>
             </div>
 
@@ -199,7 +239,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 </div>
                 <div className="col-4">
                   <div className="p-2 bg-light rounded-3">
-                    <span className="d-block fw-bold text-success">${precioHora}</span>
+                    <span className="d-block fw-bold text-success">S/. {precioHora}</span>
                     <small className="text-muted" style={{fontSize: '0.6rem'}}>PRECIO/H</small>
                   </div>
                 </div>
@@ -216,7 +256,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               </button>
               <button 
                 className="btn btn-primary rounded-pill w-100 fw-bold border-0" 
-                style={{ background: "#493774" }}
+                style={{ background: esPremium ? "#7B1FA2" : "#493774" }}
               >
                 Solicitar Tutoría
               </button>

@@ -6,13 +6,13 @@ export default function Sidebar({ role }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false);
   
-  // SIMULACIÓN DE NOTIFICACIONES REQUERIDAS POR EL CLIENTE
+  // SIMULACIÓN DE NOTIFICACIONES
   const [notificaciones, setNotificaciones] = useState([
     { id: 1, mensaje: "Tu tutoría con Luis Carlos ha sido confirmada.", leida: false },
     { id: 2, mensaje: "Alerta: El estudiante Carlos Mendoza canceló la tutoría de hoy.", leida: false }
   ]);
 
-  // SCORE DE CONFIABILIDAD INICIAL (Requerimiento del cliente de 0 a 100)
+  // SCORE DE CONFIABILIDAD
   const [scoreConfiabilidad, setScoreConfiabilidad] = useState(() => {
     return Number(localStorage.getItem("score_profesor")) || 100;
   });
@@ -30,8 +30,8 @@ export default function Sidebar({ role }) {
 
   const menuConfig = {
     admin: {
-      // AQUÍ ESTÁ EL CAMBIO: Color Índigo corporativo
-      color: "#3F51B5", 
+      // DEGRADADO CORPORATIVO: Índigo base a Índigo Oscuro (#1F0954)
+      color: "linear-gradient(180deg, #3F51B5 0%, #1F0954 100%)", 
       items: [
         { name: "Dashboard", icon: "bi-speedometer2", path: "/inicio-admin" },
         { name: "Usuarios", icon: "bi-people", path: "/usuarios-admin" },
@@ -39,7 +39,7 @@ export default function Sidebar({ role }) {
       ]
     },
     profesor: {
-      // Degradado de ángulo suavizado entre Índigo (#3F51B5) y Fúxia Medio (#7B1FA2)
+      // Degradado Profesor: Índigo a Morado
       color: "linear-gradient(180deg, #3F51B5 0%, #7B1FA2 100%)",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
@@ -58,14 +58,13 @@ export default function Sidebar({ role }) {
     }
   };
 
-  const config = menuConfig[role] || menuConfig["estudiante"]; // Failsafe por si llega vacío
+  const config = menuConfig[role] || menuConfig["estudiante"];
 
-  // LÓGICA DE COLOR PARA EL SCORE DE CONFIABILIDAD
   const obtenerColorScore = (score) => {
-    if (score >= 90) return "#28a745"; // Verde (Excelente)
-    if (score >= 70) return "#ffc107"; // Amarillo (Bueno)
-    if (score >= 50) return "#fd7e14"; // Naranja (Regular)
-    return "#dc3545"; // Rojo (Bajo)
+    if (score >= 90) return "#28a745"; // Verde
+    if (score >= 70) return "#ffc107"; // Amarillo
+    if (score >= 50) return "#fd7e14"; // Naranja
+    return "#dc3545"; // Rojo
   };
 
   const handleLogout = () => {
@@ -74,7 +73,8 @@ export default function Sidebar({ role }) {
       text: "Tendrás que volver a ingresar para acceder a tu panel.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: role === 'profesor' ? '#3F51B5' : config.color,
+      // Usar el índigo oscuro como color principal en las alertas del admin
+      confirmButtonColor: role === 'admin' ? '#1F0954' : config.color,
       cancelButtonColor: "#d33",
       confirmButtonText: "Sí, salir",
       cancelButtonText: "Cancelar"
@@ -95,7 +95,7 @@ export default function Sidebar({ role }) {
   return (
     <div 
       className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}
-      style={{ background: config.color }} 
+      style={{ background: config.color, minHeight: '100vh', transition: 'width 0.3s ease' }} 
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => {
         setIsExpanded(false);
@@ -103,14 +103,14 @@ export default function Sidebar({ role }) {
       }}
     >
       {/* HEADER DE MARCA */}
-      <div className="sidebar-header d-flex align-items-center justify-content-between px-3 w-100">
+      <div className="sidebar-header d-flex align-items-center justify-content-between px-3 w-100 py-3">
         <div className="d-flex align-items-center">
           <img src="/minilogo.png" alt="Logo" className="logo-img" style={{ width: '30px' }} />
           {isExpanded && <span className="logo-text ms-2 fw-bold text-white">ProfeMatch</span>}
         </div>
       </div>
 
-      {/* SISTEMA DE NOTIFICACIONES (CAMPANA CON BADGE) */}
+      {/* SISTEMA DE NOTIFICACIONES */}
       <div className="px-3 py-2 position-relative w-100">
         <button 
           className="btn btn-link text-white p-0 d-flex align-items-center gap-2 style-none text-decoration-none"
@@ -128,7 +128,6 @@ export default function Sidebar({ role }) {
           {isExpanded && <span className="small text-white">Notificaciones</span>}
         </button>
 
-        {/* DROPDOWN DE ALERTAS */}
         {mostrarNotificaciones && (
           <div className="position-absolute bg-white rounded shadow p-2 mt-2" style={{ width: '240px', zIndex: 1100, left: '15px', border: '1px solid #ddd' }}>
             <h6 className="fw-bold text-dark px-2 pt-1 border-bottom pb-1 mb-1" style={{ fontSize: '0.8rem' }}>Alertas Recientes</h6>
@@ -159,6 +158,7 @@ export default function Sidebar({ role }) {
             key={item.name} 
             to={item.path} 
             className={`nav-item d-flex align-items-center px-3 py-2 my-1 text-white text-decoration-none ${location.pathname === item.path ? "active bg-white bg-opacity-25 rounded" : ""}`}
+            style={{ transition: 'background-color 0.2s' }}
           >
             <i className={`bi ${item.icon} fs-5 me-3`}></i>
             {isExpanded && <span className="nav-text small">{item.name}</span>}
@@ -166,7 +166,7 @@ export default function Sidebar({ role }) {
         ))}
       </nav>
 
-      {/* WIDGET DEL SCORE DE CONFIABILIDAD CORPORATIVO */}
+      {/* WIDGET DEL SCORE DE CONFIABILIDAD */}
       <div className="w-100 px-3 mt-auto mb-2">
         <div className="p-2 rounded bg-white bg-opacity-10 text-white" style={{ fontSize: '0.8rem' }}>
           <div className="d-flex justify-content-between align-items-center mb-1">
@@ -177,7 +177,7 @@ export default function Sidebar({ role }) {
             </span>
           </div>
           {isExpanded && (
-            <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
+            <div className="progress mt-2" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
               <div 
                 className="progress-bar" 
                 style={{ 
@@ -191,7 +191,7 @@ export default function Sidebar({ role }) {
       </div>
 
       {/* FOOTER - CERRAR SESIÓN */}
-      <div className="sidebar-footer w-100">
+      <div className="sidebar-footer w-100 mt-2">
         <button onClick={handleLogout} className="nav-item logout-btn btn btn-link text-white text-decoration-none d-flex align-items-center px-3 py-2 w-100 style-none" style={{ border: 'none', background: 'none' }}>
           <i className="bi bi-box-arrow-left fs-5 me-3"></i>
           {isExpanded && <span className="nav-text small">Cerrar Sesión</span>}

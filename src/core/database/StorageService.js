@@ -183,5 +183,15 @@ export const StorageService = {
       notifications[index].read = true;
       localStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(notifications));
     }
+  },
+
+  updateProfessorScore: (profesorId, pointChange) => {
+    const profesores = StorageService.getProfessors();
+    const index = profesores.findIndex(p => p.id === profesorId);
+    if (index !== -1) {
+      const currentScore = profesores[index].scoreConfiabilidad !== undefined ? profesores[index].scoreConfiabilidad : 100;
+      profesores[index].scoreConfiabilidad = Math.max(0, currentScore + pointChange);
+      localStorage.setItem(KEYS.PROFESSORS, JSON.stringify(profesores));
+    }
   }
 };

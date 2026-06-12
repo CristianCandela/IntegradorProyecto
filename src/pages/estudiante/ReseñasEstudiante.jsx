@@ -1,72 +1,119 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
-import { profesoresData } from "../../data/profesoresData";
+import { StorageService } from "../../core/database/StorageService";
 
 export default function ReseñasEstudiante() {
-  const [misReseñas, setMisReseñas] = useState([
-    { id: 1, profesorId: 3, comentario: "Excelente explicando temas complejos.", rating: 5, fecha: "12 May 2026", materia: "Cálculo I" },
-    { id: 2, profesorId: 1, comentario: "Muy buen profesor, domina los temas a la perfección.", rating: 4, fecha: "05 May 2026", materia: "Programación Web" },
-    { id: 3, profesorId: 7, comentario: "La clase es interesante pero de dificultad muy alta.", rating: 4, fecha: "28 Abr 2026", materia: "Anatomía Humana" }
-  ]);
-
-  const [showModal, setShowModal] = useState(false);
+  const [misReseñas, setMisReseñas] = useState([]);
+  const [tutoriasCompletadas, setTutoriasCompletadas] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const [editData, setEditData] = useState({
-    id: null,
-    profesorId: null,
-    comentario: "",
-    rating: 0,
-    materia: ""
+  // Form State
+  const [selectedTutoria, setSelectedTutoria] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [categorias, setCategorias] = useState({
+    puntualidad: 0,
+    claridad: 0,
+    dominio: 0,
+    profesionalismo: 0
   });
+  const [comentario, setComentario] = useState("");
+  const [recomendaria, setRecomendaria] = useState(true);
+  const [quejaFormal, setQuejaFormal] = useState(false);
+  const [motivoQueja, setMotivoQueja] = useState("");
 
-  const handleEditar = (res) => {
-    setEditData(res);
-    setShowModal(true);
+  useEffect(() => {
+    cargarDatos();
+  }, []);
+
+  const cargarDatos = () => {
+    const reviews = StorageService.getReviews();
+    setMisReseñas(reviews);
+
+    // Cargar tutorias completadas para que el usuario pueda evaluarlas
+    const sesiones = StorageService.getTutoringSessions();
+    const completadas = sesiones.filter(s => s.estado === "Completada");
+
+    // Filtrar las que ya tienen reseña
+    const pendientes = completadas.filter(comp => !reviews.some(r => r.tutoriaId === comp.id));
+    setTutoriasCompletadas(pendientes);
+
+    // Mostrar modal automáticamente si hay una recién completada
+    // Simulación: Si hay al menos una pendiente, sugerimos valorarla.
+    if (pendientes.length > 0 && reviews.length === 0) {
+      // setShowAddModal(true); // Opcional: auto-abrir si es la primera vez
+    }
   };
 
-  const nuevaReseña = (profe) => {
-    setEditData({
-      id: Date.now(),
-      profesorId: profe.id,
-      comentario: "",
-      rating: 0,
-      materia: profe.curso
-    });
+  const handleAbrirModal = (tutoria = null) => {
+    setSelectedTutoria(tutoria);
+    setRating(0);
+    setCategorias({ puntualidad: 0, claridad: 0, dominio: 0, profesionalismo: 0 });
+    setComentario("");
+    setRecomendaria(true);
+    setQuejaFormal(false);
+    setMotivoQueja("");
+    setShowAddModal(true);
+  };
+
+  const guardarReseña = (e) => {
+    e.preventDefault();
+    if (!selectedTutoria) {
+      alert("Por favor selecciona una tutoría para evaluar.");
+      return;
+    }
+    if (rating === 0) {
+      alert("Por favor asigna una calificación general.");
+      return;
+    }
+    if (comentario.trim().length < 20) {
+      alert("El comentario debe tener al menos 20 caracteres.");
+      return;
+    }
+    if (quejaFormal && motivoQueja.trim().length < 10) {
+      alert("Por favor describe el motivo de tu queja formal.");
+      return;
+    }
+
+    const nuevaReseña = {
+      tutoriaId: selectedTutoria.id,
+      profesorId: selectedTutoria.profesorId,
+      profesorNombre: selectedTutoria.profesorNombre,
+      foto: selectedTutoria.foto,
+      materia: selectedTutoria.curso,
+      rating,
+      categorias,
+      comentario,
+      recomendaria,
+      quejaFormal,
+      motivoQueja,
+      fecha: new Date().toLocaleDateString()
+    };
+
+    StorageService.saveReview(nuevaReseña);
+
+    if (quejaFormal) {
+      StorageService.updateProfessorScore(selectedTutoria.profesorId, -20);
+      alert("La reseña y la queja formal han sido registradas. El docente será notificado.");
+    }
 
     setShowAddModal(false);
-    setShowModal(true);
+    cargarDatos();
   };
 
-  const guardarCambios = () => {
-    const existe = misReseñas.some(r => r.id === editData.id);
-
-    if (existe) {
-      setMisReseñas(prev =>
-        prev.map(r =>
-          r.id === editData.id
-            ? { ...r, comentario: editData.comentario, rating: editData.rating }
-            : r
-        )
-      );
-    } else {
-      setMisReseñas(prev => [
-        {
-          ...editData,
-          fecha: "Hoy"
-        },
-        ...prev
-      ]);
-    }
-
-    setShowModal(false);
+  const renderStars = (currentRating, onClickHandler) => {
+    return [...Array(5)].map((_, i) => (
+      <i
+        key={i}
+        className={`bi ${i < currentRating ? "bi-star-fill text-warning" : "bi-star text-secondary"} me-1`}
+        style={{ cursor: onClickHandler ? "pointer" : "default" }}
+        onClick={() => onClickHandler && onClickHandler(i + 1)}
+      ></i>
+    ));
   };
 
-  const handleEliminar = (id) => {
-    if (window.confirm("¿Seguro que quieres eliminar esta reseña?")) {
-      setMisReseñas(prev => prev.filter(r => r.id !== id));
-    }
-  };
+  const promedioCalculado = misReseñas.length
+    ? (misReseñas.reduce((acc, r) => acc + r.rating, 0) / misReseñas.length).toFixed(1)
+    : 0;
 
   return (
     <div className="main-layout">
@@ -74,221 +121,201 @@ export default function ReseñasEstudiante() {
 
       <main className="dashboard-content">
         <header className="mb-5">
-          <h2 className="fw-bold text-indigo mb-1">Mis Reseñas</h2>
-          <p className="text-muted">Gestiona y mejora tus opiniones compartidas.</p>
+          <h2 className="fw-bold text-indigo mb-1">Mis Valoraciones</h2>
+          <p className="text-muted">Evalúa a tus profesores y ayuda a la comunidad de ProfeMatch.</p>
         </header>
 
         {/* Stats */}
         <section className="row g-4 mb-5">
           <div className="col-md-4">
             <div className="card border-0 shadow-sm p-4 rounded-4 bg-white text-center">
-              <small className="text-muted fw-bold text-uppercase">Total</small>
+              <small className="text-muted fw-bold text-uppercase">Reseñas Emitidas</small>
               <h2 className="fw-bold text-indigo mb-0">{misReseñas.length}</h2>
             </div>
           </div>
 
           <div className="col-md-4">
             <div className="card border-0 shadow-sm p-4 rounded-4 bg-white text-center border-start border-4 border-warning">
-              <small className="text-muted fw-bold text-uppercase">Promedio</small>
+              <small className="text-muted fw-bold text-uppercase">Calificación Promedio Dada</small>
               <h2 className="fw-bold text-warning mb-0">
-                4.3 <i className="bi bi-star-fill"></i>
+                {promedioCalculado} <i className="bi bi-star-fill"></i>
               </h2>
             </div>
           </div>
 
           <div className="col-md-4">
-            <div className="card border-0 shadow-sm p-4 rounded-4 bg-white text-center border-start border-4 border-success">
-              <small className="text-muted fw-bold text-uppercase">Puntos</small>
-              <h2 className="fw-bold text-success mb-0">+150</h2>
+            <div className="card border-0 shadow-sm p-4 rounded-4 bg-white text-center border-start border-4 border-danger">
+              <small className="text-muted fw-bold text-uppercase">Quejas Formales</small>
+              <h2 className="fw-bold text-danger mb-0">
+                {misReseñas.filter(r => r.quejaFormal).length}
+              </h2>
             </div>
           </div>
         </section>
 
         {/* BOTON NUEVO */}
-        <div className="d-flex justify-content-end mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h5 className="fw-bold mb-0">Historial de Valoraciones</h5>
           <button
-            className="btn text-white rounded-pill px-4 border-0"
+            className="btn text-white rounded-pill px-4 border-0 shadow-sm fw-bold"
             style={{ background: "linear-gradient(135deg,#493774,#6b51a3)" }}
-            onClick={() => setShowAddModal(true)}
+            onClick={() => handleAbrirModal()}
           >
-            <i className="bi bi-plus-lg me-2"></i>
-            Añadir Reseña
+            <i className="bi bi-star-half me-2"></i>
+            Valorar Tutoría
           </button>
         </div>
 
         {/* Lista */}
-        <div className="d-flex flex-column gap-4">
-          {misReseñas.map(res => {
-            const profe = profesoresData.find(p => p.id === res.profesorId);
-
-            return (
-              <div key={res.id} className="card border-0 shadow-sm rounded-4 bg-white p-4 hover-shadow">
-                <div className="row align-items-center">
-
+        {misReseñas.length === 0 ? (
+          <div className="text-center py-5 bg-light rounded-4">
+            <i className="bi bi-chat-square-quote fs-1 text-muted mb-3 d-block"></i>
+            <h5 className="text-muted">Aún no has escrito ninguna reseña.</h5>
+            <p className="small text-muted">Las reseñas que dejes aparecerán aquí.</p>
+          </div>
+        ) : (
+          <div className="d-flex flex-column gap-4">
+            {misReseñas.map(res => (
+              <div key={res.id} className="card border-0 shadow-sm rounded-4 bg-white p-4">
+                <div className="row">
                   <div className="col-md-3 border-end d-flex align-items-center gap-3">
-                    <img
-                      src={profe?.foto}
-                      className="rounded-circle shadow-sm"
-                      width="55"
-                      height="55"
-                      style={{ objectFit:'cover' }}
-                      alt=""
-                    />
-
+                    <img src={res.foto} className="rounded-circle shadow-sm" width="55" height="55" style={{ objectFit: 'cover' }} alt="" />
                     <div>
-                      <h6 className="mb-0 fw-bold">{profe?.nombre}</h6>
+                      <h6 className="mb-0 fw-bold">{res.profesorNombre}</h6>
                       <small className="text-primary fw-bold">{res.materia}</small>
                     </div>
                   </div>
 
-                  <div className="col-md-7">
-                    <div className="mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <i
-                          key={i}
-                          className={`bi bi-star-fill ${i < res.rating ? 'text-warning' : 'text-light'} me-1`}
-                        ></i>
-                      ))}
-
-                      <span className="ms-2 badge bg-light text-dark border rounded-pill small">
+                  <div className="col-md-9 px-4">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <div>
+                        {renderStars(res.rating)}
+                        {res.recomendaria && <span className="badge bg-success ms-3"><i className="bi bi-hand-thumbs-up-fill me-1"></i> Recomendado</span>}
+                        {res.quejaFormal && <span className="badge bg-danger ms-2"><i className="bi bi-exclamation-triangle-fill me-1"></i> Queja Formal Emitida</span>}
+                      </div>
+                      <span className="badge bg-light text-dark border rounded-pill small">
                         {res.fecha}
                       </span>
                     </div>
-
-                    <p className="text-muted mb-0 small">
-                      "{res.comentario}"
-                    </p>
+                    <p className="text-muted mb-0 fst-italic">"{res.comentario}"</p>
                   </div>
-
-                  <div className="col-md-2 text-end">
-                    <button
-                      onClick={() => handleEditar(res)}
-                      className="btn btn-sm btn-outline-primary border-0"
-                    >
-                      <i className="bi bi-pencil-square fs-5"></i>
-                    </button>
-
-                    <button
-                      onClick={() => handleEliminar(res.id)}
-                      className="btn btn-sm btn-outline-danger border-0"
-                    >
-                      <i className="bi bi-trash fs-5"></i>
-                    </button>
-                  </div>
-
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
 
-      {/* MODAL EDITAR */}
-      {showModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ background: "rgba(0,0,0,0.5)", zIndex: 1050 }}
-        >
-          <div className="bg-white rounded-4 shadow p-4" style={{ width: "450px" }}>
-            <h4 className="fw-bold mb-3 text-indigo">
-              {editData.comentario ? "Editar Reseña" : "Nueva Reseña"}
-            </h4>
-
-            <label className="small fw-bold text-muted mb-2 d-block">
-              Tu calificación:
-            </label>
-
-            <div className="mb-3 fs-3">
-  {[...Array(5)].map((_, i) => (
-    <i
-      key={i}
-      className={`bi ${
-        i < editData.rating
-          ? "bi-star-fill text-warning"
-          : "bi-star"
-      } me-2`}
-      style={{
-        cursor: "pointer",
-        color: i < editData.rating ? "" : "#bdbdbd"
-      }}
-      onClick={() => setEditData({ ...editData, rating: i + 1 })}
-    ></i>
-  ))}
-</div>
-
-            <label className="small fw-bold text-muted mb-2 d-block">
-              Comentario:
-            </label>
-
-            <textarea
-              className="form-control rounded-3 mb-4"
-              rows="4"
-              value={editData.comentario}
-              onChange={(e) =>
-                setEditData({ ...editData, comentario: e.target.value })
-              }
-            />
-
-            <div className="d-flex justify-content-end gap-2">
-              <button
-                className="btn btn-light rounded-pill px-4"
-                onClick={() => setShowModal(false)}
-              >
-                Cerrar
-              </button>
-
-              <button
-                className="btn text-white rounded-pill px-4 border-0"
-                style={{ background: "linear-gradient(135deg,#493774,#6b51a3)" }}
-                onClick={guardarCambios}
-              >
-                Guardar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL AÑADIR */}
+      {/* MODAL AÑADIR/EVALUAR */}
       {showAddModal && (
-        <div
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-          style={{ background: "rgba(0,0,0,0.5)", zIndex: 1060 }}
-        >
-          <div className="bg-white rounded-4 shadow p-4" style={{ width: "400px" }}>
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 className="fw-bold text-indigo mb-0">
-                Selecciona un profesor
-              </h5>
+        <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content border-0 rounded-4 shadow-lg">
+              <div className="modal-header border-bottom-0 pb-0">
+                <h5 className="fw-bold text-indigo mb-0">Evaluar Tutoría</h5>
+                <button className="btn-close" onClick={() => setShowAddModal(false)}></button>
+              </div>
 
-              <button
-                className="btn-close"
-                onClick={() => setShowAddModal(false)}
-              ></button>
-            </div>
-
-            <div className="d-flex flex-column gap-2">
-              {profesoresData.map(profe => (
-                <button
-                  key={profe.id}
-                  onClick={() => nuevaReseña(profe)}
-                  className="btn btn-light border rounded-3 text-start d-flex align-items-center gap-3 p-2"
-                >
-                  <img
-                    src={profe.foto}
-                    width="45"
-                    height="45"
-                    className="rounded-circle"
-                    style={{ objectFit: "cover" }}
-                    alt=""
-                  />
-
-                  <div>
-                    <div className="fw-bold small">{profe.nombre}</div>
-                    <small className="text-muted">{profe.curso}</small>
+              <div className="modal-body pt-3">
+                <form onSubmit={guardarReseña}>
+                  {/* Selector de Tutoría */}
+                  <div className="mb-4">
+                    <label className="form-label small fw-bold text-secondary">Selecciona una tutoría completada pendiente de evaluación:</label>
+                    <select
+                      className="form-select bg-light"
+                      required
+                      value={selectedTutoria ? selectedTutoria.id : ""}
+                      onChange={e => {
+                        const tut = tutoriasCompletadas.find(t => t.id === parseInt(e.target.value));
+                        setSelectedTutoria(tut);
+                      }}
+                    >
+                      <option value="">-- Elige una tutoría --</option>
+                      {tutoriasCompletadas.map(tut => (
+                        <option key={tut.id} value={tut.id}>
+                          {tut.curso} con {tut.profesorNombre} ({new Date(tut.fechaHora).toLocaleDateString()})
+                        </option>
+                      ))}
+                    </select>
+                    {tutoriasCompletadas.length === 0 && (
+                      <small className="text-danger mt-1 d-block">No tienes tutorías "Completadas" pendientes de evaluar. (Prueba creando y finalizando una tutoría primero).</small>
+                    )}
                   </div>
-                </button>
-              ))}
+
+                  {selectedTutoria && (
+                    <>
+                      {/* Calificación General */}
+                      <div className="text-center mb-4 p-3 bg-light rounded-4">
+                        <label className="d-block fw-bold text-dark mb-2">Calificación General</label>
+                        <div className="fs-2">
+                          {renderStars(rating, setRating)}
+                        </div>
+                      </div>
+
+                      {/* Categorías */}
+                      <div className="row g-3 mb-4">
+                        {Object.keys(categorias).map(cat => (
+                          <div key={cat} className="col-md-6 d-flex justify-content-between align-items-center">
+                            <span className="small fw-bold text-secondary text-capitalize">{cat}:</span>
+                            <div>
+                              {renderStars(categorias[cat], (val) => setCategorias({ ...categorias, [cat]: val }))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Comentario Libre */}
+                      <div className="mb-3">
+                        <label className="form-label small fw-bold text-secondary">Comentario (Mín. 20 caracteres)</label>
+                        <textarea
+                          className="form-control bg-light"
+                          rows="3"
+                          minLength="20"
+                          required
+                          placeholder="Describe tu experiencia detalladamente..."
+                          value={comentario}
+                          onChange={(e) => setComentario(e.target.value)}
+                        />
+                        <div className="text-end small text-muted mt-1">{comentario.length} caracteres</div>
+                      </div>
+
+                      {/* Recomendación */}
+                      <div className="form-check form-switch mb-4">
+                        <input className="form-check-input" type="checkbox" role="switch" id="recomendar" checked={recomendaria} onChange={e => setRecomendaria(e.target.checked)} />
+                        <label className="form-check-label fw-bold text-dark" htmlFor="recomendar">¿Recomendarías a este profesor?</label>
+                      </div>
+
+                      {/* Queja Formal (Condicional) */}
+                      {rating > 0 && rating < 3 && (
+                        <div className="alert alert-danger border-0 rounded-4">
+                          <div className="form-check fw-bold text-danger mb-2">
+                            <input className="form-check-input" type="checkbox" id="queja" checked={quejaFormal} onChange={e => setQuejaFormal(e.target.checked)} />
+                            <label className="form-check-label" htmlFor="queja">Marcar como Queja Formal</label>
+                          </div>
+                          {quejaFormal && (
+                            <>
+                              <p className="small mb-2">Las quejas formales son revisadas por administración y restan puntos severamente al docente.</p>
+                              <textarea
+                                className="form-control"
+                                rows="2"
+                                placeholder="Describe el incidente (Obligatorio)..."
+                                required
+                                value={motivoQueja}
+                                onChange={e => setMotivoQueja(e.target.value)}
+                              />
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="d-flex gap-2">
+                        <button type="button" className="btn btn-light fw-bold flex-grow-1" onClick={() => setShowAddModal(false)}>Cancelar</button>
+                        <button type="submit" className="btn btn-primary fw-bold flex-grow-1">Enviar Valoración</button>
+                      </div>
+                    </>
+                  )}
+                </form>
+              </div>
             </div>
           </div>
         </div>

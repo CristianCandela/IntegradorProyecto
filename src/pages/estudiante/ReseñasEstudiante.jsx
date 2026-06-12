@@ -9,7 +9,6 @@ export default function ReseñasEstudiante() {
 
   // Form State
   const [selectedTutoria, setSelectedTutoria] = useState(null);
-  const [rating, setRating] = useState(0);
   const [categorias, setCategorias] = useState({
     puntualidad: 0,
     claridad: 0,
@@ -20,6 +19,12 @@ export default function ReseñasEstudiante() {
   const [recomendaria, setRecomendaria] = useState(true);
   const [quejaFormal, setQuejaFormal] = useState(false);
   const [motivoQueja, setMotivoQueja] = useState("");
+
+  const numCategoriasEvaluadas = Object.values(categorias).filter(val => val > 0).length;
+  const sumaCategorias = Object.values(categorias).reduce((a, b) => a + b, 0);
+  // Calculamos el rating solo en base a las categorías que ya fueron tocadas (o /4 si queremos obligar)
+  // Para ser precisos, se calcula sobre las 4 categorías:
+  const rating = sumaCategorias > 0 ? Math.round(sumaCategorias / 4) : 0;
 
   useEffect(() => {
     cargarDatos();
@@ -46,7 +51,6 @@ export default function ReseñasEstudiante() {
 
   const handleAbrirModal = (tutoria = null) => {
     setSelectedTutoria(tutoria);
-    setRating(0);
     setCategorias({ puntualidad: 0, claridad: 0, dominio: 0, profesionalismo: 0 });
     setComentario("");
     setRecomendaria(true);
@@ -61,8 +65,9 @@ export default function ReseñasEstudiante() {
       alert("Por favor selecciona una tutoría para evaluar.");
       return;
     }
-    if (rating === 0) {
-      alert("Por favor asigna una calificación general.");
+    // Asegurar que evaluó todas las categorías
+    if (Object.values(categorias).some(val => val === 0)) {
+      alert("Por favor evalúa todas las subcategorías (Puntualidad, Claridad, etc).");
       return;
     }
     if (comentario.trim().length < 20) {
@@ -244,11 +249,12 @@ export default function ReseñasEstudiante() {
 
                   {selectedTutoria && (
                     <>
-                      {/* Calificación General */}
+                      {/* Calificación General (Solo Lectura) */}
                       <div className="text-center mb-4 p-3 bg-light rounded-4">
-                        <label className="d-block fw-bold text-dark mb-2">Calificación General</label>
+                        <label className="d-block fw-bold text-dark mb-1">Calificación General (Automática)</label>
+                        <small className="text-muted d-block mb-2">Se calcula en base a tus respuestas abajo</small>
                         <div className="fs-2">
-                          {renderStars(rating, setRating)}
+                          {renderStars(rating)}
                         </div>
                       </div>
 

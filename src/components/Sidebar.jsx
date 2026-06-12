@@ -63,6 +63,7 @@ export default function Sidebar({ role }) {
         if (difHoras > 0 && difHoras <= 24 && !tut.notified24h) {
           StorageService.saveNotification({
             tipo: "recordatorio_24h",
+            tutoriaId: tut.id,
             mensaje: `Tu tutoría de ${tut.curso} es en menos de 24 horas. ¿Necesitas cancelar?`,
             fechaHoraRef: new Date().toISOString()
           });
@@ -73,8 +74,9 @@ export default function Sidebar({ role }) {
         if (difHoras > 0 && difHoras <= 1 && !tut.notified1h) {
           StorageService.saveNotification({
             tipo: "recordatorio_1h",
+            tutoriaId: tut.id,
             mensaje: `¡Urgente! Tu tutoría de ${tut.curso} comienza en menos de 1 hora. Entra a la sala virtual.`,
-            enlace: "#sala-virtual",
+            enlace: "/tutorias-estudiante",
             fechaHoraRef: new Date().toISOString()
           });
           StorageService.updateTutoringSession(tut.id, { notified1h: true });
@@ -94,15 +96,28 @@ export default function Sidebar({ role }) {
 
           StorageService.saveNotification({
             tipo: "inasistencia",
+            tutoriaId: tut.id,
             mensaje: `Has sido penalizado con -10 puntos por no asistir a tu tutoría de ${tut.curso}.`,
             fechaHoraRef: new Date().toISOString()
           });
           updated = true;
         }
-      } else if (tut.estado === "Completada") {
-        if (difHoras <= -2 && !tut.notifiedReview) {
+      } else if (tut.estado === "Completada" || tut.estado === "Cancelada") {
+        // Limpiar notificaciones fantasma de esta tutoría
+        const notifs = StorageService.getNotifications();
+        let changedNotifs = false;
+        notifs.forEach(n => {
+          if (n.tutoriaId === tut.id && n.tipo.startsWith("recordatorio") && !n.read) {
+            StorageService.markNotificationAsRead(n.id);
+            changedNotifs = true;
+          }
+        });
+        if (changedNotifs) updated = true;
+
+        if (tut.estado === "Completada" && difHoras <= -2 && !tut.notifiedReview) {
           StorageService.saveNotification({
             tipo: "solicitud_valoracion",
+            tutoriaId: tut.id,
             mensaje: `¿Cómo fue tu experiencia en ${tut.curso} con ${tut.profesorNombre}? Déjanos tu opinión.`,
             enlace: "/resenas-estudiante",
             fechaHoraRef: new Date().toISOString()
@@ -247,9 +262,17 @@ export default function Sidebar({ role }) {
                   >
                     <div className="mb-1">{n.mensaje}</div>
                     {n.enlace && (
-                      <a href={n.enlace} className="btn btn-sm btn-primary py-0 px-2 fw-bold d-inline-block mt-1" style={{ fontSize: '0.65rem' }}>
-                        Ir a la sala
-                      </a>
+                      <button 
+                        className="btn btn-sm btn-primary py-0 px-2 fw-bold d-inline-block mt-1 border-0 hover-shadow" 
+                        style={{ fontSize: '0.65rem', background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)" }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          marcarComoLeida(n.id);
+                          navigate(n.enlace);
+                        }}
+                      >
+                        Ir a la sección
+                      </button>
                     )}
                   </div>
                 ))

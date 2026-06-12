@@ -77,6 +77,27 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
       return false;
     }
 
+    // Validación de conflicto de horarios
+    const sesionesAgendadas = StorageService.getTutoringSessions();
+    const tiempoInicioNuevo = fechaSeleccionada.getTime();
+    const tiempoFinNuevo = tiempoInicioNuevo + duracion * 60 * 60 * 1000;
+
+    const hayConflicto = sesionesAgendadas.some(sesion => {
+      if (sesion.estado !== "Confirmada") return false;
+      
+      const tiempoInicioExistente = new Date(sesion.fechaHora).getTime();
+      const duracionExistente = sesion.duracionEstimada || 1.5;
+      const tiempoFinExistente = tiempoInicioExistente + duracionExistente * 60 * 60 * 1000;
+
+      // Hay solapamiento si: (InicioA < FinB) y (FinA > InicioB)
+      return (tiempoInicioNuevo < tiempoFinExistente) && (tiempoFinNuevo > tiempoInicioExistente);
+    });
+
+    if (hayConflicto) {
+      setErrorValidacion("Ya tienes una tutoría agendada que se cruza con este horario. Por favor elige otra hora.");
+      return false;
+    }
+
     setErrorValidacion("");
     return true;
   };

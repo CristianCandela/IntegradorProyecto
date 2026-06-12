@@ -6,24 +6,38 @@ export default function Sidebar({ role }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false);
   
-  // SIMULACIÓN DE NOTIFICACIONES REQUERIDAS POR EL CLIENTE
+  // NOTIFICACIONES DINÁMICAS (Se alimentan del listener en tiempo real)
   const [notificaciones, setNotificaciones] = useState([
     { id: 1, mensaje: "Tu tutoría con Luis Carlos ha sido confirmada.", leida: false },
     { id: 2, mensaje: "Alerta: El estudiante Carlos Mendoza canceló la tutoría de hoy.", leida: false }
   ]);
 
-  // SCORE DE CONFIABILIDAD INICIAL (Requerimiento del cliente de 0 a 100)
+  // SCORE DE CONFIABILIDAD INICIAL (EXCLUSIVO PROFESOR: 0 a 100)
   const [scoreConfiabilidad, setScoreConfiabilidad] = useState(() => {
     return Number(localStorage.getItem("score_profesor")) || 100;
   });
 
   useEffect(() => {
-    const revisarScore = () => {
-      setScoreConfiabilidad(Number(localStorage.getItem("score_profesor")) || 100);
-    };
-    window.addEventListener("storage", revisarScore);
-    return () => window.removeEventListener("storage", revisarScore);
-  }, []);
+    if (role === 'profesor') {
+      const revisarScore = () => {
+        setScoreConfiabilidad(Number(localStorage.getItem("score_profesor")) || 100);
+      };
+      window.addEventListener("storage", revisarScore);
+      
+      // ESCUCHADOR DE EVENTOS: Intercepta cuando se agenda una sesión (desde el formulario o el alumno)
+      const capturarNuevaNotificacion = (e) => {
+        setNotificaciones((prevNotificaciones) => [e.detail, ...prevNotificaciones]);
+        setMostrarNotificaciones(true); // Despliega el dropdown automáticamente para el feedback visual
+      };
+
+      window.addEventListener("nueva_notificacion_tutoria", capturarNuevaNotificacion);
+
+      return () => {
+        window.removeEventListener("storage", revisarScore);
+        window.removeEventListener("nueva_notificacion_tutoria", capturarNuevaNotificacion);
+      };
+    }
+  }, [role]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,8 +52,9 @@ export default function Sidebar({ role }) {
       ]
     },
     profesor: {
-      // CORREGIDO: Degradado de ángulo suavizado entre Índigo (#3F51B5) y Fúxia Medio (#7B1FA2)
-      color: "linear-gradient(180deg, #3F51B5 0%, #7B1FA2 100%)",
+      // CORREGIDO: Todo Índigo (#3F51B5) que predomina hasta el 75% de la barra, 
+      // y solo al final (100%) se desvanece un poco hacia un morado medio (#5E35B1). Sin fucsia.
+      color: "linear-gradient(180deg, #3F51B5 0%, #3F51B5 75%, #5E35B1 100%)",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
         { name: "Evaluaciones", icon: "bi-star", path: "/evaluaciones-profesor" },
@@ -57,14 +72,13 @@ export default function Sidebar({ role }) {
     }
   };
 
-  const config = menuConfig[role] || menuConfig["estudiante"]; // Failsafe por si llega vacío
+  const config = menuConfig[role] || menuConfig["estudiante"];
 
-  // LÓGICA DE COLOR PARA EL SCORE DE CONFIABILIDAD
   const obtenerColorScore = (score) => {
-    if (score >= 90) return "#28a745"; // Verde (Excelente)
-    if (score >= 70) return "#ffc107"; // Amarillo (Bueno)
-    if (score >= 50) return "#fd7e14"; // Naranja (Regular)
-    return "#dc3545"; // Rojo (Bajo)
+    if (score >= 90) return "#28a745"; 
+    if (score >= 70) return "#ffc107"; 
+    if (score >= 50) return "#fd7e14"; 
+    return "#dc3545"; 
   };
 
   const handleLogout = () => {
@@ -109,45 +123,49 @@ export default function Sidebar({ role }) {
         </div>
       </div>
 
-      {/* SISTEMA DE NOTIFICACIONES (CAMPANA CON BADGE) */}
-      <div className="px-3 py-2 position-relative w-100">
-        <button 
-          className="btn btn-link text-white p-0 d-flex align-items-center gap-2 style-none text-decoration-none"
-          onClick={() => setMostrarNotificaciones(!mostrarNotificaciones)}
-          style={{ border: 'none', background: 'none' }}
-        >
-          <div className="position-relative">
-            <i className="bi bi-bell-fill fs-5"></i>
-            {alertasNoLeidas > 0 && (
-              <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ fontSize: '0.6rem', padding: '0.25rem 0.4rem' }}>
-                {alertasNoLeidas}
-              </span>
-            )}
-          </div>
-          {isExpanded && <span className="small text-white">Notificaciones</span>}
-        </button>
+      {/* RESTRICCIÓN: NOTIFICACIONES SÓLO PROFESOR */}
+      {role === "profesor" && (
+        <div className="px-3 py-2 position-relative w-100">
+          <button 
+            className="btn btn-link text-white p-0 d-flex align-items-center gap-2 style-none text-decoration-none"
+            onClick={() => setMostrarNotificaciones(!mostrarNotificaciones)}
+            style={{ border: 'none', background: 'none' }}
+          >
+            <div className="position-relative">
+              <i className="bi bi-bell-fill fs-5"></i>
+              {alertasNoLeidas > 0 && (
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger" style={{ fontSize: '0.6rem', padding: '0.25rem 0.4rem' }}>
+                  {alertasNoLeidas}
+                </span>
+              )}
+            </div>
+            {isExpanded && <span className="small text-white">Notificaciones</span>}
+          </button>
 
-        {/* DROPDOWN DE ALERTAS */}
-        {mostrarNotificaciones && (
-          <div className="position-absolute bg-white rounded shadow p-2 mt-2" style={{ width: '240px', zIndex: 1100, left: '15px', border: '1px solid #ddd' }}>
-            <h6 className="fw-bold text-dark px-2 pt-1 border-bottom pb-1 mb-1" style={{ fontSize: '0.8rem' }}>Alertas Recientes</h6>
-            {notificaciones.length > 0 ? (
-              notificaciones.map(n => (
-                <div 
-                  key={n.id} 
-                  className={`p-2 small mb-1 rounded cursor-pointer ${n.leida ? 'text-muted bg-light' : 'text-dark fw-medium bg-info-subtle'}`}
-                  style={{ fontSize: '0.75rem', cursor: 'pointer', borderLeft: n.leida ? 'none' : '3px solid #0dcaf0' }}
-                  onClick={() => marcarComoLeida(n.id)}
-                >
-                  {n.mensaje}
-                </div>
-              ))
-            ) : (
-              <div className="text-muted p-2 text-center small" style={{ fontSize: '0.75rem' }}>No tienes alertas.</div>
-            )}
-          </div>
-        )}
-      </div>
+          {/* DROPDOWN DE ALERTAS */}
+          {mostrarNotificaciones && (
+            <div className="position-absolute bg-white rounded shadow p-2 mt-2" style={{ width: '240px', zIndex: 1100, left: '15px', border: '1px solid #ddd' }}>
+              <h6 className="fw-bold text-dark px-2 pt-1 border-bottom pb-1 mb-1" style={{ fontSize: '0.8rem' }}>Alertas Recientes</h6>
+              <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                {notificaciones.length > 0 ? (
+                  notificaciones.map(n => (
+                    <div 
+                      key={n.id} 
+                      className={`p-2 small mb-1 rounded cursor-pointer ${n.leida ? 'text-muted bg-light' : 'text-dark fw-medium bg-info-subtle'}`}
+                      style={{ fontSize: '0.75rem', cursor: 'pointer', borderLeft: n.leida ? 'none' : '3px solid #0dcaf0' }}
+                      onClick={() => marcarComoLeida(n.id)}
+                    >
+                      {n.mensaje}
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-muted p-2 text-center small" style={{ fontSize: '0.75rem' }}>No tienes alertas.</div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <hr className="my-2 text-white opacity-25 w-100" />
 
@@ -165,32 +183,34 @@ export default function Sidebar({ role }) {
         ))}
       </nav>
 
-      {/* WIDGET DEL SCORE DE CONFIABILIDAD CORPORATIVO */}
-      <div className="w-100 px-3 mt-auto mb-2">
-        <div className="p-2 rounded bg-white bg-opacity-10 text-white" style={{ fontSize: '0.8rem' }}>
-          <div className="d-flex justify-content-between align-items-center mb-1">
-            <i className="bi bi-shield-check fs-6"></i>
-            {isExpanded && <span className="fw-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>CONFIABILIDAD</span>}
-            <span className="badge" style={{ backgroundColor: obtenerColorScore(scoreConfiabilidad) }}>
-              {scoreConfiabilidad}%
-            </span>
-          </div>
-          {isExpanded && (
-            <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
-              <div 
-                className="progress-bar" 
-                style={{ 
-                  width: `${scoreConfiabilidad}%`, 
-                  backgroundColor: obtenerColorScore(scoreConfiabilidad) 
-                }}
-              ></div>
+      {/* RESTRICCIÓN: WIDGET CONFIABILIDAD SÓLO PROFESOR */}
+      {role === "profesor" && (
+        <div className="w-100 px-3 mt-auto mb-2">
+          <div className="p-2 rounded bg-white bg-opacity-10 text-white" style={{ fontSize: '0.8rem' }}>
+            <div className="d-flex justify-content-between align-items-center mb-1">
+              <i className="bi bi-shield-check fs-6"></i>
+              {isExpanded && <span className="fw-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>CONFIABILIDAD</span>}
+              <span className="badge" style={{ backgroundColor: obtenerColorScore(scoreConfiabilidad) }}>
+                {scoreConfiabilidad}%
+              </span>
             </div>
-          )}
+            {isExpanded && (
+              <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                <div 
+                  className="progress-bar" 
+                  style={{ 
+                    width: `${scoreConfiabilidad}%`, 
+                    backgroundColor: obtenerColorScore(scoreConfiabilidad) 
+                  }}
+                ></div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* FOOTER - CERRAR SESIÓN */}
-      <div className="sidebar-footer w-100">
+      <div className={`sidebar-footer w-100 ${role !== "profesor" ? "mt-auto" : ""}`}>
         <button onClick={handleLogout} className="nav-item logout-btn btn btn-link text-white text-decoration-none d-flex align-items-center px-3 py-2 w-100 style-none" style={{ border: 'none', background: 'none' }}>
           <i className="bi bi-box-arrow-left fs-5 me-3"></i>
           {isExpanded && <span className="nav-text small">Cerrar Sesión</span>}

@@ -85,6 +85,11 @@ const TutoriasProfesor = () => {
       const mes = partes[1];
       const dia = partes[2];
       
+      // Control de seguridad por si ingresan años inválidos accidentalmente en el formulario (ej: año 4222 o 1444)
+      if (parseInt(anio, 10) > 2030 || parseInt(anio, 10) < 2025) {
+        return `${parseInt(dia, 10)}/${mes}/${anio}`; 
+      }
+
       const meses = [
         "enero", "febrero", "marzo", "abril", "mayo", "junio", 
         "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
@@ -106,6 +111,18 @@ const TutoriasProfesor = () => {
     const lista = [...tutorias, nueva];
     setTutorias(lista);
     localStorage.setItem("tutorias", JSON.stringify(lista));
+
+    // CONEXIÓN REACTIVA: Despachamos el evento personalizado para que el Sidebar lo pinte en vivo
+    const eventoNotificacion = new CustomEvent("nueva_notificacion_tutoria", {
+      detail: {
+        id: Date.now(),
+        mensaje: `Nueva tutoría agendada con ${alumno} para el curso de ${materia}.`,
+        leida: false
+      }
+    });
+    window.dispatchEvent(eventoNotificacion);
+
+    // Limpiar formulario
     setAlumno(''); setMateria(''); setFecha('');
   };
 
@@ -406,7 +423,7 @@ const TutoriasProfesor = () => {
         <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1060 }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
-              <div className="modal-header text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px', backgroundColor: colores.violet }}>
+              <div className="modal-header text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px', backgroundColor: colores.indigo }}>
                 <h5 className="modal-title fw-bold">Análisis Académico Post-Tutoría</h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setMostrarModalValoracion(false)}></button>
               </div>
@@ -429,17 +446,17 @@ const TutoriasProfesor = () => {
                   <div className="row g-3 mb-4">
                     <div className="col-md-4">
                       <label className="form-label small text-muted">Compromiso y preparación</label>
-                      <input type="range" className="form-range" min="1" max="5" value={compromiso} onChange={(e)=>setCompromiso(Number(e.target.value))} />
+                      <input type="range" className="form-range" min="1" max="5" value={compromiso} onChange={(e)=>setCompromiso(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
                       <span className="badge bg-secondary">{compromiso} / 5</span>
                     </div>
                     <div className="col-md-4">
                       <label className="form-label small text-muted">Respeto y puntualidad</label>
-                      <input type="range" className="form-range" min="1" max="5" value={respeto} onChange={(e)=>setRespeto(Number(e.target.value))} />
+                      <input type="range" className="form-range" min="1" max="5" value={respeto} onChange={(e)=>setRespeto(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
                       <span className="badge bg-secondary">{respeto} / 5</span>
                     </div>
                     <div className="col-md-4">
                       <label className="form-label small text-muted">Participación activa</label>
-                      <input type="range" className="form-range" min="1" max="5" value={participacion} onChange={(e)=>setParticipacion(Number(e.target.value))} />
+                      <input type="range" className="form-range" min="1" max="5" value={participacion} onChange={(e)=>setParticipacion(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
                       <span className="badge bg-secondary">{participacion} / 5</span>
                     </div>
                   </div>
@@ -483,7 +500,7 @@ const TutoriasProfesor = () => {
                 </div>
                 <div className="modal-footer border-0">
                   <button type="button" className="btn btn-secondary px-4" onClick={() => setMostrarModalValoracion(false)}>Cerrar</button>
-                  <button type="submit" className="btn text-white px-4 fw-bold" style={{ backgroundColor: colores.violet }}>Enviar Valoración</button>
+                  <button type="submit" className="btn text-white px-4 fw-bold" style={{ backgroundColor: colores.indigo }}>Enviar Valoración</button>
                 </div>
               </form>
             </div>

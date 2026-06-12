@@ -13,7 +13,9 @@ export default function ReseñasEstudiante() {
     puntualidad: 0,
     claridad: 0,
     dominio: 0,
-    profesionalismo: 0
+    profesionalismo: 0,
+    exigencia: 0,
+    disponibilidad: 0
   });
   const [comentario, setComentario] = useState("");
   const [recomendaria, setRecomendaria] = useState(true);
@@ -23,8 +25,8 @@ export default function ReseñasEstudiante() {
   const numCategoriasEvaluadas = Object.values(categorias).filter(val => val > 0).length;
   const sumaCategorias = Object.values(categorias).reduce((a, b) => a + b, 0);
   // Calculamos el rating solo en base a las categorías que ya fueron tocadas (o /4 si queremos obligar)
-  // Para ser precisos, se calcula sobre las 4 categorías:
-  const rating = sumaCategorias > 0 ? Math.round(sumaCategorias / 4) : 0;
+  // Para ser precisos, se calcula sobre las 6 categorías:
+  const rating = sumaCategorias > 0 ? Math.round(sumaCategorias / 6) : 0;
 
   useEffect(() => {
     cargarDatos();
@@ -51,7 +53,7 @@ export default function ReseñasEstudiante() {
 
   const handleAbrirModal = (tutoria = null) => {
     setSelectedTutoria(tutoria);
-    setCategorias({ puntualidad: 0, claridad: 0, dominio: 0, profesionalismo: 0 });
+    setCategorias({ puntualidad: 0, claridad: 0, dominio: 0, profesionalismo: 0, exigencia: 0, disponibilidad: 0 });
     setComentario("");
     setRecomendaria(true);
     setQuejaFormal(false);

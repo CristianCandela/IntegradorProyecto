@@ -35,10 +35,10 @@ export default function ModalCancelacion({ tutoria, onClose, onSuccess }) {
     // 2. Aplicar penalización al Score
     StorageService.updateScore(-penalizacion);
 
-    // 3. Generar notificación al docente (simulada)
+    // 3. Generar notificación en el panel del estudiante
     const notificacion = {
       tipo: "cancelacion",
-      mensaje: `Tu tutoría con Estudiante ha sido cancelada. Motivo: ${motivo}.`,
+      mensaje: `Tu tutoría con ${tutoria.profesorNombre} ha sido cancelada. Motivo: ${motivo}.`,
       fechaHoraRef: tutoria.fechaHora,
     };
     StorageService.saveNotification(notificacion);

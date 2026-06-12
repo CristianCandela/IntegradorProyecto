@@ -58,7 +58,15 @@ const EvaluacionesProfesor = () => {
     setRespuestas({ ...respuestas, [id]: texto });
   };
 
-  const mostrarEstrellas = (cantidad) => "⭐".repeat(cantidad);
+  // Renderizar estrellas usando iconos de Bootstrap en lugar de emojis
+  const renderEstrellas = (cantidad) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <i 
+        key={i} 
+        className={`bi ${i < cantidad ? 'bi-star-fill text-warning' : 'bi-star text-muted'} me-1`}
+      ></i>
+    ));
+  };
 
   // Lógica de filtrado combinada (Estrellas + Palabra seleccionada de la Nube)
   const resenasFiltradas = resenas.filter(r => {
@@ -82,10 +90,10 @@ const EvaluacionesProfesor = () => {
           <div className="d-flex gap-3 align-items-center">
             {palabraFiltro && (
               <button 
-                className="btn btn-sm btn-danger rounded-pill px-3"
+                className="btn btn-sm btn-danger rounded-pill px-3 d-flex align-items-center gap-1"
                 onClick={() => setPalabraFiltro('')}
               >
-                Limpiar Filtro: "{palabraFiltro}" ✕
+                Limpiar Filtro: "{palabraFiltro}" <i className="bi bi-x-circle-fill"></i>
               </button>
             )}
             <select 
@@ -99,8 +107,9 @@ const EvaluacionesProfesor = () => {
               <option value="4">4 Estrellas</option>
               <option value="3">3 Estrellas</option>
             </select>
-            <div className="bg-white p-2 rounded shadow-sm border px-3">
-              <span className="fw-bold text-primary">4.5 / 5 ⭐</span>
+            <div className="bg-white p-2 rounded shadow-sm border px-3 d-flex align-items-center gap-1">
+              <span className="fw-bold text-primary">4.5 / 5</span>
+              <i className="bi bi-star-fill text-warning"></i>
             </div>
           </div>
         </div>
@@ -118,10 +127,10 @@ const EvaluacionesProfesor = () => {
                           <h6 className="fw-bold mb-0">{res.alumno}</h6>
                           <small className="text-muted">{res.fecha}</small>
                         </div>
-                        <div className="my-2 text-warning">
-                          {mostrarEstrellas(res.estrellas)}
+                        <div className="my-2">
+                          {renderEstrellas(res.estrellas)}
                         </div>
-                        <p className="card-text text-secondary italic">"{res.comentario}"</p>
+                        <p className="card-text text-secondary fst-italic">"{res.comentario}"</p>
                         
                         {/* SECCIÓN DE RESPUESTA */}
                         <div className="mt-3 pt-3 border-top">
@@ -174,7 +183,9 @@ const EvaluacionesProfesor = () => {
           <div className="col-lg-4">
             {/* COMPONENTE EXIGIDO: NUBE DE PALABRAS (TAG CLOUD) */}
             <div className="card border-0 shadow-sm p-4 mb-4" style={{ borderRadius: '15px' }}>
-              <h5 className="fw-bold mb-1 text-dark">☁️ Nube de Palabras</h5>
+              <h5 className="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <i className="bi bi-cloud-text text-indigo"></i> Nube de Palabras
+              </h5>
               <p className="text-muted small mb-3">Términos recurrentes en las opiniones. Haz clic en uno para filtrar.</p>
               
               <div className="d-flex flex-wrap justify-content-center align-items-center gap-2 p-2 bg-light rounded-4 border border-light-subtle" style={{ minHeight: '120px' }}>
@@ -183,7 +194,7 @@ const EvaluacionesProfesor = () => {
                     <span
                       key={i}
                       className={`badge cursor-pointer p-2 rounded-pill shadow-sm transition-all ${
-                        palabraFiltro === word.text ? 'bg-primary text-white' : 'bg-white text-indigo border text-dark'
+                        palabraFiltro === word.text ? 'bg-primary text-white' : 'bg-white text-dark border'
                       }`}
                       style={{ 
                         fontSize: word.size, 
@@ -194,7 +205,7 @@ const EvaluacionesProfesor = () => {
                       onMouseEnter={(e) => e.target.style.transform = 'scale(1.1)'}
                       onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
                     >
-                      {word.text} <span className="opacity-50 font-normal" style={{ fontSize: '0.65rem' }}>({word.count})</span>
+                      {word.text} <span className="opacity-50 fw-normal" style={{ fontSize: '0.65rem' }}>({word.count})</span>
                     </span>
                   ))
                 ) : (
@@ -212,7 +223,9 @@ const EvaluacionesProfesor = () => {
                 return (
                   <div className="mb-3" key={num}>
                     <div className="d-flex justify-content-between small mb-1">
-                      <span>{num} estrellas</span>
+                      <span className="d-flex align-items-center gap-1">
+                        {num} <i className="bi bi-star-fill text-warning" style={{ fontSize: '0.8rem' }}></i>
+                      </span>
                       <span className="text-muted">{cantidad}</span>
                     </div>
                     <div className="progress" style={{ height: '8px', backgroundColor: '#e9ecef' }}>
@@ -228,12 +241,15 @@ const EvaluacionesProfesor = () => {
           </div>
         </div>
 
-        {/* SECCIÓN INFORMATIVA REPARADA CON COLOR ÍNDIGO SÓLIDO (#3F51B5) */}
-        <div className="mt-4 p-3 text-white rounded-4 shadow-sm" style={{ backgroundColor: '#3F51B5' }}>
-          <h6 className="fw-bold mb-1">💡 Tip de Reputación Docente</h6>
-          <p className="mb-0 small opacity-90">
-            Responder a las reseñas de tus alumnos mejora tu visibilidad en ProfeMatch en un 20%. Mantén un canal activo de retroalimentación.
-          </p>
+        {/* SECCIÓN INFORMATIVA CON COLOR ÍNDIGO SÓLIDO (#3F51B5) */}
+        <div className="mt-4 p-3 text-white rounded-4 shadow-sm d-flex align-items-start gap-3" style={{ backgroundColor: '#3F51B5' }}>
+          <i className="bi bi-lightbulb fs-5 mt-0.5"></i>
+          <div>
+            <h6 className="fw-bold mb-1">Tip de Reputación Docente</h6>
+            <p className="mb-0 small opacity-90">
+              Responder a las reseñas de tus alumnos mejora tu visibilidad en ProfeMatch en un 20%. Mantén un canal activo de retroalimentación.
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -10,13 +10,21 @@ export default function LoginHero({ video, titulo, highlight, subtitulo }) {
   ];
 
   return (
-    <div className="login-hero-wrapper w-100">
-      <video autoPlay muted loop playsInline className="hero-video" key={video}>
+    <div className="login-hero-wrapper w-100 h-100 position-relative">
+      <video 
+        autoPlay 
+        muted 
+        loop 
+        playsInline 
+        className="hero-video w-100 h-100 object-cover"
+        key={video}
+      >
         <source src={video} type="video/mp4" />
       </video>
-      <div className="overlay"></div>
+      
+      <div className="overlay position-absolute inset-0"></div>
 
-      {/* LOGO  */}
+      {/* LOGO */}
       <div className="position-absolute top-0 start-0 p-5" style={{ zIndex: 10 }}>
         <Link to="/" className="d-block transition-hover"> 
           <img 
@@ -27,7 +35,7 @@ export default function LoginHero({ video, titulo, highlight, subtitulo }) {
         </Link>
       </div>
       
-      <div className="login-hero-content text-white p-5">
+      <div className="login-hero-content text-white p-5 position-relative z-1">
         <h1 className="display-4 fw-bold mt-4">
           {titulo} <span className="highlight">{highlight}</span>
         </h1>

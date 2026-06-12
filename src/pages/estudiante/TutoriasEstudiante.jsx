@@ -4,14 +4,15 @@ import ProfesorCard from "../../components/ProfesorCard";
 import CheckoutModal from "../../components/CheckoutModal";
 import ModalCancelacion from "../../components/ModalCancelacion";
 import { StorageService } from "../../core/database/StorageService";
+import { courseDurations } from "../../data/profesoresData";
 
 export default function TutoriasEstudiante() {
   const [tab, setTab] = useState("mis-tutorias"); // 'mis-tutorias' o 'explorar'
-  
+
   // Data
   const [profesores, setProfesores] = useState([]);
   const [tutoriasAgendadas, setTutoriasAgendadas] = useState([]);
-  
+
   // Modals state
   const [selectedProfesor, setSelectedProfesor] = useState(null);
   const [tutoriaACancelar, setTutoriaACancelar] = useState(null);
@@ -59,29 +60,62 @@ export default function TutoriasEstudiante() {
     }
   };
 
+  const getCourseIcon = (curso) => {
+    const icons = {
+      "Programación Web": "bi-code-slash",
+      "Psicología Social": "bi-person-hearts",
+      "Cálculo I": "bi-calculator",
+      "Física II": "bi-lightning",
+      "Microeconomía": "bi-graph-up-arrow",
+      "Base de Datos": "bi-database",
+      "Anatomía Humana": "bi-lungs",
+      "Redacción Académica": "bi-pen",
+      "Gestión de Procesos": "bi-diagram-3",
+      "Derecho Constitucional": "bi-bank",
+      "Estructura de Datos": "bi-diagram-2",
+      "Álgebra Lineal": "bi-bounding-box",
+      "Neuropsicología": "bi-brain"
+    };
+    return icons[curso] || "bi-book";
+  };
+
+  // Corporate Gradient Style
+  const gradientStyle = {
+    background: "linear-gradient(135deg, #801caaff 0%, rgba(127, 56, 221, 1) 100%)",
+    color: "white"
+  };
+
+  const textGradient = {
+    background: "linear-gradient(135deg, #801caaff 0%, rgba(127, 56, 221, 1) 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
+  };
+
   return (
     <div className="main-layout">
       <Sidebar role="estudiante" />
 
       <main className="dashboard-content">
         <header className="mb-4">
-          <h2 className="fw-bold text-indigo">Centro de Tutorías</h2>
+          <h2 className="fw-bold" style={textGradient}>Centro de Tutorías</h2>
           <p className="text-muted">Gestiona tus sesiones programadas o explora nuevas materias.</p>
         </header>
 
         {/* TABS */}
         <ul className="nav nav-tabs mb-4">
           <li className="nav-item">
-            <button 
-              className={`nav-link fw-bold ${tab === "mis-tutorias" ? "active text-primary border-bottom-0" : "text-muted bg-light"}`}
+            <button
+              className={`nav-link fw-bold ${tab === "mis-tutorias" ? "active border-bottom-0" : "text-muted bg-light"}`}
+              style={tab === "mis-tutorias" ? textGradient : {}}
               onClick={() => setTab("mis-tutorias")}
             >
               Mis Tutorías Programadas
             </button>
           </li>
           <li className="nav-item">
-            <button 
-              className={`nav-link fw-bold ${tab === "explorar" ? "active text-primary border-bottom-0" : "text-muted bg-light"}`}
+            <button
+              className={`nav-link fw-bold ${tab === "explorar" ? "active border-bottom-0" : "text-muted bg-light"}`}
+              style={tab === "explorar" ? textGradient : {}}
               onClick={() => {
                 setTab("explorar");
                 setCursoSeleccionado(null);
@@ -98,7 +132,13 @@ export default function TutoriasEstudiante() {
               <div className="text-center py-5 bg-light rounded-4">
                 <i className="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
                 <h5 className="text-muted">No tienes tutorías programadas</h5>
-                <button className="btn btn-primary mt-3 fw-bold" onClick={() => setTab("explorar")}>Agendar una ahora</button>
+                <button
+                  className="btn mt-3 fw-bold border-0 shadow-sm px-4 py-2 rounded-pill"
+                  style={gradientStyle}
+                  onClick={() => setTab("explorar")}
+                >
+                  Agendar una ahora
+                </button>
               </div>
             ) : (
               <div className="row g-4">
@@ -119,7 +159,7 @@ export default function TutoriasEstudiante() {
 
                         <h5 className="fw-bold text-dark mb-1">{tut.curso}</h5>
                         <div className="d-flex align-items-center mb-3">
-                          <img src={tut.foto} alt={tut.profesorNombre} className="rounded-circle me-2" width="30" height="30" />
+                          <img src={tut.foto} alt={tut.profesorNombre} className="rounded-circle me-2" width="30" height="30" style={{ objectFit: 'cover' }} />
                           <small className="text-muted">{tut.profesorNombre}</small>
                         </div>
 
@@ -130,13 +170,16 @@ export default function TutoriasEstudiante() {
                           </div>
                           <div className="d-flex align-items-center">
                             <i className="bi bi-clock text-primary me-2"></i>
-                            <small className="fw-bold">{new Date(tut.fechaHora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</small>
+                            <small className="fw-bold">
+                              {new Date(tut.fechaHora).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {tut.duracionEstimada && ` • ${tut.duracionEstimada}h`}
+                            </small>
                           </div>
                         </div>
 
                         {tut.estado === "Confirmada" && (
-                          <button 
-                            className="btn btn-outline-danger btn-sm w-100 fw-bold"
+                          <button
+                            className="btn btn-outline-danger btn-sm w-100 fw-bold rounded-pill"
                             onClick={() => setTutoriaACancelar(tut)}
                           >
                             <i className="bi bi-x-circle me-2"></i> Cancelar Tutoría
@@ -159,20 +202,39 @@ export default function TutoriasEstudiante() {
                 <div className="row g-4">
                   {cursosUnicos.map(curso => {
                     const profesDelCurso = profesores.filter(p => p.curso === curso);
+                    const duracion = courseDurations[curso] || 1.5;
+                    const numProfesores = profesDelCurso.length;
+
                     return (
                       <div key={curso} className="col-md-4 col-lg-3">
-                        <div 
-                          className="card border-0 shadow-sm rounded-4 h-100 text-center p-4"
+                        <div
+                          className="card border-0 shadow-sm rounded-4 h-100 text-center p-4 position-relative overflow-hidden"
                           onClick={() => setCursoSeleccionado(curso)}
                           style={{ cursor: "pointer", transition: "transform 0.2s ease, box-shadow 0.2s ease" }}
-                          onMouseOver={e => e.currentTarget.style.transform = "translateY(-5px)"}
-                          onMouseOut={e => e.currentTarget.style.transform = "translateY(0)"}
+                          onMouseOver={e => {
+                            e.currentTarget.style.transform = "translateY(-5px)";
+                            e.currentTarget.style.boxShadow = "0 10px 20px rgba(123, 31, 162, 0.15)";
+                          }}
+                          onMouseOut={e => {
+                            e.currentTarget.style.transform = "translateY(0)";
+                            e.currentTarget.style.boxShadow = "0 0.125rem 0.25rem rgba(0, 0, 0, 0.075)";
+                          }}
                         >
-                          <div className="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style={{ width: "60px", height: "60px" }}>
-                            <i className="bi bi-book fs-3 text-primary"></i>
+                          <div className="position-absolute top-0 start-0 w-100" style={{ height: '4px', ...gradientStyle }}></div>
+
+                          <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3 shadow-sm" style={{ width: "60px", height: "60px" }}>
+                            <i className={`bi ${getCourseIcon(curso)} fs-3`} style={textGradient}></i>
                           </div>
-                          <h6 className="fw-bold text-dark">{curso}</h6>
-                          <small className="text-muted">{profesDelCurso.length} profesores disponibles</small>
+
+                          <h6 className="fw-bold text-dark mb-1">{curso}</h6>
+                          <div className="d-flex flex-column gap-1 mt-2">
+                            <small className="text-muted">
+                              <i className="bi bi-clock me-1"></i> {duracion}h estimadas
+                            </small>
+                            <small className="text-muted fw-bold">
+                              {numProfesores} {numProfesores === 1 ? "profesor disponible" : "profesores disponibles"}
+                            </small>
+                          </div>
                         </div>
                       </div>
                     );
@@ -181,15 +243,26 @@ export default function TutoriasEstudiante() {
               </>
             ) : (
               <>
-                <button className="btn btn-link text-decoration-none text-muted p-0 mb-4 fw-bold" onClick={() => setCursoSeleccionado(null)}>
-                  <i className="bi bi-arrow-left me-2"></i> Volver a cursos
+                <button className="btn btn-link text-decoration-none text-muted p-0 mb-4 fw-bold d-flex align-items-center" onClick={() => setCursoSeleccionado(null)}>
+                  <i className="bi bi-arrow-left me-2 fs-5"></i> Volver a cursos
                 </button>
-                <h4 className="fw-bold text-indigo mb-4">Profesores de {cursoSeleccionado}</h4>
+                <div className="d-flex align-items-center gap-3 mb-4">
+                  <div className="bg-light rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style={{ width: "50px", height: "50px" }}>
+                    <i className={`bi ${getCourseIcon(cursoSeleccionado)} fs-4`} style={textGradient}></i>
+                  </div>
+                  <div>
+                    <h4 className="fw-bold mb-0" style={textGradient}>Profesores de {cursoSeleccionado}</h4>
+                    <span className="badge mt-1 shadow-sm" style={gradientStyle}>
+                      <i className="bi bi-clock me-1"></i> {courseDurations[cursoSeleccionado] || 1.5}h
+                    </span>
+                  </div>
+                </div>
+
                 <div className="row g-4">
                   {profesores.filter(p => p.curso === cursoSeleccionado).map((profe) => (
                     <div key={profe.id} className="col-sm-6 col-lg-4 col-xl-3">
-                      <ProfesorCard 
-                        profesor={profe} 
+                      <ProfesorCard
+                        profesor={profe}
                         isTutoria={true}
                         onSolicitar={setSelectedProfesor}
                       />
@@ -205,17 +278,17 @@ export default function TutoriasEstudiante() {
 
       {/* MODALS */}
       {selectedProfesor && (
-        <CheckoutModal 
-          profesor={selectedProfesor} 
-          onClose={() => setSelectedProfesor(null)} 
+        <CheckoutModal
+          profesor={selectedProfesor}
+          onClose={() => setSelectedProfesor(null)}
           onSuccess={handleTutoriaAgendada}
         />
       )}
 
       {tutoriaACancelar && (
-        <ModalCancelacion 
-          tutoria={tutoriaACancelar} 
-          onClose={() => setTutoriaACancelar(null)} 
+        <ModalCancelacion
+          tutoria={tutoriaACancelar}
+          onClose={() => setTutoriaACancelar(null)}
           onSuccess={handleTutoriaCancelada}
         />
       )}

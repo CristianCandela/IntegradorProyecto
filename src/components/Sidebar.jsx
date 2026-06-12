@@ -131,7 +131,7 @@ export default function Sidebar({ role }) {
       ]
     },
     estudiante: {
-      color: "#493774",
+      color: "linear-gradient(180deg, #6836c5ff 0%, #75149eff 100%)",
       items: [
         { name: "Inicio", icon: "bi-house-door", path: "/inicio-estudiante" },
         { name: "Buscar Profe", icon: "bi-search", path: "/buscar-estudiante" },

@@ -43,7 +43,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
         {esPremium && (
           <span
             className="position-absolute top-0 end-0 m-3 badge rounded-pill text-white shadow-sm d-flex align-items-center gap-1 px-3 py-2"
-            style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)", zIndex: 10, fontSize: "0.7rem" }}
+            style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #6824c2ff 100%)", zIndex: 10, fontSize: "0.7rem" }}
           >
             <i className="bi bi-patch-check-fill"></i> Destacado
           </span>
@@ -89,7 +89,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                     width: "100px",
                     height: "100px",
                     objectFit: "cover",
-                    borderColor: esPremium ? "#7B1FA2" : "white"
+                    borderColor: esPremium ? "#8e28b9ff" : "white"
                   }}
                 />
               </div>
@@ -164,11 +164,9 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
             </button>
 
             <button
-              className="btn btn-sm rounded-pill fw-bold py-2 text-white border-0"
+              className="btn btn-sm rounded-pill fw-bold py-2 text-white border-0 hover-shadow"
               style={{
-                background: esPremium
-                  ? "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)"
-                  : "linear-gradient(135deg, #493774 0%, #6b51a3 100%)"
+                background: "linear-gradient(135deg, #4b1083ff 0%, #7a2baffd 100%)"
               }}
               onClick={() => onSolicitar && onSolicitar(profesor)}
             >
@@ -255,8 +253,8 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 Cerrar
               </button>
               <button
-                className="btn btn-primary rounded-pill w-100 fw-bold border-0"
-                style={{ background: esPremium ? "#7B1FA2" : "#493774" }}
+                className="btn btn-primary rounded-pill w-100 fw-bold border-0 hover-shadow"
+                style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
                 onClick={() => {
                   setShowModal(false);
                   if (onSolicitar) onSolicitar(profesor);

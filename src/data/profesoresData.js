@@ -1,3 +1,19 @@
+export const courseDurations = {
+  "Programación Web": 1.5,
+  "Psicología Social": 2.0,
+  "Cálculo I": 2.0,
+  "Física II": 2.5,
+  "Microeconomía": 1.5,
+  "Base de Datos": 2.0,
+  "Anatomía Humana": 3.0,
+  "Redacción Académica": 1.0,
+  "Gestión de Procesos": 1.5,
+  "Derecho Constitucional": 2.0,
+  "Estructura de Datos": 2.0,
+  "Álgebra Lineal": 1.5,
+  "Neuropsicología": 2.0
+};
+
 export const profesoresData = [
   {
     id: 1,
@@ -10,6 +26,19 @@ export const profesoresData = [
     foto: "https://randomuser.me/api/portraits/men/10.jpg",
     metodologia: "Aprendizaje basado en proyectos y principios SOLID.",
     etiquetas: ["Innovador", "Exigente", "Claro"],
+    descripcion: "Especialista en desarrollo Fullstack con más de 10 años de experiencia en la industria tecnológica."
+  },
+  {
+    id: 11, // Mismo profesor, otro curso
+    nombre: "Prof. Carlos Ramirez",
+    departamento: "Ingeniería de Sistemas",
+    curso: "Base de Datos",
+    rating: 4.8,
+    dificultad: 8.0,
+    precioHora: 35,
+    foto: "https://randomuser.me/api/portraits/men/10.jpg",
+    metodologia: "Modelado relacional intensivo.",
+    etiquetas: ["Estructurado", "Práctico"],
     descripcion: "Especialista en desarrollo Fullstack con más de 10 años de experiencia en la industria tecnológica."
   },
   {
@@ -26,6 +55,19 @@ export const profesoresData = [
     descripcion: "Investigadora enfocada en el comportamiento organizacional."
   },
   {
+    id: 12, // Mismo profesor, otro curso
+    nombre: "Dra. Carmen López",
+    departamento: "Psicología",
+    curso: "Neuropsicología",
+    rating: 4.7,
+    dificultad: 7.5,
+    precioHora: 28,
+    foto: "https://randomuser.me/api/portraits/women/11.jpg",
+    metodologia: "Análisis clínico y mapas cerebrales interactivos.",
+    etiquetas: ["Analítica", "Paciente"],
+    descripcion: "Investigadora con especialidad en redes neuronales cognitivas."
+  },
+  {
     id: 3,
     nombre: "Dr. Ana Martinez",
     departamento: "Matemáticas",
@@ -37,6 +79,19 @@ export const profesoresData = [
     metodologia: "Resolución intensiva de problemas y rigor académico.",
     etiquetas: ["Claro", "Exigente", "Puntual"],
     descripcion: "Doctora en Ciencias Matemáticas enfocada en algoritmos complejos."
+  },
+  {
+    id: 13, // Mismo curso (Cálculo I), diferente profesor (Competencia)
+    nombre: "Prof. Mateo Rojas",
+    departamento: "Matemáticas",
+    curso: "Cálculo I",
+    rating: 4.2,
+    dificultad: 6.5,
+    precioHora: 15,
+    foto: "https://randomuser.me/api/portraits/men/22.jpg",
+    metodologia: "Repaso de fórmulas con ejercicios guiados paso a paso.",
+    etiquetas: ["Básico", "Accesible", "Paciente"],
+    descripcion: "Estudiante de maestría apasionado por la enseñanza introductoria."
   },
   {
     id: 4,
@@ -78,6 +133,32 @@ export const profesoresData = [
     descripcion: "Arquitecto de datos con enfoque en sistemas distribuidos."
   },
   {
+    id: 14, // Nuevo profesor, Programación Web (Competencia)
+    nombre: "Ing. Sofia Morales",
+    departamento: "Ingeniería de Sistemas",
+    curso: "Programación Web",
+    rating: 4.9,
+    dificultad: 8.2,
+    precioHora: 45,
+    foto: "https://randomuser.me/api/portraits/women/24.jpg",
+    metodologia: "Bootcamp intensivo enfocado en React y Node.js.",
+    etiquetas: ["Moderna", "Rápida", "Premium"],
+    descripcion: "Senior Frontend Developer en una compañía multinacional."
+  },
+  {
+    id: 15, // Nuevo profesor, Estructura de Datos
+    nombre: "Ing. Sofia Morales",
+    departamento: "Ingeniería de Sistemas",
+    curso: "Estructura de Datos",
+    rating: 4.6,
+    dificultad: 8.9,
+    precioHora: 40,
+    foto: "https://randomuser.me/api/portraits/women/24.jpg",
+    metodologia: "Análisis asintótico y resolución de problemas de LeetCode.",
+    etiquetas: ["Teórica", "Exigente"],
+    descripcion: "Senior Frontend Developer con fuerte base algorítmica."
+  },
+  {
     id: 7,
     nombre: "Dra. Elena Vargas",
     departamento: "Medicina",
@@ -87,7 +168,7 @@ export const profesoresData = [
     precioHora: 40,
     foto: "https://randomuser.me/api/portraits/women/17.jpg",
     metodologia: "Aprendizaje clínico con simulaciones médicas.",
-    etiquetas: ["Estrica", "Experta", "Metódica"],
+    etiquetas: ["Estricta", "Experta", "Metódica"],
     descripcion: "Especialista en cirugía y formación médica universitaria."
   },
   {
@@ -128,5 +209,18 @@ export const profesoresData = [
     metodologia: "Debates académicos y análisis jurisprudencial.",
     etiquetas: ["Argumentativo", "Directo", "Culto"],
     descripcion: "Abogado litigante especializado en derecho público."
+  },
+  {
+    id: 16, // Nuevo profesor, Álgebra Lineal
+    nombre: "Prof. Hector Lira",
+    departamento: "Matemáticas",
+    curso: "Álgebra Lineal",
+    rating: 4.1,
+    dificultad: 6.0,
+    precioHora: 18,
+    foto: "https://randomuser.me/api/portraits/men/25.jpg",
+    metodologia: "Explicación gráfica de vectores y matrices.",
+    etiquetas: ["Claro", "Paciente", "Amigable"],
+    descripcion: "Especialista en didáctica matemática."
   }
 ];

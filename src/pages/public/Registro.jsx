@@ -1,5 +1,5 @@
 import "./Registro.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginHero from "../../components/LoginHero";
 import heroVideo from "../../images/hero.mp4";
@@ -8,10 +8,11 @@ import Swal from "sweetalert2";
 
 const roleOptions = {
   estudiante: { 
-    color: "#493774", 
+    color: "#6247a0", 
     icon: "bi-mortarboard-fill",
     title: "Estudiante",
     desc: "Encuentra los mejores profesores",
+    path: "/inicio-estudiante",
     fields: [
       { name: "nombres", label: "Nombres completos", icon: "bi-person", type: "text", placeholder: "Ej: Juan Carlos" },
       { name: "email", label: "Correo universitario", icon: "bi-envelope", type: "email", placeholder: "tu.nombre@u.edu.pe" },
@@ -21,10 +22,11 @@ const roleOptions = {
     ]
   },
   profesor: { 
-    color: "#1f1c64", 
+    color: "#1d1c50", 
     icon: "bi-person-badge-fill",
     title: "Docente",
     desc: "Construye tu reputación académica",
+    path: "/inicio-profesor",
     fields: [
       { name: "nombres", label: "Nombres completos", icon: "bi-person", type: "text", placeholder: "Ej: María García" },
       { name: "email", label: "Correo institucional", icon: "bi-envelope", type: "email", placeholder: "profesor@universidad.edu.pe" },
@@ -44,6 +46,17 @@ export default function Registro() {
   const [isLoading, setIsLoading] = useState(false);
 
   const currentRole = roleOptions[role];
+
+  // Protección de sesión 
+  useEffect(() => {
+    const sessionActiva = localStorage.getItem("userSession");
+    if (sessionActiva) {
+      const { role: savedRole } = JSON.parse(sessionActiva);
+      const redirectPath = savedRole === "admin" ? "/inicio-admin" : 
+                          savedRole === "profesor" ? "/inicio-profesor" : "/inicio-estudiante";
+      navigate(redirectPath);
+    }
+  }, [navigate]);
 
   const handleRoleChange = (newRole) => {
     if (newRole !== role) {
@@ -145,38 +158,19 @@ export default function Registro() {
   };
 
   return (
-    <main className="container-fluid p-0 min-vh-100 overflow-hidden">
-      <div className="row g-0 min-vh-100">
-        <div className="col-lg-6 d-none d-lg-block p-0 position-relative">
+    <main className="container-fluid p-0 min-vh-100 overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
+      <div className="row g-0 flex-grow-1">
+        {/* Hero Section */}
+        <div className="col-lg-6 d-none d-lg-block p-0 d-flex flex-column">
           <LoginHero 
             video={heroVideo} 
             titulo="Únete a" 
             highlight="ProfeMatch" 
             subtitulo="Forma parte de la comunidad que está transformando la educación universitaria."
           />
-          
-          <div className="position-absolute bottom-0 start-0 p-5 w-100" 
-               style={{ 
-                 background: "linear-gradient(to top, rgba(24,15,42,0.95), transparent)",
-                 zIndex: 2
-               }}>
-            <div className="row g-4">
-              <div className="col-6">
-                <div className="benefit-card-glass p-3 text-center">
-                  <i className="bi bi-shield-check d-block mb-2"></i>
-                  <small className="fw-bold">100% Seguro</small>
-                </div>
-              </div>
-              <div className="col-6">
-                <div className="benefit-card-glass p-3 text-center">
-                  <i className="bi bi-people d-block mb-2"></i>
-                  <small className="fw-bold">+1000 Usuarios</small>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
+        {/* Form Section */}
         <div className="col-lg-6 d-flex align-items-center justify-content-center position-relative px-3 px-md-4 py-5">
           <div className="position-absolute top-0 end-0 p-3 p-md-4">
             <span className="text-muted small">¿Ya tienes cuenta?</span>
@@ -186,8 +180,9 @@ export default function Registro() {
           </div>
 
           <div className={`registro-card p-4 p-md-5 shadow-lg bg-white w-100 position-relative ${isAnimating ? 'role-swap' : ''}`} 
-               style={{ zIndex: 1 }}>
+               style={{ zIndex: 1, maxWidth: "520px" }}>
             
+            {/* Selector de rol */}
             <div className="role-selector mb-4">
               <div className="row g-2">
                 {Object.keys(roleOptions).map((r) => (
@@ -209,6 +204,7 @@ export default function Registro() {
               </div>
             </div>
 
+            {/* Header */}
             <div className="text-center mb-4">
               <div className="icon-badge-mx-auto" style={{ backgroundColor: currentRole.color }}>
                 <i className={`bi ${currentRole.icon}`}></i>
@@ -218,6 +214,7 @@ export default function Registro() {
               <p className="text-muted small fst-italic mt-2">{currentRole.desc}</p>
             </div>
 
+            {/* Formulario */}
             <form onSubmit={handleRegister} className="mb-4">
               <div className="row g-3">
                 {currentRole.fields.map((field) => (
@@ -243,6 +240,7 @@ export default function Registro() {
                 ))}
               </div>
 
+              {/* Términos y condiciones */}
               <div className="form-check mt-4 mb-4">
                 <input className="form-check-input" type="checkbox" id="terms" required />
                 <label className="form-check-label small text-muted" htmlFor="terms">
@@ -250,6 +248,7 @@ export default function Registro() {
                 </label>
               </div>
 
+              {/* Botón de registro */}
               <div className="d-grid gap-3">
                 <button 
                   type="submit" 
@@ -275,6 +274,7 @@ export default function Registro() {
               </div>
             </form>
 
+            {/* Divider */}
             <div className="text-center position-relative my-4">
               <hr className="text-muted opacity-25" />
               <span className="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">
@@ -282,6 +282,7 @@ export default function Registro() {
               </span>
             </div>
 
+            {/* Social login */}
             <div className="row g-2 mb-3">
               <div className="col-6">
                 <button className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
@@ -297,6 +298,7 @@ export default function Registro() {
               </div>
             </div>
 
+            {/* Info adicional */}
             <div className="text-center mt-4 p-3" style={{ backgroundColor: '#f8f7ff', borderRadius: '12px' }}>
               <p className="small text-muted mb-0">
                 <i className="bi bi-info-circle me-2" style={{ color: 'var(--violet-main)' }}></i>

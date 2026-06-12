@@ -271,7 +271,7 @@ export default function Sidebar({ role }) {
                           navigate(n.enlace);
                         }}
                       >
-                        Ir a la sección
+                        Ir a la sala
                       </button>
                     )}
                   </div>

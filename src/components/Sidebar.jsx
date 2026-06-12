@@ -80,6 +80,25 @@ export default function Sidebar({ role }) {
           StorageService.updateTutoringSession(tut.id, { notified1h: true });
           updated = true;
         }
+
+        // Regla de Inasistencia: Si ya pasó la hora de inicio + su duración y sigue en "Confirmada" (nunca entró)
+        const duracion = tut.duracionEstimada || 1.5;
+        if (difHoras < -duracion) {
+          // Marcar como No Asistió
+          StorageService.updateTutoringSession(tut.id, { estado: "Cancelada" });
+          
+          // Penalizar al estudiante (ej. -10 puntos de Confiabilidad)
+          const currentStats = StorageService.getStudentStats();
+          const newScore = Math.max(0, currentStats.scoreConfiabilidad - 10);
+          StorageService.saveStudentStats({ scoreConfiabilidad: newScore });
+
+          StorageService.saveNotification({
+            tipo: "inasistencia",
+            mensaje: `Has sido penalizado con -10 puntos por no asistir a tu tutoría de ${tut.curso}.`,
+            fechaHoraRef: new Date().toISOString()
+          });
+          updated = true;
+        }
       } else if (tut.estado === "Completada") {
         if (difHoras <= -2 && !tut.notifiedReview) {
           StorageService.saveNotification({

@@ -3,6 +3,7 @@ import Sidebar from "../../components/Sidebar";
 import ProfesorCard from "../../components/ProfesorCard";
 import CheckoutModal from "../../components/CheckoutModal";
 import ModalCancelacion from "../../components/ModalCancelacion";
+import ModalSalaVirtual from "../../components/ModalSalaVirtual";
 import { StorageService } from "../../core/database/StorageService";
 import { courseDurations } from "../../data/profesoresData";
 
@@ -16,6 +17,7 @@ export default function TutoriasEstudiante() {
   // Modals state
   const [selectedProfesor, setSelectedProfesor] = useState(null);
   const [tutoriaACancelar, setTutoriaACancelar] = useState(null);
+  const [tutoriaEnSala, setTutoriaEnSala] = useState(null);
 
   // Grouping by course
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
@@ -49,6 +51,12 @@ export default function TutoriasEstudiante() {
     const hoy = new Date();
     const fecha = new Date(fechaISO);
     return hoy.toDateString() === fecha.toDateString();
+  };
+
+  const isHoraDeClase = (fechaISO) => {
+    const ahora = new Date();
+    const fechaInicio = new Date(fechaISO);
+    return ahora >= fechaInicio;
   };
 
   const getStatusColor = (estado) => {
@@ -178,12 +186,24 @@ export default function TutoriasEstudiante() {
                         </div>
 
                         {tut.estado === "Confirmada" && (
-                          <button
-                            className="btn btn-outline-danger btn-sm w-100 fw-bold rounded-pill"
-                            onClick={() => setTutoriaACancelar(tut)}
-                          >
-                            <i className="bi bi-x-circle me-2"></i> Cancelar Tutoría
-                          </button>
+                          <div className="d-grid mt-3">
+                            {isHoraDeClase(tut.fechaHora) ? (
+                              <button 
+                                className="btn rounded-pill fw-bold py-2 text-white border-0 shadow-sm hover-shadow animation-pulse"
+                                style={gradientStyle}
+                                onClick={() => setTutoriaEnSala(tut)}
+                              >
+                                <i className="bi bi-camera-video-fill me-2"></i> Entrar a Sala Virtual
+                              </button>
+                            ) : (
+                              <button 
+                                className="btn btn-outline-danger btn-sm rounded-pill fw-bold"
+                                onClick={() => setTutoriaACancelar(tut)}
+                              >
+                                <i className="bi bi-x-circle me-2"></i> Cancelar Tutoría
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -290,6 +310,17 @@ export default function TutoriasEstudiante() {
           tutoria={tutoriaACancelar}
           onClose={() => setTutoriaACancelar(null)}
           onSuccess={handleTutoriaCancelada}
+        />
+      )}
+
+      {tutoriaEnSala && (
+        <ModalSalaVirtual 
+          tutoria={tutoriaEnSala}
+          onClose={() => setTutoriaEnSala(null)}
+          onSuccess={() => {
+            setTutoriaEnSala(null);
+            cargarDatos();
+          }}
         />
       )}
     </div>

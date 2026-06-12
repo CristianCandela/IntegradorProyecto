@@ -190,8 +190,8 @@ export default function Sidebar({ role }) {
       text: "Tendrás que volver a ingresar para acceder a tu panel.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: role === 'profesor' ? '#3F51B5' : config.color,
-      cancelButtonColor: "#d33",
+      confirmButtonColor: role === 'profesor' ? '#3F51B5' : '#671572ff',
+      cancelButtonColor: "#3f3375ff",
       confirmButtonText: "Sí, salir",
       cancelButtonText: "Cancelar"
     }).then((result) => {
@@ -245,7 +245,7 @@ export default function Sidebar({ role }) {
           </button>
 
           {mostrarNotificaciones && (
-            <div className="position-absolute bg-white rounded shadow p-2 mt-2" style={{ width: '280px', zIndex: 1100, left: '15px', border: '1px solid #ddd', maxHeight: '300px', overflowY: 'auto' }}>
+            <div className="bg-white rounded shadow p-2 mt-2 position-relative" style={{ zIndex: 1100, border: '1px solid #ddd', maxHeight: '300px', overflowY: 'auto' }}>
               <div className="d-flex justify-content-between align-items-center border-bottom pb-1 mb-1">
                 <h6 className="fw-bold text-dark px-2 pt-1 m-0" style={{ fontSize: '0.8rem' }}>Notificaciones</h6>
                 <button className="btn btn-sm btn-link text-muted p-0" style={{ fontSize: '0.7rem' }} onClick={simularTutoriaFutura} title="Crear tutoría a 59 mins para probar campana">

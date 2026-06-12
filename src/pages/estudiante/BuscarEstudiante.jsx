@@ -36,7 +36,7 @@ export default function BuscarEstudiante() {
     return acc;
   }, {})).map(g => ({
     ...g,
-    rating: g.ratingTotal / g.count,
+    rating: Number((g.ratingTotal / g.count).toFixed(1)),
     dificultad: Math.round((g.dificultadTotal / g.count) * 10) / 10,
     curso: g.count > 1 ? "Múltiples Materias" : g.curso,
     departamento: g.count > 1 ? "Varios Departamentos" : g.departamento
@@ -114,12 +114,9 @@ export default function BuscarEstudiante() {
         <section className="card border-0 shadow-sm p-4 rounded-4 mb-5 bg-white">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h6 className="fw-bold mb-0">Búsqueda Principal</h6>
-            <div className="form-check form-switch d-flex align-items-center gap-2">
-              <label className="form-check-label small fw-bold text-secondary" htmlFor="flexSwitchCheckDefault">
-                Filtros Avanzados
-              </label>
+            <div className="form-check form-switch d-flex align-items-center">
               <input
-                className="form-check-input mt-0"
+                className="form-check-input mt-0 me-2"
                 type="checkbox"
                 role="switch"
                 id="flexSwitchCheckDefault"
@@ -127,6 +124,9 @@ export default function BuscarEstudiante() {
                 onChange={() => setFiltrosAvanzados(!filtrosAvanzados)}
                 style={{ cursor: 'pointer' }}
               />
+              <label className="form-check-label small fw-bold text-secondary mb-0" htmlFor="flexSwitchCheckDefault">
+                Filtros Avanzados
+              </label>
             </div>
           </div>
 

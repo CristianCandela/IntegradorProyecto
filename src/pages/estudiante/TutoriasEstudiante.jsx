@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import ProfesorCard from "../../components/ProfesorCard";
 import CheckoutModal from "../../components/CheckoutModal";
@@ -22,9 +23,23 @@ export default function TutoriasEstudiante() {
   // Grouping by course
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     cargarDatos();
   }, []);
+
+  // Recibir navegación desde el buscador
+  useEffect(() => {
+    if (location.state?.cursoSeleccionado) {
+      setTab("explorar");
+      setCursoSeleccionado(location.state.cursoSeleccionado);
+      
+      // Limpiar el estado para no quedarse pegado si recarga
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, navigate, location.pathname]);
 
   const cargarDatos = () => {
     setProfesores(StorageService.getCompleteProfessors());

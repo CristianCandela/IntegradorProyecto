@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false, onSolicitar }) {
 
@@ -15,8 +16,11 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
     etiquetas,
     curso,
     descripcion,
-    metodologia
+    metodologia,
+    cursosAsociados
   } = profesor;
+
+  const navigate = useNavigate();
 
   // REQUISITO: Verificar si este profesor tiene el Plan Premium activo para destacarlo
   useEffect(() => {
@@ -168,7 +172,18 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               style={{
                 background: "linear-gradient(135deg, #4b1083ff 0%, #7a2baffd 100%)"
               }}
-              onClick={() => onSolicitar && onSolicitar(profesor)}
+              onClick={() => {
+                if (onSolicitar) {
+                  onSolicitar(profesor);
+                } else {
+                  if (cursosAsociados && cursosAsociados.length > 1) {
+                    setShowModal(true);
+                  } else {
+                    const cursoTarget = cursosAsociados ? cursosAsociados[0].curso : curso;
+                    navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
+                  }
+                }
+              }}
             >
               Solicitar
             </button>
@@ -222,29 +237,54 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 <p className="text-muted small mb-0">{metodologia || "Basada en casos prácticos y teoría aplicada."}</p>
               </div>
 
-              <div className="row text-center g-2">
-                <div className="col-4">
-                  <div className="p-2 bg-light rounded-3">
-                    <span className="d-block fw-bold text-warning">{rating} ⭐</span>
-                    <small className="text-muted" style={{ fontSize: '0.6rem' }}>RATING</small>
+              {cursosAsociados && cursosAsociados.length > 1 ? (
+                <div className="mb-3 text-start">
+                  <h6 className="fw-bold text-indigo border-bottom pb-2">Cursos que dicta</h6>
+                  <div className="d-flex flex-column gap-2 mt-2">
+                    {cursosAsociados.map(c => (
+                      <div key={c.id} className="border rounded-3 p-3 bg-white shadow-sm d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong className="d-block text-dark">{c.curso}</strong>
+                          <small className="text-muted">S/. {c.precioHora}/h | ⭐ {c.rating} | 📊 {c.dificultad}/10</small>
+                        </div>
+                        <button 
+                          className="btn btn-sm btn-outline-primary rounded-pill fw-bold"
+                          onClick={() => {
+                            setShowModal(false);
+                            if (onSolicitar) onSolicitar(c);
+                            else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: c.curso } });
+                          }}
+                        >
+                          Solicitar
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="col-4">
-                  <div className="p-2 bg-light rounded-3">
-                    <span className="d-block fw-bold text-info">{dificultad}/10</span>
-                    <small className="text-muted" style={{ fontSize: '0.6rem' }}>DIFICULTAD</small>
+              ) : (
+                <div className="row text-center g-2">
+                  <div className="col-4">
+                    <div className="p-2 bg-light rounded-3">
+                      <span className="d-block fw-bold text-warning">{rating} ⭐</span>
+                      <small className="text-muted" style={{ fontSize: '0.6rem' }}>RATING</small>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="p-2 bg-light rounded-3">
+                      <span className="d-block fw-bold text-info">{dificultad}/10</span>
+                      <small className="text-muted" style={{ fontSize: '0.6rem' }}>DIFICULTAD</small>
+                    </div>
+                  </div>
+                  <div className="col-4">
+                    <div className="p-2 bg-light rounded-3">
+                      <span className="d-block fw-bold text-success">S/. {precioHora}</span>
+                      <small className="text-muted" style={{ fontSize: '0.6rem' }}>PRECIO/H</small>
+                    </div>
                   </div>
                 </div>
-                <div className="col-4">
-                  <div className="p-2 bg-light rounded-3">
-                    <span className="d-block fw-bold text-success">S/. {precioHora}</span>
-                    <small className="text-muted" style={{ fontSize: '0.6rem' }}>PRECIO/H</small>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Acciones del Modal */}
             <div className="p-3 border-top d-flex gap-2 bg-white">
               <button
                 onClick={() => setShowModal(false)}
@@ -252,16 +292,20 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               >
                 Cerrar
               </button>
-              <button
-                className="btn btn-primary rounded-pill w-100 fw-bold border-0 hover-shadow"
-                style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
-                onClick={() => {
-                  setShowModal(false);
-                  if (onSolicitar) onSolicitar(profesor);
-                }}
-              >
-                Solicitar Tutoría
-              </button>
+              {!(cursosAsociados && cursosAsociados.length > 1) && (
+                <button
+                  className="btn btn-primary rounded-pill w-100 fw-bold border-0 hover-shadow"
+                  style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
+                  onClick={() => {
+                    setShowModal(false);
+                    const cursoTarget = cursosAsociados ? cursosAsociados[0] : profesor;
+                    if (onSolicitar) onSolicitar(cursoTarget);
+                    else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget.curso } });
+                  }}
+                >
+                  Solicitar Tutoría
+                </button>
+              )}
             </div>
           </div>
         </div>

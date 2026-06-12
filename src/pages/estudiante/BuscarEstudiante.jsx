@@ -17,6 +17,31 @@ export default function BuscarEstudiante() {
     ...new Set(profesores.map(p => p.departamento))
   ];
 
+  // AGRUPAR PROFESORES POLÍMATAS
+  const profesoresUnificados = Object.values(profesores.reduce((acc, p) => {
+    if (!acc[p.nombre]) {
+      acc[p.nombre] = {
+        ...p,
+        ratingTotal: p.rating,
+        dificultadTotal: p.dificultad,
+        count: 1,
+        cursosAsociados: [p]
+      };
+    } else {
+      acc[p.nombre].ratingTotal += p.rating;
+      acc[p.nombre].dificultadTotal += p.dificultad;
+      acc[p.nombre].count += 1;
+      acc[p.nombre].cursosAsociados.push(p);
+    }
+    return acc;
+  }, {})).map(g => ({
+    ...g,
+    rating: g.ratingTotal / g.count,
+    dificultad: Math.round((g.dificultadTotal / g.count) * 10) / 10,
+    curso: g.count > 1 ? "Múltiples Materias" : g.curso,
+    departamento: g.count > 1 ? "Varios Departamentos" : g.departamento
+  }));
+
   // TEXTO DINÁMICO DIFICULTAD
   const getDificultadLabel = (val) => {
     if (val <= 3) return "Fácil";
@@ -32,18 +57,18 @@ export default function BuscarEstudiante() {
     return "Excelentes";
   };
 
-  // FILTRADO DINÁMICO
-  const profesoresFiltrados = profesores.filter((profe) => {
+  // FILTRADO DINÁMICO SOBRE UNIFICADOS
+  let profesoresFiltrados = profesoresUnificados.filter((profe) => {
 
     const textoBusqueda = busqueda.trim().toLowerCase();
 
     const cumpleBusqueda =
       profe.nombre.toLowerCase().includes(textoBusqueda) ||
-      profe.curso.toLowerCase().includes(textoBusqueda);
+      profe.cursosAsociados.some(c => c.curso.toLowerCase().includes(textoBusqueda));
 
     const cumpleDepto =
       deptoSel === "Todos" ||
-      profe.departamento === deptoSel;
+      profe.cursosAsociados.some(c => c.departamento === deptoSel);
 
     const cumpleRating = !filtrosAvanzados || profe.rating >= ratingMin;
     const cumpleDificultad = !filtrosAvanzados || profe.dificultad <= difMax;
@@ -55,6 +80,12 @@ export default function BuscarEstudiante() {
       cumpleDificultad
     );
   });
+
+  // LÍMITE DE 10 SI NO HAY BÚSQUEDA ACTIVA
+  const isBuscando = busqueda.trim() !== "" || deptoSel !== "Todos" || filtrosAvanzados;
+  if (!isBuscando) {
+    profesoresFiltrados = profesoresFiltrados.slice(0, 10);
+  }
 
   const textGradient = {
     background: "linear-gradient(135deg, #57227ae5 0%, #9f39c7fa 100%)",

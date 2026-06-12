@@ -23,6 +23,7 @@ export default function Inicio() {
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState([]);
   const [indexActivo, setIndexActivo] = useState(0);
+  const intervalRef = React.useRef(null);
 
   // --- DATOS ---
   const pasos = [
@@ -53,17 +54,58 @@ export default function Inicio() {
   ];
 
   const estadisticasFinales = [
-    { icon: "👥", val: "500+", label: "Profesores", color: "bg-indigo-soft" },
-    { icon: "⭐", val: "10k+", label: "Reseñas", color: "bg-violet-soft" },
-    { icon: "📈", val: "100%", label: "Satisfacción", color: "bg-purple-soft" }
-  ];
-
+  { 
+    icon: "bi bi-people", 
+    val: "500+", 
+    label: "Profesores", 
+    textColor: "#ffffff" 
+  },
+  { 
+    icon: "bi bi-star-fill", 
+    val: "10k+", 
+    label: "Reseñas",
+    textColor: "#ffffff" 
+  },
+  { 
+    icon: "bi bi-graph-up", 
+    val: "100%", 
+    label: "Satisfacción",  
+    textColor: "#ffffff" 
+  }
+];
   useEffect(() => {
-    const intervalo = setInterval(() => {
+    // Limpiar intervalo previo si existe
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    // Iniciar nuevo intervalo
+    intervalRef.current = setInterval(() => {
       setIndexActivo((prev) => (prev + 1) % pasos.length);
-    }, 5000); 
-    return () => clearInterval(intervalo);
+    }, 5000);
+
+    // Cleanup al desmontar
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [pasos.length]);
+
+  // Función para cambiar manualmente y reiniciar el temporizador
+  const cambiarPaso = (nuevoIndex) => {
+    if (nuevoIndex !== indexActivo) {
+      setIndexActivo(nuevoIndex);
+      
+      // Reiniciar el temporizador desde cero
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      intervalRef.current = setInterval(() => {
+        setIndexActivo((prev) => (prev + 1) % pasos.length);
+      }, 5000);
+    }
+  };
 
   const manejarBusqueda = (e) => {
     const valor = e.target.value;
@@ -79,6 +121,7 @@ export default function Inicio() {
       setResultados([]);
     }
   };
+
 
   return (
     <main>
@@ -319,10 +362,16 @@ export default function Inicio() {
           <div className="row g-4 py-5">
             {estadisticasFinales.map((stat, i) => (
               <div className="col-md-4" key={i}>
-                <div className="stat-card glass-effect round-xl shadow-purple hover-lift p-4 text-center">
-                  <div className={`icon-box mx-auto ${stat.color} mb-3`}>{stat.icon}</div>
-                  <h2 className="fw-bold m-0">{stat.val}</h2>
-                  <p className="text-muted m-0">{stat.label}</p>
+                <div className="stat-card glass-effect round-xl shadow-purple hover-lift p-4 text-center"
+                     style={{
+                       background: 'var(--gradient-primary)' 
+                     }}>
+                  <div className="icon-box mx-auto mb-3 d-flex align-items-center justify-content-center"
+                       style={{ color: stat.textColor }}> 
+                    <i className={`${stat.icon} fs-3`}></i>
+                  </div>
+                  <h2 className="fw-bold text-white m-0">{stat.val}</h2>
+                  <p className="text-white opacity-75 m-0">{stat.label}</p>
                 </div>
               </div>
             ))}

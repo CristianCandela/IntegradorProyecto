@@ -88,7 +88,7 @@ export default function Sidebar({ role }) {
         if (difHoras < -duracion) {
           // Marcar como No Asistió
           StorageService.updateTutoringSession(tut.id, { estado: "Cancelada" });
-          
+
           // Penalizar al estudiante (ej. -10 puntos de Confiabilidad)
           const currentStats = StorageService.getStudentStats();
           const newScore = Math.max(0, currentStats.scoreConfiabilidad - 10);
@@ -190,8 +190,8 @@ export default function Sidebar({ role }) {
       text: "Tendrás que volver a ingresar para acceder a tu panel.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: role === 'profesor' ? '#3F51B5' : config.color,
-      cancelButtonColor: "#d33",
+      confirmButtonColor: role === 'profesor' ? '#3F51B5' : '#7B1FA2',
+      cancelButtonColor: "#6c757d",
       confirmButtonText: "Sí, salir",
       cancelButtonText: "Cancelar"
     }).then((result) => {
@@ -262,16 +262,16 @@ export default function Sidebar({ role }) {
                   >
                     <div className="mb-1">{n.mensaje}</div>
                     {n.enlace && (
-                      <button 
-                        className="btn btn-sm btn-primary py-0 px-2 fw-bold d-inline-block mt-1 border-0 hover-shadow" 
-                        style={{ fontSize: '0.65rem', background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)" }}
+                      <button
+                        className="btn btn-sm btn-primary py-0 px-2 fw-bold d-inline-block mt-1 border-0 hover-shadow"
+                        style={{ fontSize: '0.65rem', background: "linear-gradient(135deg, #7B1FA2 0%, #431c83ff 100%)" }}
                         onClick={(e) => {
                           e.stopPropagation();
                           marcarComoLeida(n.id);
                           navigate(n.enlace);
                         }}
                       >
-                        Ir a la sección
+                        Ir a la sala
                       </button>
                     )}
                   </div>
@@ -306,28 +306,30 @@ export default function Sidebar({ role }) {
       </nav>
 
       {/* WIDGET DEL SCORE DE CONFIABILIDAD */}
-      <div className="w-100 px-3 mt-auto mb-2">
-        <div className="p-2 rounded bg-white bg-opacity-10 text-white" style={{ fontSize: '0.8rem' }}>
-          <div className="d-flex justify-content-between align-items-center mb-1">
-            <i className="bi bi-shield-check fs-6"></i>
-            {isExpanded && <span className="fw-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>CONFIABILIDAD</span>}
-            <span className="badge" style={{ backgroundColor: obtenerColorScore(scoreConfiabilidad) }}>
-              {scoreConfiabilidad}
-            </span>
-          </div>
-          {isExpanded && (
-            <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${scoreConfiabilidad}%`,
-                  backgroundColor: obtenerColorScore(scoreConfiabilidad)
-                }}
-              ></div>
+      {role === "estudiante" && (
+        <div className="w-100 px-3 mt-auto mb-2">
+          <div className="p-2 rounded bg-white bg-opacity-10 text-white" style={{ fontSize: '0.8rem' }}>
+            <div className="d-flex justify-content-between align-items-center mb-1">
+              <i className="bi bi-shield-check fs-6"></i>
+              {isExpanded && <span className="fw-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>CONFIABILIDAD</span>}
+              <span className="badge" style={{ backgroundColor: obtenerColorScore(scoreConfiabilidad) }}>
+                {scoreConfiabilidad}
+              </span>
             </div>
-          )}
+            {isExpanded && (
+              <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${scoreConfiabilidad}%`,
+                    backgroundColor: obtenerColorScore(scoreConfiabilidad)
+                  }}
+                ></div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="sidebar-footer w-100">
         <button onClick={handleLogout} className="nav-item logout-btn btn btn-link text-white text-decoration-none d-flex align-items-center px-3 py-2 w-100 style-none" style={{ border: 'none', background: 'none' }}>

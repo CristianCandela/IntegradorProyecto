@@ -142,9 +142,9 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
         <div className="modal-content border-0 rounded-4 shadow">
           {paso === 1 ? (
             <>
-              <div className="modal-header border-bottom-0 pb-0">
+              <div className="modal-header border-bottom-0 pb-0" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                 <h5 className="modal-title fw-bold">Agendar Tutoría</h5>
-                <button type="button" className="btn-close" onClick={onClose}></button>
+                <button type="button" className="btn-close" onClick={onClose} style={{ filter: "invert(0)" }}></button>
               </div>
               <div className="modal-body pt-2">
                 <div className="d-flex align-items-center mb-4">
@@ -238,7 +238,7 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
                     </div>
                   )}
 
-                  <button type="submit" className="btn btn-primary w-100 fw-bold py-2">
+                  <button type="submit" className="btn btn-primary w-100 fw-bold py-2 border-0 hover-shadow" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}>
                     Confirmar y Pagar
                   </button>
                 </form>
@@ -255,7 +255,7 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
                 <small className="d-block text-muted mb-1">ID de Transacción</small>
                 <strong className="text-dark">{transaccionId}</strong>
               </div>
-              <button className="btn btn-primary w-100 fw-bold py-2" onClick={handleCerrar}>
+              <button className="btn btn-primary w-100 fw-bold py-2 border-0 hover-shadow" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }} onClick={handleCerrar}>
                 Ver mis tutorías
               </button>
             </div>

@@ -216,39 +216,57 @@ export default function ReseñasEstudiante() {
         <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 rounded-4 shadow-lg">
-              <div className="modal-header border-bottom-0 pb-0">
-                <h5 className="fw-bold text-indigo mb-0">Evaluar Tutoría</h5>
-                <button className="btn-close" onClick={() => setShowAddModal(false)}></button>
+              <div className="modal-header border-bottom-0 pb-0" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                <h5 className="fw-bold mb-0">Evaluar Tutoría</h5>
+                <button type="button" className="btn-close" onClick={() => setShowAddModal(false)}></button>
               </div>
 
               <div className="modal-body pt-3">
                 <form onSubmit={guardarReseña}>
-                  {/* Selector de Tutoría */}
-                  <div className="mb-4">
-                    <label className="form-label small fw-bold text-secondary">Selecciona una tutoría completada pendiente de evaluación:</label>
-                    <select
-                      className="form-select bg-light"
-                      required
-                      value={selectedTutoria ? selectedTutoria.id : ""}
-                      onChange={e => {
-                        const tut = tutoriasCompletadas.find(t => t.id === parseInt(e.target.value));
-                        setSelectedTutoria(tut);
-                      }}
-                    >
-                      <option value="">-- Elige una tutoría --</option>
-                      {tutoriasCompletadas.map(tut => (
-                        <option key={tut.id} value={tut.id}>
-                          {tut.curso} con {tut.profesorNombre} ({new Date(tut.fechaHora).toLocaleDateString()})
-                        </option>
-                      ))}
-                    </select>
-                    {tutoriasCompletadas.length === 0 && (
-                      <small className="text-danger mt-1 d-block">No tienes tutorías "Completadas" pendientes de evaluar. (Prueba creando y finalizando una tutoría primero).</small>
-                    )}
-                  </div>
+                  {/* Selector de Tutoría (Modern Cards) */}
+                  {!selectedTutoria && (
+                    <div className="mb-4">
+                      <label className="form-label small fw-bold text-secondary mb-3">Tutorías pendientes de evaluación:</label>
+                      {tutoriasCompletadas.length === 0 ? (
+                        <div className="alert alert-light text-center small text-muted border rounded-4">
+                          No tienes tutorías "Completadas" pendientes de evaluar.
+                        </div>
+                      ) : (
+                        <div className="d-flex flex-column gap-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                          {tutoriasCompletadas.map(tut => (
+                            <div 
+                              key={tut.id} 
+                              className="card border border-light shadow-sm rounded-3 p-3 cursor-pointer hover-shadow transition-all"
+                              style={{ cursor: 'pointer' }}
+                              onClick={() => setSelectedTutoria(tut)}
+                            >
+                              <div className="d-flex align-items-center gap-3">
+                                <img src={tut.foto} alt={tut.profesorNombre} className="rounded-circle" width="40" height="40" style={{ objectFit: 'cover' }} />
+                                <div>
+                                  <h6 className="fw-bold mb-0 text-dark">{tut.curso}</h6>
+                                  <small className="text-muted d-block">{tut.profesorNombre} • {new Date(tut.fechaHora).toLocaleDateString()}</small>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {selectedTutoria && (
                     <>
+                      <div className="d-flex justify-content-between align-items-center mb-3 p-3 bg-light rounded-4 border border-light">
+                        <div className="d-flex align-items-center gap-3">
+                          <img src={selectedTutoria.foto} alt={selectedTutoria.profesorNombre} className="rounded-circle shadow-sm" width="50" height="50" style={{ objectFit: 'cover' }} />
+                          <div>
+                            <h6 className="fw-bold mb-0 text-dark">{selectedTutoria.curso}</h6>
+                            <small className="text-muted">{selectedTutoria.profesorNombre}</small>
+                          </div>
+                        </div>
+                        <button type="button" className="btn btn-sm btn-outline-secondary rounded-pill" onClick={() => setSelectedTutoria(null)}>Cambiar</button>
+                      </div>
+
                       {/* Calificación General (Solo Lectura) */}
                       <div className="text-center mb-4 p-3 bg-light rounded-4">
                         <label className="d-block fw-bold text-dark mb-1">Calificación General (Automática)</label>
@@ -315,8 +333,8 @@ export default function ReseñasEstudiante() {
                       )}
 
                       <div className="d-flex gap-2">
-                        <button type="button" className="btn btn-light fw-bold flex-grow-1" onClick={() => setShowAddModal(false)}>Cancelar</button>
-                        <button type="submit" className="btn btn-primary fw-bold flex-grow-1">Enviar Valoración</button>
+                        <button type="button" className="btn btn-light fw-bold flex-grow-1 rounded-pill" onClick={() => setShowAddModal(false)}>Cancelar</button>
+                        <button type="submit" className="btn btn-primary fw-bold flex-grow-1 rounded-pill border-0 hover-shadow" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}>Enviar Valoración</button>
                       </div>
                     </>
                   )}

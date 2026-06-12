@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false }) {
+export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false, onSolicitar }) {
   
   const [showModal, setShowModal] = useState(false);
   const [esPremium, setEsPremium] = useState(false);
@@ -20,14 +20,20 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
   // REQUISITO: Verificar si este profesor tiene el Plan Premium activo para destacarlo
   useEffect(() => {
-    // Si es tu propio perfil simulado o si añadimos la propiedad en la base de datos
     const planGuardado = localStorage.getItem("plan_profesor") || "Freemium";
     
-    // Para la demo, si el nombre coincide con el tuyo o si el objeto ya viene marcado como destacado
     if (planGuardado === "Premium" && (nombre.includes("Juan Jose") || profesor.isPremium)) {
       setEsPremium(true);
     }
   }, [nombre, profesor]);
+
+  // Maneja el clic en solicitar cerrando el modal de detalles si estuviera abierto
+  const handleSolicitarClick = () => {
+    setShowModal(false); 
+    if (onSolicitar) {
+      onSolicitar();
+    }
+  };
 
   return (
     <>
@@ -164,7 +170,9 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               Ver Perfil
             </button>
 
+            {/* CORREGIDO: onClick enlazado a la función controladora de solicitudes */}
             <button
+              onClick={handleSolicitarClick}
               className="btn btn-sm rounded-pill fw-bold py-2 text-white border-0"
               style={{
                 background: esPremium 
@@ -254,7 +262,10 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               >
                 Cerrar
               </button>
+              
+              {/* CORREGIDO: onClick enlazado también aquí para poder agendar desde la vista extendida */}
               <button 
+                onClick={handleSolicitarClick}
                 className="btn btn-primary rounded-pill w-100 fw-bold border-0" 
                 style={{ background: esPremium ? "#7B1FA2" : "#493774" }}
               >

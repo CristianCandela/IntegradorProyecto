@@ -26,7 +26,7 @@ export default function ModalSalaVirtual({ tutoria, onClose, onSuccess }) {
 
             return 100;
           }
-          return prev + 2; // Incremento de 2% cada 100ms = 5 segundos total
+          return prev + 2;
         });
       }, 100);
     }
@@ -38,7 +38,7 @@ export default function ModalSalaVirtual({ tutoria, onClose, onSuccess }) {
   }, [fase, tutoria.id]);
 
   const handleIrAReseñas = () => {
-    onSuccess(); // Actualiza la lista de tutorías en el padre
+    onSuccess();
     navigate("/resenas-estudiante");
   };
 

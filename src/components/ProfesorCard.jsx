@@ -1,5 +1,24 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Chart as ChartJS,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Radar } from 'react-chartjs-2';
+
+ChartJS.register(
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+  Tooltip,
+  Legend
+);
 
 export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false, onSolicitar }) {
 
@@ -17,7 +36,14 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
     curso,
     descripcion,
     metodologia,
-    cursosAsociados
+    cursosAsociados,
+    universidad,
+    metricas,
+    reconocimientos,
+    modalidades,
+    horarios,
+    criteriosEvaluacion,
+    resenasDestacadas
   } = profesor;
 
   const navigate = useNavigate();
@@ -198,8 +224,8 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
           style={{ background: "rgba(0,0,0,0.7)", zIndex: 1060 }}
         >
           <div
-            className="bg-white rounded-4 shadow-lg overflow-hidden"
-            style={{ width: "90%", maxWidth: "550px", animation: "fadeInUp 0.3s ease" }}
+            className="bg-white rounded-4 shadow-lg overflow-hidden d-flex flex-column"
+            style={{ width: "95%", maxWidth: "800px", maxHeight: "90vh", animation: "fadeInUp 0.3s ease" }}
           >
             {/* Header del Modal */}
             <div className="p-4 text-center border-bottom bg-light position-relative">
@@ -226,19 +252,117 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
             </div>
 
             {/* Contenido del Modal */}
-            <div className="p-4" style={{ maxHeight: "50vh", overflowY: "auto" }}>
-              <div className="mb-4 text-start">
-                <h6 className="fw-bold text-indigo border-bottom pb-2">Sobre el Profesor</h6>
-                <p className="text-muted small mb-0">{descripcion || "Sin descripción disponible."}</p>
+            <div className="p-4 flex-grow-1" style={{ overflowY: "auto" }}>
+
+              {/* Información Institucional & Stat Cards */}
+              <div className="row g-3 mb-4 text-center">
+                <div className="col-12 mb-2 text-start">
+                  {universidad && <span className="badge bg-light text-dark border me-2"><i className="bi bi-building me-1"></i> {universidad}</span>}
+                  {modalidades?.map(m => <span key={m} className="badge bg-light text-primary border me-2">{m}</span>)}
+                </div>
+                <div className="col-4">
+                  <div className="p-3 bg-light rounded-4 shadow-sm border border-white h-100 d-flex flex-column justify-content-center">
+                    <h3 className="fw-bold text-success mb-0">{metricas?.tasaAprobacion || 'N/A'}%</h3>
+                    <small className="text-muted d-block mt-1" style={{ fontSize: '0.65rem', lineHeight: '1' }}>Tasa Aprobación</small>
+                  </div>
+                </div>
+                <div className="col-4">
+                  <div className="p-3 bg-light rounded-4 shadow-sm border border-white h-100 d-flex flex-column justify-content-center">
+                    <h3 className="fw-bold text-indigo mb-0">{metricas?.estudiantesAtendidos || 'N/A'}</h3>
+                    <small className="text-muted d-block mt-1" style={{ fontSize: '0.65rem', lineHeight: '1' }}>Estudiantes Atendidos</small>
+                  </div>
+                </div>
+                <div className="col-4">
+                  <div className="p-3 bg-light rounded-4 shadow-sm border border-white h-100 d-flex flex-column justify-content-center">
+                    <h4 className="fw-bold text-info mb-0 pt-1">{metricas?.tiempoRespuesta || 'N/A'}</h4>
+                    <small className="text-muted d-block mt-1" style={{ fontSize: '0.65rem', lineHeight: '1' }}>Tiempo de Respuesta</small>
+                  </div>
+                </div>
               </div>
 
-              <div className="mb-4 text-start">
-                <h6 className="fw-bold text-indigo border-bottom pb-2">Metodología</h6>
-                <p className="text-muted small mb-0">{metodologia || "Basada en casos prácticos y teoría aplicada."}</p>
+              <div className="row mb-4">
+                <div className="col-lg-6 text-start mb-4 mb-lg-0">
+                  <h6 className="fw-bold text-indigo border-bottom pb-2">Sobre el Profesor</h6>
+                  <p className="text-muted small mb-3">{descripcion || "Sin descripción disponible."}</p>
+
+                  <h6 className="fw-bold text-indigo border-bottom pb-2">Metodología</h6>
+                  <p className="text-muted small mb-3">{metodologia || "Basada en casos prácticos y teoría aplicada."}</p>
+
+                  {reconocimientos && reconocimientos.length > 0 && (
+                    <>
+                      <h6 className="fw-bold text-indigo border-bottom pb-2">Reconocimientos y Logros</h6>
+                      <ul className="text-muted small ps-3 mb-0">
+                        {reconocimientos.map((r, i) => <li key={i} className="mb-1">{r}</li>)}
+                      </ul>
+                    </>
+                  )}
+                </div>
+
+                <div className="col-lg-6">
+                  {/* Radar Chart */}
+                  {criteriosEvaluacion && (
+                    <div className="bg-light p-3 rounded-4 shadow-sm h-100 d-flex flex-column align-items-center justify-content-center border border-white">
+                      <h6 className="fw-bold text-center mb-2 small text-dark">Desempeño Cualitativo</h6>
+                      <div style={{ width: '100%', maxWidth: '260px', margin: '0 auto' }}>
+                        <Radar
+                          data={{
+                            labels: ['Puntualidad', 'Claridad', 'Dominio', 'Profesionalismo', 'Exigencia', 'Disponibilidad'],
+                            datasets: [{
+                              label: 'Puntuación (1-5)',
+                              data: [
+                                criteriosEvaluacion.Puntualidad,
+                                criteriosEvaluacion.Claridad,
+                                criteriosEvaluacion.Dominio,
+                                criteriosEvaluacion.Profesionalismo,
+                                criteriosEvaluacion.Exigencia,
+                                criteriosEvaluacion.Disponibilidad
+                              ],
+                              backgroundColor: 'rgba(123, 31, 162, 0.2)',
+                              borderColor: 'rgba(123, 31, 162, 1)',
+                              borderWidth: 2,
+                              pointBackgroundColor: 'rgba(233, 30, 99, 1)',
+                              pointBorderColor: '#fff',
+                              pointHoverBackgroundColor: '#fff',
+                              pointHoverBorderColor: 'rgba(233, 30, 99, 1)'
+                            }]
+                          }}
+                          options={{
+                            scales: {
+                              r: {
+                                angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                pointLabels: { font: { size: 9, weight: 'bold' }, color: '#495057' },
+                                ticks: { min: 0, max: 5, stepSize: 1, display: false }
+                              }
+                            },
+                            plugins: { legend: { display: false } },
+                            maintainAspectRatio: true
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {cursosAsociados && cursosAsociados.length > 1 ? (
-                <div className="mb-3 text-start">
+              {/* Horarios Disponibles */}
+              {horarios && (
+                <div className="mb-4 text-start">
+                  <h6 className="fw-bold text-indigo border-bottom pb-2">Horarios de Disponibilidad Habitual</h6>
+                  <div className="d-flex flex-wrap gap-2 mt-2">
+                    {Object.entries(horarios).map(([dia, horas]) => (
+                      <div key={dia} className="border rounded-3 p-2 bg-light shadow-sm flex-grow-1 text-center">
+                        <strong className="d-block text-dark small mb-1">{dia}</strong>
+                        {horas.map((h, i) => <span key={i} className="badge bg-white text-secondary border me-1 mb-1 shadow-sm">{h}</span>)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Cursos Extra (Si los tiene) */}
+              {cursosAsociados && cursosAsociados.length > 1 && (
+                <div className="mb-4 text-start">
                   <h6 className="fw-bold text-indigo border-bottom pb-2">Cursos que dicta</h6>
                   <div className="d-flex flex-column gap-2 mt-2">
                     {cursosAsociados.map(c => (
@@ -247,7 +371,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                           <strong className="d-block text-dark">{c.curso}</strong>
                           <small className="text-muted">S/. {c.precioHora}/h | ⭐ {c.rating} | 📊 {c.dificultad}/10</small>
                         </div>
-                        <button 
+                        <button
                           className="btn btn-sm btn-outline-primary rounded-pill fw-bold"
                           onClick={() => {
                             setShowModal(false);
@@ -261,25 +385,30 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                     ))}
                   </div>
                 </div>
-              ) : (
-                <div className="row text-center g-2">
-                  <div className="col-4">
-                    <div className="p-2 bg-light rounded-3">
-                      <span className="d-block fw-bold text-warning">{rating} ⭐</span>
-                      <small className="text-muted" style={{ fontSize: '0.6rem' }}>RATING</small>
-                    </div>
-                  </div>
-                  <div className="col-4">
-                    <div className="p-2 bg-light rounded-3">
-                      <span className="d-block fw-bold text-info">{dificultad}/10</span>
-                      <small className="text-muted" style={{ fontSize: '0.6rem' }}>DIFICULTAD</small>
-                    </div>
-                  </div>
-                  <div className="col-4">
-                    <div className="p-2 bg-light rounded-3">
-                      <span className="d-block fw-bold text-success">S/. {precioHora}</span>
-                      <small className="text-muted" style={{ fontSize: '0.6rem' }}>PRECIO/H</small>
-                    </div>
+              )}
+
+              {/* Reseñas Destacadas */}
+              {resenasDestacadas && resenasDestacadas.length > 0 && (
+                <div className="mb-2 text-start">
+                  <h6 className="fw-bold text-indigo border-bottom pb-2">Reseñas Destacadas</h6>
+                  <div className="d-flex flex-column gap-3 mt-3">
+                    {resenasDestacadas.map((r, i) => (
+                      <div key={i} className="bg-light p-3 rounded-4 shadow-sm border border-white position-relative">
+                        <div className="d-flex align-items-center mb-2">
+                          <div className="bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white fw-bold me-2" style={{ width: '35px', height: '35px', fontSize: '0.8rem' }}>
+                            {r.estudiante.charAt(0)}
+                          </div>
+                          <div>
+                            <strong className="d-block text-dark" style={{ fontSize: '0.85rem' }}>{r.estudiante}</strong>
+                            <small className="text-muted d-block" style={{ fontSize: '0.7rem' }}>{r.curso} • {r.fecha}</small>
+                          </div>
+                          <div className="ms-auto text-warning fw-bold" style={{ fontSize: '0.8rem' }}>
+                            <i className="bi bi-star-fill"></i> {r.puntuaciones?.Claridad || rating}
+                          </div>
+                        </div>
+                        <p className="text-muted mb-0 fst-italic" style={{ fontSize: '0.8rem' }}>"{r.comentario}"</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

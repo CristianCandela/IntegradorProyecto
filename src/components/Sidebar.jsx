@@ -89,7 +89,7 @@ export default function Sidebar({ role }) {
           // Marcar como No Asistió
           StorageService.updateTutoringSession(tut.id, { estado: "Cancelada" });
 
-          // Penalizar al estudiante (ej. -10 puntos de Confiabilidad)
+          // Penalizar al estudiante
           const currentStats = StorageService.getStudentStats();
           const newScore = Math.max(0, currentStats.scoreConfiabilidad - 10);
           StorageService.saveStudentStats({ scoreConfiabilidad: newScore });
@@ -134,7 +134,7 @@ export default function Sidebar({ role }) {
   };
 
   const simularTutoriaFutura = () => {
-    const futura = new Date(Date.now() + 59 * 60000); // 59 minutos en el futuro
+    const futura = new Date(Date.now() + 59 * 60000);
     StorageService.saveTutoringSession({
       profesorId: 1,
       profesorNombre: "Profesor Prueba",
@@ -204,7 +204,7 @@ export default function Sidebar({ role }) {
 
   const marcarComoLeida = (id) => {
     StorageService.markNotificationAsRead(id);
-    cargarDatosEstudiante(); // Refrescar estado local
+    cargarDatosEstudiante();
   };
 
   const alertasNoLeidas = notificaciones.filter(n => !n.read).length;

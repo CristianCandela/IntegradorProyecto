@@ -20,7 +20,7 @@ export const profesoresData = [
     "nombre": "Prof. Carlos Ramirez",
     "departamento": "Ingeniería de Sistemas",
     "curso": "Programación Web",
-    "rating": 4.9,
+    "rating": 4.7,
     "dificultad": 7.5,
     "precioHora": 30,
     "foto": "https://randomuser.me/api/portraits/men/10.jpg",
@@ -58,10 +58,10 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.9,
-      "Claridad": 4.9,
-      "Dominio": 5,
-      "Profesionalismo": 5,
+      "Puntualidad": 4.8,
+      "Claridad": 4.7,
+      "Dominio": 4.9,
+      "Profesionalismo": 4.8,
       "Exigencia": 3.8,
       "Disponibilidad": 4.8
     },
@@ -69,44 +69,44 @@ export const profesoresData = [
       {
         "estudiante": "Anónimo",
         "curso": "Programación Web",
-        "fecha": "15/05/2026",
+        "fecha": "01/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 4.9,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4.8,
+          "Claridad": 4.7,
+          "Dominio": 4.9,
+          "Profesionalismo": 4.8,
           "Exigencia": 3.8,
           "Disponibilidad": 4.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "El contenido sirve, pero la exigencia es fuerte."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Programación Web",
-        "fecha": "02/04/2026",
+        "fecha": "27/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.4,
-          "Claridad": 4.9,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4.8,
+          "Claridad": 5,
+          "Dominio": 4.9,
+          "Profesionalismo": 4.8,
           "Exigencia": 3.8,
           "Disponibilidad": 4.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El profe es chévere, te resuelve las dudas sin problema."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Programación Web",
-        "fecha": "28/02/2026",
+        "fecha": "05/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 4.9,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4.8,
+          "Claridad": 5,
+          "Dominio": 4.9,
+          "Profesionalismo": 4.8,
           "Exigencia": 3.8,
           "Disponibilidad": 4.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Excelente profe, sus clases son muy claras y siempre está dispuesto a ayudar."
       }
     ]
   },
@@ -115,7 +115,7 @@ export const profesoresData = [
     "nombre": "Prof. Carlos Ramirez",
     "departamento": "Ingeniería de Sistemas",
     "curso": "Base de Datos",
-    "rating": 4.8,
+    "rating": 4.9,
     "dificultad": 8,
     "precioHora": 35,
     "foto": "https://randomuser.me/api/portraits/men/10.jpg",
@@ -153,10 +153,10 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.9,
-      "Claridad": 4.7,
+      "Puntualidad": 4.7,
+      "Claridad": 5,
       "Dominio": 5,
-      "Profesionalismo": 4.9,
+      "Profesionalismo": 5,
       "Exigencia": 4,
       "Disponibilidad": 4.8
     },
@@ -164,44 +164,44 @@ export const profesoresData = [
       {
         "estudiante": "Anónimo",
         "curso": "Base de Datos",
-        "fecha": "15/05/2026",
+        "fecha": "05/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 4.7,
+          "Puntualidad": 4.7,
+          "Claridad": 5,
           "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Profesionalismo": 5,
           "Exigencia": 4,
           "Disponibilidad": 4.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Sus materiales de estudio son súper completos, me salvaron en el parcial."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Base de Datos",
-        "fecha": "02/04/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.4,
-          "Claridad": 4.7,
+          "Puntualidad": 4.7,
+          "Claridad": 5,
           "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Profesionalismo": 5,
           "Exigencia": 4,
           "Disponibilidad": 4.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "Inspira confianza y explica con mucha paciencia."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Base de Datos",
-        "fecha": "28/02/2026",
+        "fecha": "29/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 4.7,
+          "Puntualidad": 4.7,
+          "Claridad": 5,
           "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Profesionalismo": 5,
           "Exigencia": 4,
           "Disponibilidad": 4.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Sabe mucho, pero a veces es difícil seguirle el ritmo."
       }
     ]
   },
@@ -210,7 +210,7 @@ export const profesoresData = [
     "nombre": "Dra. Carmen López",
     "departamento": "Psicología",
     "curso": "Psicología Social",
-    "rating": 4.9,
+    "rating": 3.8,
     "dificultad": 4.8,
     "precioHora": 22,
     "foto": "https://randomuser.me/api/portraits/women/11.jpg",
@@ -248,55 +248,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.7,
-      "Claridad": 4.9,
-      "Dominio": 5,
-      "Profesionalismo": 5,
+      "Puntualidad": 4.1,
+      "Claridad": 3.8,
+      "Dominio": 4,
+      "Profesionalismo": 3.9,
       "Exigencia": 2.4,
-      "Disponibilidad": 4.8
+      "Disponibilidad": 2.9
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Psicología Social",
-        "fecha": "15/05/2026",
+        "fecha": "04/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.7,
-          "Claridad": 4.9,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4.1,
+          "Claridad": 3.8,
+          "Dominio": 4,
+          "Profesionalismo": 3.9,
           "Exigencia": 2.4,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 2.9
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "El contenido sirve, pero la exigencia es fuerte."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Psicología Social",
-        "fecha": "02/04/2026",
+        "fecha": "25/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.2,
-          "Claridad": 4.9,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 3.3,
+          "Claridad": 3.3,
+          "Dominio": 4,
+          "Profesionalismo": 3.9,
           "Exigencia": 2.4,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 1.9
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El profe sabe, pero no se le entiende bien cuando va rápido."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Psicología Social",
-        "fecha": "28/02/2026",
+        "fecha": "07/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.7,
-          "Claridad": 4.9,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 3.3,
+          "Claridad": 3.3,
+          "Dominio": 4,
+          "Profesionalismo": 3.9,
           "Exigencia": 2.4,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 1.9
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Siento que le falta paciencia si no entiendes a la primera."
       }
     ]
   },
@@ -305,7 +305,7 @@ export const profesoresData = [
     "nombre": "Dra. Carmen López",
     "departamento": "Psicología",
     "curso": "Neuropsicología",
-    "rating": 4.7,
+    "rating": 3.2,
     "dificultad": 7.5,
     "precioHora": 28,
     "foto": "https://randomuser.me/api/portraits/women/11.jpg",
@@ -343,55 +343,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.6,
-      "Claridad": 4.8,
-      "Dominio": 4.9,
-      "Profesionalismo": 4.8,
+      "Puntualidad": 3.2,
+      "Claridad": 3.3,
+      "Dominio": 3.4,
+      "Profesionalismo": 3.3,
       "Exigencia": 3.8,
-      "Disponibilidad": 4.8
+      "Disponibilidad": 2.9
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Neuropsicología",
-        "fecha": "15/05/2026",
+        "fecha": "05/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.6,
-          "Claridad": 4.8,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 3.2,
+          "Claridad": 3.3,
+          "Dominio": 3.4,
+          "Profesionalismo": 3.3,
           "Exigencia": 3.8,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 2.9
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "El profe explica bien pero a veces va muy rápido."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Neuropsicología",
-        "fecha": "02/04/2026",
+        "fecha": "06/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.1,
-          "Claridad": 4.8,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 2.4,
+          "Claridad": 2.8,
+          "Dominio": 3.4,
+          "Profesionalismo": 3.3,
           "Exigencia": 3.8,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 1.9
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "A veces tarda en responder los mensajes pero la clase en sí está bien."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Neuropsicología",
-        "fecha": "28/02/2026",
+        "fecha": "30/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.6,
-          "Claridad": 4.8,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 2.4,
+          "Claridad": 2.8,
+          "Dominio": 3.4,
+          "Profesionalismo": 3.3,
           "Exigencia": 3.8,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 1.9
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Domina el tema pero es muy exigente con los tiempos, casi no hay margen."
       }
     ]
   },
@@ -400,7 +400,7 @@ export const profesoresData = [
     "nombre": "Dr. Ana Martinez",
     "departamento": "Matemáticas",
     "curso": "Cálculo I",
-    "rating": 4.8,
+    "rating": 4.1,
     "dificultad": 9.2,
     "precioHora": 25,
     "foto": "https://randomuser.me/api/portraits/women/12.jpg",
@@ -438,55 +438,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.7,
-      "Claridad": 4.8,
-      "Dominio": 5,
-      "Profesionalismo": 4.9,
+      "Puntualidad": 3.9,
+      "Claridad": 4.4,
+      "Dominio": 4.3,
+      "Profesionalismo": 4.2,
       "Exigencia": 4.6,
-      "Disponibilidad": 4.8
+      "Disponibilidad": 3.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Cálculo I",
-        "fecha": "15/05/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.7,
-          "Claridad": 4.8,
-          "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Puntualidad": 3.9,
+          "Claridad": 4.4,
+          "Dominio": 4.3,
+          "Profesionalismo": 4.2,
           "Exigencia": 4.6,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "El profe es chévere pero a veces termina la clase antes de tiempo."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Cálculo I",
-        "fecha": "02/04/2026",
+        "fecha": "05/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.2,
-          "Claridad": 4.8,
-          "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Puntualidad": 3.9,
+          "Claridad": 4.4,
+          "Dominio": 4.3,
+          "Profesionalismo": 4.2,
           "Exigencia": 4.6,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "Muy pro, pero me gustaría que ponga más ejemplos."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Cálculo I",
-        "fecha": "28/02/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.7,
-          "Claridad": 4.8,
-          "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Puntualidad": 3.9,
+          "Claridad": 4.9,
+          "Dominio": 4.3,
+          "Profesionalismo": 4.2,
           "Exigencia": 4.6,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Excelente profe, sus clases son muy claras y siempre está dispuesto a ayudar."
       }
     ]
   },
@@ -495,7 +495,7 @@ export const profesoresData = [
     "nombre": "Prof. Mateo Rojas",
     "departamento": "Matemáticas",
     "curso": "Cálculo I",
-    "rating": 4.2,
+    "rating": 3.4,
     "dificultad": 6.5,
     "precioHora": 15,
     "foto": "https://randomuser.me/api/portraits/men/22.jpg",
@@ -533,55 +533,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.3,
-      "Claridad": 4.3,
-      "Dominio": 4.4,
-      "Profesionalismo": 4.3,
+      "Puntualidad": 3.7,
+      "Claridad": 3.4,
+      "Dominio": 3.6,
+      "Profesionalismo": 3.5,
       "Exigencia": 3.3,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 2.9
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Cálculo I",
-        "fecha": "15/05/2026",
+        "fecha": "31/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.3,
-          "Claridad": 4.3,
-          "Dominio": 4.4,
-          "Profesionalismo": 4.3,
+          "Puntualidad": 2.9,
+          "Claridad": 2.9,
+          "Dominio": 3.6,
+          "Profesionalismo": 3.5,
           "Exigencia": 3.3,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 1.9
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "A veces tarda en responder los mensajes pero la clase en sí está bien."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Cálculo I",
-        "fecha": "02/04/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
-          "Puntualidad": 3.8,
-          "Claridad": 4.3,
-          "Dominio": 4.4,
-          "Profesionalismo": 4.3,
+          "Puntualidad": 2.9,
+          "Claridad": 2.9,
+          "Dominio": 3.6,
+          "Profesionalismo": 3.5,
           "Exigencia": 3.3,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 1.9
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "Domina el tema pero es muy exigente con los tiempos, casi no hay margen."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Cálculo I",
-        "fecha": "28/02/2026",
+        "fecha": "06/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.3,
-          "Claridad": 4.3,
-          "Dominio": 4.4,
-          "Profesionalismo": 4.3,
+          "Puntualidad": 3.7,
+          "Claridad": 3.4,
+          "Dominio": 3.6,
+          "Profesionalismo": 3.5,
           "Exigencia": 3.3,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 2.9
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Se nota que sabe su tema pero cuesta entenderle al principio."
       }
     ]
   },
@@ -590,7 +590,7 @@ export const profesoresData = [
     "nombre": "Dra. Patricia Silva",
     "departamento": "Física",
     "curso": "Física II",
-    "rating": 4.7,
+    "rating": 5,
     "dificultad": 8.5,
     "precioHora": 35,
     "foto": "https://randomuser.me/api/portraits/women/13.jpg",
@@ -628,10 +628,10 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.7,
-      "Claridad": 4.6,
-      "Dominio": 4.9,
-      "Profesionalismo": 4.8,
+      "Puntualidad": 4.9,
+      "Claridad": 4.7,
+      "Dominio": 5,
+      "Profesionalismo": 5,
       "Exigencia": 4.3,
       "Disponibilidad": 4.8
     },
@@ -639,44 +639,44 @@ export const profesoresData = [
       {
         "estudiante": "Anónimo",
         "curso": "Física II",
-        "fecha": "15/05/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.7,
-          "Claridad": 4.6,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 4.9,
+          "Claridad": 5,
+          "Dominio": 5,
+          "Profesionalismo": 5,
           "Exigencia": 4.3,
           "Disponibilidad": 4.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "El profe es chévere, te resuelve las dudas sin problema."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Física II",
-        "fecha": "02/04/2026",
+        "fecha": "11/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.2,
-          "Claridad": 4.6,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 4.9,
+          "Claridad": 5,
+          "Dominio": 5,
+          "Profesionalismo": 5,
           "Exigencia": 4.3,
           "Disponibilidad": 4.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "Excelente dominio del tema y se le entiende todo clarito."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Física II",
-        "fecha": "28/02/2026",
+        "fecha": "06/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.7,
-          "Claridad": 4.6,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 4.9,
+          "Claridad": 4.7,
+          "Dominio": 5,
+          "Profesionalismo": 5,
           "Exigencia": 4.3,
           "Disponibilidad": 4.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Sabe mucho, pero a veces es difícil seguirle el ritmo."
       }
     ]
   },
@@ -722,55 +722,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.4,
-      "Claridad": 4.6,
+      "Puntualidad": 4.6,
+      "Claridad": 4.7,
       "Dominio": 4.8,
       "Profesionalismo": 4.7,
       "Exigencia": 3.4,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 4.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Microeconomía",
-        "fecha": "15/05/2026",
+        "fecha": "02/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.4,
-          "Claridad": 4.6,
+          "Puntualidad": 4.6,
+          "Claridad": 5,
           "Dominio": 4.8,
           "Profesionalismo": 4.7,
           "Exigencia": 3.4,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 4.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Su metodología es increíble. Hace que la clase sea dinámica y entretenida."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Microeconomía",
-        "fecha": "02/04/2026",
+        "fecha": "07/06/2026",
         "puntuaciones": {
-          "Puntualidad": 3.9000000000000004,
-          "Claridad": 4.6,
+          "Puntualidad": 4.6,
+          "Claridad": 5,
           "Dominio": 4.8,
           "Profesionalismo": 4.7,
           "Exigencia": 3.4,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 4.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El profe es chévere, te resuelve las dudas sin problema."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Microeconomía",
-        "fecha": "28/02/2026",
+        "fecha": "30/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.4,
-          "Claridad": 4.6,
+          "Puntualidad": 4.6,
+          "Claridad": 4.7,
           "Dominio": 4.8,
           "Profesionalismo": 4.7,
           "Exigencia": 3.4,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 4.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Sabe mucho, pero a veces es difícil seguirle el ritmo."
       }
     ]
   },
@@ -779,7 +779,7 @@ export const profesoresData = [
     "nombre": "Prof. Roberto Diaz",
     "departamento": "Ingeniería de Sistemas",
     "curso": "Base de Datos",
-    "rating": 4.4,
+    "rating": 4.8,
     "dificultad": 7.9,
     "precioHora": 27,
     "foto": "https://randomuser.me/api/portraits/men/16.jpg",
@@ -816,54 +816,54 @@ export const profesoresData = [
     },
     "criteriosEvaluacion": {
       "Puntualidad": 4.5,
-      "Claridad": 4.3,
-      "Dominio": 4.6,
-      "Profesionalismo": 4.5,
+      "Claridad": 4.7,
+      "Dominio": 5,
+      "Profesionalismo": 4.9,
       "Exigencia": 4,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 4.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Base de Datos",
-        "fecha": "15/05/2026",
+        "fecha": "03/06/2026",
         "puntuaciones": {
           "Puntualidad": 4.5,
-          "Claridad": 4.3,
-          "Dominio": 4.6,
-          "Profesionalismo": 4.5,
+          "Claridad": 5,
+          "Dominio": 5,
+          "Profesionalismo": 4.9,
           "Exigencia": 4,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 4.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Su metodología es increíble. Hace que la clase sea dinámica y entretenida."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Base de Datos",
-        "fecha": "02/04/2026",
+        "fecha": "25/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4,
-          "Claridad": 4.3,
-          "Dominio": 4.6,
-          "Profesionalismo": 4.5,
+          "Puntualidad": 4.5,
+          "Claridad": 5,
+          "Dominio": 5,
+          "Profesionalismo": 4.9,
           "Exigencia": 4,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 4.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "Sus materiales de estudio son súper completos, me salvaron en el parcial."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Base de Datos",
-        "fecha": "28/02/2026",
+        "fecha": "07/06/2026",
         "puntuaciones": {
           "Puntualidad": 4.5,
-          "Claridad": 4.3,
-          "Dominio": 4.6,
-          "Profesionalismo": 4.5,
+          "Claridad": 4.7,
+          "Dominio": 5,
+          "Profesionalismo": 4.9,
           "Exigencia": 4,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 4.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Muy pro, pero me gustaría que ponga más ejemplos."
       }
     ]
   },
@@ -872,7 +872,7 @@ export const profesoresData = [
     "nombre": "Ing. Sofia Morales",
     "departamento": "Ingeniería de Sistemas",
     "curso": "Programación Web",
-    "rating": 4.9,
+    "rating": 4.3,
     "dificultad": 8.2,
     "precioHora": 45,
     "foto": "https://randomuser.me/api/portraits/women/24.jpg",
@@ -910,55 +910,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.9,
-      "Claridad": 5,
-      "Dominio": 5,
-      "Profesionalismo": 5,
+      "Puntualidad": 4,
+      "Claridad": 4.1,
+      "Dominio": 4.5,
+      "Profesionalismo": 4.4,
       "Exigencia": 4.1,
-      "Disponibilidad": 4.8
+      "Disponibilidad": 3.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Programación Web",
-        "fecha": "15/05/2026",
+        "fecha": "29/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 5,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4,
+          "Claridad": 4.6,
+          "Dominio": 4.5,
+          "Profesionalismo": 4.4,
           "Exigencia": 4.1,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Inspira confianza y explica con mucha paciencia."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Programación Web",
-        "fecha": "02/04/2026",
+        "fecha": "08/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.4,
-          "Claridad": 5,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4,
+          "Claridad": 4.1,
+          "Dominio": 4.5,
+          "Profesionalismo": 4.4,
           "Exigencia": 4.1,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El contenido sirve, pero la exigencia es fuerte."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Programación Web",
-        "fecha": "28/02/2026",
+        "fecha": "02/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 5,
-          "Dominio": 5,
-          "Profesionalismo": 5,
+          "Puntualidad": 4,
+          "Claridad": 4.1,
+          "Dominio": 4.5,
+          "Profesionalismo": 4.4,
           "Exigencia": 4.1,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Buen profe, pero a veces demora en responder el chat."
       }
     ]
   },
@@ -967,7 +967,7 @@ export const profesoresData = [
     "nombre": "Ing. Sofia Morales",
     "departamento": "Ingeniería de Sistemas",
     "curso": "Estructura de Datos",
-    "rating": 4.6,
+    "rating": 3.6,
     "dificultad": 8.9,
     "precioHora": 40,
     "foto": "https://randomuser.me/api/portraits/women/24.jpg",
@@ -1003,55 +1003,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.6,
-      "Claridad": 4.5,
-      "Dominio": 4.8,
-      "Profesionalismo": 4.7,
+      "Puntualidad": 3.9,
+      "Claridad": 3.5,
+      "Dominio": 3.8,
+      "Profesionalismo": 3.7,
       "Exigencia": 4.5,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 2.9
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Estructura de Datos",
-        "fecha": "15/05/2026",
+        "fecha": "25/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.6,
-          "Claridad": 4.5,
-          "Dominio": 4.8,
-          "Profesionalismo": 4.7,
+          "Puntualidad": 3.9,
+          "Claridad": 3.5,
+          "Dominio": 3.8,
+          "Profesionalismo": 3.7,
           "Exigencia": 4.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 2.9
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Muy pro, pero me gustaría que ponga más ejemplos."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Estructura de Datos",
-        "fecha": "02/04/2026",
+        "fecha": "10/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.1,
-          "Claridad": 4.5,
-          "Dominio": 4.8,
-          "Profesionalismo": 4.7,
+          "Puntualidad": 3.1,
+          "Claridad": 3,
+          "Dominio": 3.8,
+          "Profesionalismo": 3.7,
           "Exigencia": 4.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 1.9
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "No me gustó tanto su método, muy estricto con la asistencia y entregas."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Estructura de Datos",
-        "fecha": "28/02/2026",
+        "fecha": "27/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.6,
-          "Claridad": 4.5,
-          "Dominio": 4.8,
-          "Profesionalismo": 4.7,
+          "Puntualidad": 3.1,
+          "Claridad": 3,
+          "Dominio": 3.8,
+          "Profesionalismo": 3.7,
           "Exigencia": 4.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 1.9
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Sus horarios son medio pesados, cuesta cuadrar."
       }
     ]
   },
@@ -1060,7 +1060,7 @@ export const profesoresData = [
     "nombre": "Dra. Elena Vargas",
     "departamento": "Medicina",
     "curso": "Anatomía Humana",
-    "rating": 4.8,
+    "rating": 4.9,
     "dificultad": 9.4,
     "precioHora": 40,
     "foto": "https://randomuser.me/api/portraits/women/17.jpg",
@@ -1099,10 +1099,10 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.8,
-      "Claridad": 4.8,
+      "Puntualidad": 5,
+      "Claridad": 5,
       "Dominio": 5,
-      "Profesionalismo": 4.9,
+      "Profesionalismo": 5,
       "Exigencia": 4.7,
       "Disponibilidad": 4.8
     },
@@ -1110,44 +1110,44 @@ export const profesoresData = [
       {
         "estudiante": "Anónimo",
         "curso": "Anatomía Humana",
-        "fecha": "15/05/2026",
+        "fecha": "08/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.8,
-          "Claridad": 4.8,
+          "Puntualidad": 5,
+          "Claridad": 5,
           "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Profesionalismo": 5,
           "Exigencia": 4.7,
           "Disponibilidad": 4.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Su metodología es increíble. Hace que la clase sea dinámica y entretenida."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Anatomía Humana",
-        "fecha": "02/04/2026",
+        "fecha": "31/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.3,
-          "Claridad": 4.8,
+          "Puntualidad": 5,
+          "Claridad": 5,
           "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Profesionalismo": 5,
           "Exigencia": 4.7,
           "Disponibilidad": 4.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El mejor profe que he tenido. Se nota que sabe un montón."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Anatomía Humana",
-        "fecha": "28/02/2026",
+        "fecha": "12/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.8,
-          "Claridad": 4.8,
+          "Puntualidad": 5,
+          "Claridad": 5,
           "Dominio": 5,
-          "Profesionalismo": 4.9,
+          "Profesionalismo": 5,
           "Exigencia": 4.7,
           "Disponibilidad": 4.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Las clases son buenas, aunque podría ir más despacio en los temas trancas."
       }
     ]
   },
@@ -1156,7 +1156,7 @@ export const profesoresData = [
     "nombre": "Prof. Miguel Torres",
     "departamento": "Literatura",
     "curso": "Redacción Académica",
-    "rating": 4.5,
+    "rating": 4.3,
     "dificultad": 5.1,
     "precioHora": 18,
     "foto": "https://randomuser.me/api/portraits/men/18.jpg",
@@ -1194,54 +1194,54 @@ export const profesoresData = [
     },
     "criteriosEvaluacion": {
       "Puntualidad": 4.6,
-      "Claridad": 4.6,
-      "Dominio": 4.7,
-      "Profesionalismo": 4.6,
+      "Claridad": 4.5,
+      "Dominio": 4.5,
+      "Profesionalismo": 4.4,
       "Exigencia": 2.5,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 3.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Redacción Académica",
-        "fecha": "15/05/2026",
+        "fecha": "05/06/2026",
         "puntuaciones": {
           "Puntualidad": 4.6,
-          "Claridad": 4.6,
-          "Dominio": 4.7,
-          "Profesionalismo": 4.6,
+          "Claridad": 5,
+          "Dominio": 4.5,
+          "Profesionalismo": 4.4,
           "Exigencia": 2.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Su metodología es increíble. Hace que la clase sea dinámica y entretenida."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Redacción Académica",
-        "fecha": "02/04/2026",
+        "fecha": "25/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.1,
-          "Claridad": 4.6,
-          "Dominio": 4.7,
-          "Profesionalismo": 4.6,
+          "Puntualidad": 4.6,
+          "Claridad": 4.5,
+          "Dominio": 4.5,
+          "Profesionalismo": 4.4,
           "Exigencia": 2.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El contenido sirve, pero la exigencia es fuerte."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Redacción Académica",
-        "fecha": "28/02/2026",
+        "fecha": "05/06/2026",
         "puntuaciones": {
           "Puntualidad": 4.6,
-          "Claridad": 4.6,
-          "Dominio": 4.7,
-          "Profesionalismo": 4.6,
+          "Claridad": 4.5,
+          "Dominio": 4.5,
+          "Profesionalismo": 4.4,
           "Exigencia": 2.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "El profe es chévere pero a veces termina la clase antes de tiempo."
       }
     ]
   },
@@ -1250,7 +1250,7 @@ export const profesoresData = [
     "nombre": "Ing. Valeria Castro",
     "departamento": "Ingeniería Industrial",
     "curso": "Gestión de Procesos",
-    "rating": 4.7,
+    "rating": 4.2,
     "dificultad": 6.9,
     "precioHora": 29,
     "foto": "https://randomuser.me/api/portraits/women/19.jpg",
@@ -1289,55 +1289,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.9,
-      "Claridad": 4.6,
-      "Dominio": 4.9,
-      "Profesionalismo": 4.8,
+      "Puntualidad": 4,
+      "Claridad": 4,
+      "Dominio": 4.4,
+      "Profesionalismo": 4.3,
       "Exigencia": 3.5,
-      "Disponibilidad": 4.8
+      "Disponibilidad": 3.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Gestión de Procesos",
-        "fecha": "15/05/2026",
+        "fecha": "11/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 4.6,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 4,
+          "Claridad": 4.5,
+          "Dominio": 4.4,
+          "Profesionalismo": 4.3,
           "Exigencia": 3.5,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Excelente dominio del tema y se le entiende todo clarito."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Gestión de Procesos",
-        "fecha": "02/04/2026",
+        "fecha": "29/05/2026",
         "puntuaciones": {
-          "Puntualidad": 4.4,
-          "Claridad": 4.6,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 4,
+          "Claridad": 4,
+          "Dominio": 4.4,
+          "Profesionalismo": 4.3,
           "Exigencia": 3.5,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "Buen profe, pero a veces demora en responder el chat."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Gestión de Procesos",
-        "fecha": "28/02/2026",
+        "fecha": "08/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.9,
-          "Claridad": 4.6,
-          "Dominio": 4.9,
-          "Profesionalismo": 4.8,
+          "Puntualidad": 4,
+          "Claridad": 4,
+          "Dominio": 4.4,
+          "Profesionalismo": 4.3,
           "Exigencia": 3.5,
-          "Disponibilidad": 4.8
+          "Disponibilidad": 3.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Es exigente, no te regala nada pero aprendes bastante."
       }
     ]
   },
@@ -1346,7 +1346,7 @@ export const profesoresData = [
     "nombre": "Prof. Diego Salazar",
     "departamento": "Derecho",
     "curso": "Derecho Constitucional",
-    "rating": 4.3,
+    "rating": 4.4,
     "dificultad": 7.1,
     "precioHora": 24,
     "foto": "https://randomuser.me/api/portraits/men/20.jpg",
@@ -1385,54 +1385,54 @@ export const profesoresData = [
     },
     "criteriosEvaluacion": {
       "Puntualidad": 4.4,
-      "Claridad": 4.1,
-      "Dominio": 4.5,
-      "Profesionalismo": 4.4,
+      "Claridad": 4.3,
+      "Dominio": 4.6,
+      "Profesionalismo": 4.5,
       "Exigencia": 3.5,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 3.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Derecho Constitucional",
-        "fecha": "15/05/2026",
+        "fecha": "06/06/2026",
         "puntuaciones": {
           "Puntualidad": 4.4,
-          "Claridad": 4.1,
-          "Dominio": 4.5,
-          "Profesionalismo": 4.4,
+          "Claridad": 4.8,
+          "Dominio": 4.6,
+          "Profesionalismo": 4.5,
           "Exigencia": 3.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Es re puntual y las clases se pasan volando."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Derecho Constitucional",
-        "fecha": "02/04/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
-          "Puntualidad": 3.9000000000000004,
-          "Claridad": 4.1,
-          "Dominio": 4.5,
-          "Profesionalismo": 4.4,
+          "Puntualidad": 4.4,
+          "Claridad": 4.3,
+          "Dominio": 4.6,
+          "Profesionalismo": 4.5,
           "Exigencia": 3.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El contenido sirve, pero la exigencia es fuerte."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Derecho Constitucional",
-        "fecha": "28/02/2026",
+        "fecha": "09/06/2026",
         "puntuaciones": {
           "Puntualidad": 4.4,
-          "Claridad": 4.1,
-          "Dominio": 4.5,
-          "Profesionalismo": 4.4,
+          "Claridad": 4.3,
+          "Dominio": 4.6,
+          "Profesionalismo": 4.5,
           "Exigencia": 3.5,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Se nota que sabe su tema pero cuesta entenderle al principio."
       }
     ]
   },
@@ -1441,7 +1441,7 @@ export const profesoresData = [
     "nombre": "Prof. Hector Lira",
     "departamento": "Matemáticas",
     "curso": "Álgebra Lineal",
-    "rating": 4.1,
+    "rating": 4,
     "dificultad": 6,
     "precioHora": 18,
     "foto": "https://randomuser.me/api/portraits/men/25.jpg",
@@ -1478,55 +1478,55 @@ export const profesoresData = [
       ]
     },
     "criteriosEvaluacion": {
-      "Puntualidad": 4.1,
+      "Puntualidad": 3.8,
       "Claridad": 4,
-      "Dominio": 4.3,
-      "Profesionalismo": 4.2,
+      "Dominio": 4.2,
+      "Profesionalismo": 4.1,
       "Exigencia": 3,
-      "Disponibilidad": 3.5
+      "Disponibilidad": 3.8
     },
     "resenasDestacadas": [
       {
         "estudiante": "Anónimo",
         "curso": "Álgebra Lineal",
-        "fecha": "15/05/2026",
+        "fecha": "06/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.1,
-          "Claridad": 4,
-          "Dominio": 4.3,
-          "Profesionalismo": 4.2,
+          "Puntualidad": 3.8,
+          "Claridad": 4.5,
+          "Dominio": 4.2,
+          "Profesionalismo": 4.1,
           "Exigencia": 3,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Excelente profesor, sus clases son muy claras y siempre está dispuesto a ayudar. Altamente recomendado."
+        "comentario": "Su metodología es increíble. Hace que la clase sea dinámica y entretenida."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Álgebra Lineal",
-        "fecha": "02/04/2026",
+        "fecha": "10/06/2026",
         "puntuaciones": {
-          "Puntualidad": 3.5999999999999996,
+          "Puntualidad": 3.8,
           "Claridad": 4,
-          "Dominio": 4.3,
-          "Profesionalismo": 4.2,
+          "Dominio": 4.2,
+          "Profesionalismo": 4.1,
           "Exigencia": 3,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Sus evaluaciones son exigentes pero se aprende muchísimo en cada sesión."
+        "comentario": "El contenido sirve, pero la exigencia es fuerte."
       },
       {
         "estudiante": "Anónimo",
         "curso": "Álgebra Lineal",
-        "fecha": "28/02/2026",
+        "fecha": "01/06/2026",
         "puntuaciones": {
-          "Puntualidad": 4.1,
+          "Puntualidad": 3.8,
           "Claridad": 4,
-          "Dominio": 4.3,
-          "Profesionalismo": 4.2,
+          "Dominio": 4.2,
+          "Profesionalismo": 4.1,
           "Exigencia": 3,
-          "Disponibilidad": 3.5
+          "Disponibilidad": 3.8
         },
-        "comentario": "Me ayudó a entender temas complejos con ejemplos muy prácticos de la vida real."
+        "comentario": "Es exigente, no te regala nada pero aprendes bastante."
       }
     ]
   }

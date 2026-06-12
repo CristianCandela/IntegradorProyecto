@@ -59,7 +59,7 @@ export default function ModalCancelacion({ tutoria, onClose, onSuccess }) {
           </div>
 
           <div className="modal-body pt-3">
-            <div className="alert alert-warning border-warning border-opacity-50 text-dark small mb-4">
+            <div className="bg-light rounded p-3 text-dark small mb-4 shadow-sm" style={{ borderLeft: "4px solid #7B1FA2" }}>
               <ul className="mb-0 ps-3">
                 <li>Esta cancelación se registrará en tu perfil.</li>
                 <li>

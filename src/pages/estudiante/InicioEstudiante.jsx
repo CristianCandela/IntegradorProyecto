@@ -8,7 +8,6 @@ export default function InicioEstudiante() {
   const [userName, setUserName] = useState("Estudiante");
   const navigate = useNavigate();
 
-  // Data states
   const [sesionesCompletadas, setSesionesCompletadas] = useState([]);
   const [sesionesConfirmadas, setSesionesConfirmadas] = useState([]);
   const [horasTotales, setHorasTotales] = useState(0);
@@ -32,12 +31,11 @@ export default function InicioEstudiante() {
     const completadas = sesiones.filter(s => s.estado === "Completada");
     const confirmadas = sesiones.filter(s => s.estado === "Confirmada");
 
-    // Sort upcoming
     confirmadas.sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora));
 
     setSesionesCompletadas(completadas);
     setSesionesConfirmadas(confirmadas);
-    setHorasTotales(completadas.length); // 1 hora por sesión
+    setHorasTotales(completadas.length);
 
     // Distribución por materias
     const conteoMaterias = {};
@@ -84,7 +82,7 @@ export default function InicioEstudiante() {
 
     // Objetivo
     if (distribucionArray.length > 0) {
-      const ultimaMateria = distribucionArray[distribucionArray.length - 1].curso; // la menos estudiada
+      const ultimaMateria = distribucionArray[distribucionArray.length - 1].curso;
       setSugerenciaObjetivo(`Refuerza tus conocimientos en ${ultimaMateria}. ¡Agenda una sesión pronto!`);
     } else {
       setSugerenciaObjetivo("¡Empieza explorando materias nuevas en el buscador!");

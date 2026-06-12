@@ -59,7 +59,8 @@ export default function Sidebar({ role }) {
 
   const menuConfig = {
     admin: {
-      color: "#180f2a",
+      // DEGRADADO CORPORATIVO: Índigo base a Índigo Oscuro (#1F0954)
+      color: "linear-gradient(180deg, #3F51B5 0%, #1F0954 100%)", 
       items: [
         { name: "Dashboard", icon: "bi-speedometer2", path: "/inicio-admin" },
         { name: "Usuarios", icon: "bi-people", path: "/usuarios-admin" },
@@ -100,7 +101,8 @@ export default function Sidebar({ role }) {
       text: "Tendrás que volver a ingresar para acceder a tu panel.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: role === 'profesor' ? '#3F51B5' : config.color,
+      // Usar el índigo oscuro como color principal en las alertas del admin
+      confirmButtonColor: role === 'admin' ? '#1F0954' : config.color,
       cancelButtonColor: "#d33",
       confirmButtonText: "Sí, salir",
       cancelButtonText: "Cancelar"
@@ -123,7 +125,7 @@ export default function Sidebar({ role }) {
   return (
     <div 
       className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}
-      style={{ background: config.color }} 
+      style={{ background: config.color, minHeight: '100vh', transition: 'width 0.3s ease' }} 
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => {
         setIsExpanded(false);
@@ -131,7 +133,7 @@ export default function Sidebar({ role }) {
       }}
     >
       {/* HEADER DE MARCA */}
-      <div className="sidebar-header d-flex align-items-center justify-content-between px-3 w-100">
+      <div className="sidebar-header d-flex align-items-center justify-content-between px-3 w-100 py-3">
         <div className="d-flex align-items-center">
           <img src="/minilogo.png" alt="Logo" className="logo-img" style={{ width: '30px' }} />
           {isExpanded && <span className="logo-text ms-2 fw-bold text-white">ProfeMatch</span>}
@@ -191,6 +193,7 @@ export default function Sidebar({ role }) {
             key={item.name} 
             to={item.path} 
             className={`nav-item d-flex align-items-center px-3 py-2 my-1 text-white text-decoration-none ${location.pathname === item.path ? "active bg-white bg-opacity-25 rounded" : ""}`}
+            style={{ transition: 'background-color 0.2s' }}
           >
             <i className={`bi ${item.icon} fs-5 me-3`}></i>
             {isExpanded && <span className="nav-text small">{item.name}</span>}

@@ -149,7 +149,8 @@ export default function Sidebar({ role }) {
 
   const menuConfig = {
     admin: {
-      color: "#180f2a",
+      // DEGRADADO CORPORATIVO: Índigo base a Índigo Oscuro (#1F0954)
+      color: "linear-gradient(180deg, #3F51B5 0%, #1F0954 100%)", 
       items: [
         { name: "Dashboard", icon: "bi-speedometer2", path: "/inicio-admin" },
         { name: "Usuarios", icon: "bi-people", path: "/usuarios-admin" },
@@ -157,7 +158,7 @@ export default function Sidebar({ role }) {
       ]
     },
     profesor: {
-      color: "linear-gradient(180deg, #3F51B5 0%, #7B1FA2 100%)",
+      color: "linear-gradient(180deg, #3F51B5 0%, #3F51B5 75%, #5E35B1 100%)",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
         { name: "Evaluaciones", icon: "bi-star", path: "/evaluaciones-profesor" },
@@ -178,10 +179,10 @@ export default function Sidebar({ role }) {
   const config = menuConfig[role] || menuConfig["estudiante"];
 
   const obtenerColorScore = (score) => {
-    if (score >= 90) return "#28a745"; // Verde (Excelente)
-    if (score >= 70) return "#ffc107"; // Amarillo (Bueno)
-    if (score >= 50) return "#fd7e14"; // Naranja (Regular)
-    return "#dc3545"; // Rojo (Bajo)
+    if (score >= 90) return "#28a745"; 
+    if (score >= 70) return "#ffc107"; 
+    if (score >= 50) return "#fd7e14"; 
+    return "#dc3545"; 
   };
 
   const handleLogout = () => {
@@ -190,8 +191,13 @@ export default function Sidebar({ role }) {
       text: "Tendrás que volver a ingresar para acceder a tu panel.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: role === 'profesor' ? '#3F51B5' : '#671572ff',
-      cancelButtonColor: "#3f3375ff",
+      confirmButtonColor:
+        role === 'admin'
+          ? '#1F0954'
+          : role === 'profesor'
+            ? '#3F51B5'
+            : '#671572ff',
+      cancelButtonColor: "#d33",
       confirmButtonText: "Sí, salir",
       cancelButtonText: "Cancelar"
     }).then((result) => {
@@ -212,14 +218,15 @@ export default function Sidebar({ role }) {
   return (
     <div
       className={`sidebar-container ${isExpanded ? "expanded" : "collapsed"}`}
-      style={{ background: config.color }}
+      style={{ background: config.color, minHeight: '100vh', transition: 'width 0.3s ease' }} 
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => {
         setIsExpanded(false);
         setMostrarNotificaciones(false);
       }}
     >
-      <div className="sidebar-header d-flex align-items-center justify-content-between px-3 w-100">
+      {/* HEADER DE MARCA */}
+      <div className="sidebar-header d-flex align-items-center justify-content-between px-3 w-100 py-3">
         <div className="d-flex align-items-center">
           <img src="/minilogo.png" alt="Logo" className="logo-img" style={{ width: '30px' }} />
           {isExpanded && <span className="logo-text ms-2 fw-bold text-white">ProfeMatch</span>}
@@ -284,12 +291,6 @@ export default function Sidebar({ role }) {
         </div>
       )}
 
-      {role !== "estudiante" && (
-        <div className="px-3 py-2 w-100 text-center">
-          {/* Espacio reservado para profesores/admin si lo tuvieran */}
-        </div>
-      )}
-
       <hr className="my-2 text-white opacity-25 w-100" />
 
       <nav className="sidebar-nav w-100">
@@ -298,37 +299,60 @@ export default function Sidebar({ role }) {
             key={item.name}
             to={item.path}
             className={`nav-item d-flex align-items-center px-3 py-2 my-1 text-white text-decoration-none ${location.pathname === item.path ? "active bg-white bg-opacity-25 rounded" : ""}`}
+            style={{ transition: 'background-color 0.2s' }}
           >
             <i className={`bi ${item.icon} fs-5 me-3`}></i>
             {isExpanded && <span className="nav-text small">{item.name}</span>}
           </Link>
         ))}
       </nav>
-
       {/* WIDGET DEL SCORE DE CONFIABILIDAD */}
-      <div className="w-100 px-3 mt-auto mb-2">
-        <div className="p-2 rounded bg-white bg-opacity-10 text-white" style={{ fontSize: '0.8rem' }}>
-          <div className="d-flex justify-content-between align-items-center mb-1">
-            <i className="bi bi-shield-check fs-6"></i>
-            {isExpanded && <span className="fw-bold" style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}>CONFIABILIDAD</span>}
-            <span className="badge" style={{ backgroundColor: obtenerColorScore(scoreConfiabilidad) }}>
-              {scoreConfiabilidad}
-            </span>
-          </div>
-          {isExpanded && (
-            <div className="progress" style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)' }}>
-              <div
-                className="progress-bar"
-                style={{
-                  width: `${scoreConfiabilidad}%`,
-                  backgroundColor: obtenerColorScore(scoreConfiabilidad)
-                }}
-              ></div>
-            </div>
-          )}
-        </div>
-      </div>
+      {role !== "admin" && (
+        <div className="w-100 px-3 mt-auto mb-2">
+          <div
+            className="p-2 rounded bg-white bg-opacity-10 text-white"
+            style={{ fontSize: '0.8rem' }}
+          >
+            <div className="d-flex justify-content-between align-items-center mb-1">
+              <i className="bi bi-shield-check fs-6"></i>
 
+              {isExpanded && (
+                <span
+                  className="fw-bold"
+                  style={{ fontSize: '0.7rem', letterSpacing: '0.5px' }}
+                >
+                  CONFIABILIDAD
+                </span>
+              )}
+
+              <span
+                className="badge"
+                style={{ backgroundColor: obtenerColorScore(scoreConfiabilidad) }}
+              >
+                {scoreConfiabilidad}%
+              </span>
+            </div>
+
+            {isExpanded && (
+              <div
+                className="progress"
+                style={{
+                  height: '4px',
+                  backgroundColor: 'rgba(255,255,255,0.2)'
+                }}
+              >
+                <div
+                  className="progress-bar"
+                  style={{
+                    width: `${scoreConfiabilidad}%`,
+                    backgroundColor: obtenerColorScore(scoreConfiabilidad)
+                  }}
+                ></div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <div className="sidebar-footer w-100">
         <button onClick={handleLogout} className="nav-item logout-btn btn btn-link text-white text-decoration-none d-flex align-items-center px-3 py-2 w-100 style-none" style={{ border: 'none', background: 'none' }}>
           <i className="bi bi-box-arrow-left fs-5 me-3"></i>

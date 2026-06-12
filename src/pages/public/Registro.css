@@ -1,0 +1,192 @@
+/* Animación de entrada */
+.registro-card { 
+  animation: fadeIn 0.6s ease-out; 
+  transition: all 0.4s ease; 
+  border-radius: 24px;
+  max-width: 520px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* BOTONES PRINCIPALES */
+.btn-register { 
+  color: #fff !important; 
+  border: none; 
+  border-radius: 12px; 
+  font-weight: 600; 
+  transition: all 0.3s ease;
+}
+
+.btn-register:hover:not(:disabled) { 
+  transform: translateY(-2px); 
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
+  filter: brightness(1.1); 
+}
+
+.btn-register:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* SELECTOR DE ROLES */
+.role-btn {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.role-btn:hover:not(.active) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--violet-main);
+}
+
+.role-btn.active {
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* ICONO BADGE SUPERIOR - CORREGIDO */
+.icon-badge-mx-auto { 
+  width: 56px; 
+  height: 56px; 
+  border-radius: 16px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  margin: 0 auto 1rem auto;
+  transition: background-color 0.4s ease;
+  position: relative;
+}
+
+.icon-badge-mx-auto i {
+  font-size: 1.8rem;
+  color: #ffffff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* LINKS */
+.hover-link { 
+  color: var(--violet-main) !important; 
+  transition: all 0.3s ease; 
+}
+
+.hover-link:hover { 
+  color: var(--indigo-deep) !important; 
+  transform: scale(1.05); 
+  text-decoration: underline !important; 
+}
+
+/* ANIMACIÓN DE CAMBIO DE ROL */
+.role-swap { 
+  animation: swapEffect 0.5s ease-in-out; 
+}
+
+@keyframes swapEffect {
+  50% { 
+    opacity: 0.6; 
+    transform: translateY(-10px) scale(0.98); 
+    filter: blur(2px); 
+  }
+}
+
+/* INPUTS Y FORMULARIOS */
+.registro-card .form-control:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  border-color: var(--violet-main);
+}
+
+.registro-card .input-group-text {
+  min-width: 50px;
+  color: var(--violet-main);
+  background-color: #f8f9fa;
+  border: none;
+}
+
+.registro-card .form-label {
+  color: var(--indigo-deep);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* Checkbox personalizado */
+.registro-card .form-check-input:checked {
+  background-color: var(--violet-main);
+  border-color: var(--violet-main);
+}
+
+.registro-card .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
+}
+
+/* BOTONES SOCIALES */
+.registro-card .btn-outline-secondary {
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+}
+
+.registro-card .btn-outline-secondary:hover {
+  background-color: #f5f3ff;
+  border-color: var(--violet-main);
+  color: var(--violet-main);
+  transform: translateY(-1px);
+}
+
+/* SECCIÓN INFORMATIVA */
+.bg-light-soft {
+  background-color: #f8f7ff;
+}
+
+/* SPINNER DE CARGA */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* RESPONSIVE */
+@media (max-width: 991px) {
+  .registro-card {
+    max-width: 100%;
+    border-radius: 20px;
+  }
+  
+  .icon-badge-mx-auto {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .icon-badge-mx-auto i {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .role-btn {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .btn-register {
+    padding: 0.75rem;
+  }
+  
+  .icon-badge-mx-auto {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .icon-badge-mx-auto i {
+    font-size: 1.3rem;
+  }
+}

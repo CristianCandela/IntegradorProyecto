@@ -50,7 +50,6 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
   // REQUISITO: Verificar si este profesor tiene el Plan Premium activo para destacarlo
   useEffect(() => {
-    // Si es tu propio perfil simulado o si añadimos la propiedad en la base de datos
     const planGuardado = localStorage.getItem("plan_profesor") || "Freemium";
 
     // Para la demo, si el nombre coincide con el tuyo o si el objeto ya viene marcado como destacado
@@ -58,6 +57,14 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
       setEsPremium(true);
     }
   }, [nombre, profesor]);
+
+  // Maneja el clic en solicitar cerrando el modal de detalles si estuviera abierto
+  const handleSolicitarClick = () => {
+    setShowModal(false); 
+    if (onSolicitar) {
+      onSolicitar();
+    }
+  };
 
   return (
     <>
@@ -193,6 +200,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               Ver Perfil
             </button>
 
+            {/* CORREGIDO: onClick enlazado a la función controladora de solicitudes */}
             <button
               className="btn btn-sm rounded-pill fw-bold py-2 text-white border-0 hover-shadow"
               style={{

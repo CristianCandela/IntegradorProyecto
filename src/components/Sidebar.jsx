@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"; // <-- Corregido: Agregado useEffect aquí
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import Swal from "sweetalert2"; 
 
@@ -38,8 +38,8 @@ export default function Sidebar({ role }) {
       ]
     },
     profesor: {
-      // Reemplazado por tu degradado corporativo ProfeMatch
-      color: "linear-gradient(135deg, #3F51B5 0%, #7B1FA2 50%, #E91E63 100%)",
+      // CORREGIDO: Degradado de ángulo suavizado entre Índigo (#3F51B5) y Fúxia Medio (#7B1FA2)
+      color: "linear-gradient(180deg, #3F51B5 0%, #7B1FA2 100%)",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
         { name: "Evaluaciones", icon: "bi-star", path: "/evaluaciones-profesor" },

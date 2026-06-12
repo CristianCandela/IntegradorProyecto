@@ -228,8 +228,8 @@ const EvaluacionesProfesor = () => {
           </div>
         </div>
 
-        {/* Sección informativa */}
-        <div className="mt-4 p-3 text-white rounded-4 shadow-sm" style={{ background: 'linear-gradient(135deg, #3F51B5 0%, #7B1FA2 100%)' }}>
+        {/* SECCIÓN INFORMATIVA REPARADA CON COLOR ÍNDIGO SÓLIDO (#3F51B5) */}
+        <div className="mt-4 p-3 text-white rounded-4 shadow-sm" style={{ backgroundColor: '#3F51B5' }}>
           <h6 className="fw-bold mb-1">💡 Tip de Reputación Docente</h6>
           <p className="mb-0 small opacity-90">
             Responder a las reseñas de tus alumnos mejora tu visibilidad en ProfeMatch en un 20%. Mantén un canal activo de retroalimentación.

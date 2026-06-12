@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable'; // <-- Importación directa para evitar caídas en el constructor
+import autoTable from 'jspdf-autotable'; 
 
 // IMPORTACIONES PARA EL GRÁFICO ESTADÍSTICO
 import {
@@ -15,7 +15,7 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2'; 
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -39,7 +39,7 @@ const InicioProfesor = () => {
 
   useEffect(() => {
     const TARIFA_POR_HORA = 50;
-    const COMISION_PORCENTAJE = 0.15; // 15% comisión ProfeMatch
+    const COMISION_PORCENTAJE = 0.15; 
 
     const datosTutoriasFinanzas = [
       { id: 1, estudiante: "Ana Maria Gomez", curso: "Física de Campos", fecha: "2026-05-20", horas: 2, estado: "Completada" },
@@ -144,7 +144,6 @@ const InicioProfesor = () => {
     }
   };
 
-  // EXPORTACIÓN CORREGIDA CON ENFOQUE FUNCIONAL DIRECTO
   const descargarPDF = () => {
     try {
       const doc = new jsPDF();
@@ -180,7 +179,6 @@ const InicioProfesor = () => {
         filas.push(["-", "¡BONO EXCELENCIA CUMPLIDO!", "-", "-", "-", `S/. ${MONTO_BONO.toFixed(2)}`, "Asignado"]);
       }
 
-      // Solución definitiva al error: Llamar a autoTable pasándole el documento como parámetro de instancia
       autoTable(doc, {
         startY: 44,
         head: [columnas],
@@ -394,15 +392,28 @@ const InicioProfesor = () => {
           </div>
         </div>
 
-        {/* MODAL CALENDARIO */}
+        {/* MODAL CALENDARIO CON ENFOQUE ÍNDIGO SÓLIDO TOTALMENTE SANEADO */}
         {mostrarCalendario && (
           <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
             <div className="modal-dialog modal-dialog-centered modal-lg">
-              <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
-                <div className="modal-header text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px', backgroundColor: '#7B1FA2' }}>
-                  <h5 className="modal-title fw-bold">📅 Calendario Académico de Estados</h5>
-                  <button type="button" className="btn-close btn-close-white" onClick={() => setMostrarCalendario(false)}></button>
+              <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px', backgroundColor: '#ffffff', overflow: 'hidden' }}>
+                
+                {/* REMOVIDAS TODAS LAS CLASES DE ENTRADA PARA ELIMINAR EL DEGRADADO HEREDADO */}
+                <div 
+                  className="text-white d-flex justify-content-between align-items-center p-3" 
+                  style={{ 
+                    backgroundColor: '#3F51B5',
+                    background: '#3F51B5'
+                  }}
+                >
+                  <h5 className="modal-title fw-bold m-0" style={{ fontSize: '1.1rem' }}>📅 Calendario Académico de Estados</h5>
+                  <button 
+                    type="button" 
+                    className="btn-close btn-close-white shadow-none m-0" 
+                    onClick={() => setMostrarCalendario(false)}
+                  ></button>
                 </div>
+
                 <div className="modal-body p-4">
                   <table className="table table-hover border mb-0 align-middle">
                     <thead className="table-light">
@@ -426,10 +437,11 @@ const InicioProfesor = () => {
                     </tbody>
                   </table>
                 </div>
-                <div className="modal-footer border-0">
-                  <button className="btn btn-secondary px-4" onClick={() => setMostrarCalendario(false)}>Cerrar</button>
+                <div className="modal-footer border-0 bg-light">
+                  <button className="btn btn-secondary px-4 fw-semibold" onClick={() => setMostrarCalendario(false)}>Cerrar</button>
                 </div>
               </div>
+
             </div>
           </div>
         )}

@@ -75,9 +75,8 @@ const TutoriasProfesor = () => {
     localStorage.setItem("disponibilidad_profesor", JSON.stringify(nuevaDisp));
   };
 
-  // FUNCIÓN PARA FORMATEAR LA FECHA A FORMATO LATINOAMERICANO Y EN ESPAÑOL (CON FILTRO DE SEGURIDAD INDESTRUCTIBLE)
+  // FUNCIÓN PARA FORMATEAR LA FECHA A FORMATO LATINOAMERICANO Y EN ESPAÑOL
   const formatearFechaEspanol = (fechaString) => {
-    // Si la fecha es null, undefined o vacía, frena el crash inmediatamente
     if (!fechaString || typeof fechaString !== 'string') return "Fecha por asignar";
     
     const partes = fechaString.split("-");
@@ -408,7 +407,7 @@ const TutoriasProfesor = () => {
           <div className="modal-dialog modal-dialog-centered modal-lg">
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
               <div className="modal-header text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px', backgroundColor: colores.violet }}>
-                <h5 className="modal-title fw-bold">⭐ Sistema de Valoración Post-Tutoría</h5>
+                <h5 className="modal-title fw-bold">Análisis Académico Post-Tutoría</h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setMostrarModalValoracion(false)}></button>
               </div>
               <form onSubmit={guardarValoracionDocente}>
@@ -449,7 +448,7 @@ const TutoriasProfesor = () => {
                     <textarea 
                       className="form-control bg-light border-0" 
                       rows="3" 
-                      placeholder="Describe el desempeño o comportamiento del estudiante..."
+                      placeholder="Describe el desempeño..."
                       value={comentarioLibre}
                       onChange={(e) => setComentarioLibre(e.target.value)}
                     ></textarea>
@@ -491,7 +490,6 @@ const TutoriasProfesor = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

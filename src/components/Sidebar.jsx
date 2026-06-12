@@ -6,11 +6,20 @@ export default function Sidebar({ role }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [mostrarNotificaciones, setMostrarNotificaciones] = useState(false);
   
-  // NOTIFICACIONES DINÁMICAS (Se alimentan del listener en tiempo real)
-  const [notificaciones, setNotificaciones] = useState([
-    { id: 1, mensaje: "Tu tutoría con Luis Carlos ha sido confirmada.", leida: false },
-    { id: 2, mensaje: "Alerta: El estudiante Carlos Mendoza canceló la tutoría de hoy.", leida: false }
-  ]);
+  // PERSISTENCIA: Inicializamos las notificaciones desde localStorage para que no se borren al navegar
+  const [notificaciones, setNotificaciones] = useState(() => {
+    const alertasPreinstaladas = [
+      { id: 1, mensaje: "Tu tutoría con Luis Carlos ha sido confirmada.", leida: false },
+      { id: 2, mensaje: "Alerta: El estudiante Carlos Mendoza canceló la tutoría de hoy.", leida: false }
+    ];
+    
+    const guardadas = localStorage.getItem("alertas_visuales");
+    if (!guardadas) {
+      localStorage.setItem("alertas_visuales", JSON.stringify(alertasPreinstaladas));
+      return alertasPreinstaladas;
+    }
+    return JSON.parse(guardadas);
+  });
 
   // SCORE DE CONFIABILIDAD INICIAL (EXCLUSIVO PROFESOR: 0 a 100)
   const [scoreConfiabilidad, setScoreConfiabilidad] = useState(() => {
@@ -24,10 +33,16 @@ export default function Sidebar({ role }) {
       };
       window.addEventListener("storage", revisarScore);
       
-      // ESCUCHADOR DE EVENTOS: Intercepta cuando se agenda una sesión (desde el formulario o el alumno)
+      // ESCUCHADOR DE EVENTOS: Intercepta de manera reactiva el clic del alumno o del formulario
       const capturarNuevaNotificacion = (e) => {
-        setNotificaciones((prevNotificaciones) => [e.detail, ...prevNotificaciones]);
-        setMostrarNotificaciones(true); // Despliega el dropdown automáticamente para el feedback visual
+        setNotificaciones((prevNotificaciones) => {
+          const actualizadas = [e.detail, ...prevNotificaciones];
+          localStorage.setItem("alertas_visuales", JSON.stringify(actualizadas));
+          return actualizadas;
+        });
+        
+        // Despliega automáticamente para dar el feedback inmediato en pantalla
+        setMostrarNotificaciones(true); 
       };
 
       window.addEventListener("nueva_notificacion_tutoria", capturarNuevaNotificacion);
@@ -52,8 +67,6 @@ export default function Sidebar({ role }) {
       ]
     },
     profesor: {
-      // CORREGIDO: Todo Índigo (#3F51B5) que predomina hasta el 75% de la barra, 
-      // y solo al final (100%) se desvanece un poco hacia un morado medio (#5E35B1). Sin fucsia.
       color: "linear-gradient(180deg, #3F51B5 0%, #3F51B5 75%, #5E35B1 100%)",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },
@@ -100,7 +113,9 @@ export default function Sidebar({ role }) {
   };
 
   const marcarComoLeida = (id) => {
-    setNotificaciones(notificaciones.map(n => n.id === id ? { ...n, leida: true } : n));
+    const actualizadas = notificaciones.map(n => n.id === id ? { ...n, leida: true } : n);
+    setNotificaciones(actualizadas);
+    localStorage.setItem("alertas_visuales", JSON.stringify(actualizadas));
   };
 
   const alertasNoLeidas = notificaciones.filter(n => !n.leida).length;
@@ -152,7 +167,7 @@ export default function Sidebar({ role }) {
                     <div 
                       key={n.id} 
                       className={`p-2 small mb-1 rounded cursor-pointer ${n.leida ? 'text-muted bg-light' : 'text-dark fw-medium bg-info-subtle'}`}
-                      style={{ fontSize: '0.75rem', cursor: 'pointer', borderLeft: n.leida ? 'none' : '3px solid #0dcaf0' }}
+                      style={{ fontSize: '0.75rem', cursor: 'pointer', borderLeft: n.leida ? 'none' : '3px solid #0dcaf0', whiteSpace: 'normal', wordBreak: 'break-word' }}
                       onClick={() => marcarComoLeida(n.id)}
                     >
                       {n.mensaje}

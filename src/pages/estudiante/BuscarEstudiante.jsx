@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import ProfesorCard from "../../components/ProfesorCard";
-import { profesoresData } from "../../data/profesoresData";
+import { StorageService } from "../../core/database/StorageService";
 
 export default function BuscarEstudiante() {
 
@@ -10,9 +10,10 @@ export default function BuscarEstudiante() {
   const [ratingMin, setRatingMin] = useState(0);
   const [difMax, setDifMax] = useState(10);
 
+  const profesores = StorageService.getCompleteProfessors();
   const especialidades = [
     "Todos",
-    ...new Set(profesoresData.map(p => p.departamento))
+    ...new Set(profesores.map(p => p.departamento))
   ];
 
   // TEXTO DINÁMICO DIFICULTAD
@@ -31,7 +32,7 @@ export default function BuscarEstudiante() {
   };
 
   // FILTRADO DINÁMICO
-  const profesoresFiltrados = profesoresData.filter((profe) => {
+  const profesoresFiltrados = profesores.filter((profe) => {
 
     const textoBusqueda = busqueda.trim().toLowerCase();
 
@@ -131,7 +132,7 @@ export default function BuscarEstudiante() {
               <div className="d-flex justify-content-between align-items-center">
 
                 <label className="form-label small fw-bold text-secondary mb-1">
-                  Rating mínimo
+                  Valoración Docente Mínima
                 </label>
 
                 <span className="badge bg-warning text-dark">
@@ -164,7 +165,7 @@ export default function BuscarEstudiante() {
               <div className="d-flex justify-content-between align-items-center">
 
                 <label className="form-label small fw-bold text-secondary mb-1">
-                  Dificultad máxima
+                  Nivel de Exigencia
                 </label>
 
                 <span

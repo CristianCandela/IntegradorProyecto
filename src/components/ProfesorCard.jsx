@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false }) {
-  
+export default function ProfesorCard({ profesor, showPrice = false, isTutoria = false, onSolicitar }) {
+
   const [showModal, setShowModal] = useState(false);
   const [esPremium, setEsPremium] = useState(false);
 
@@ -14,15 +14,15 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
     precioHora,
     etiquetas,
     curso,
-    descripcion, 
-    metodologia   
+    descripcion,
+    metodologia
   } = profesor;
 
   // REQUISITO: Verificar si este profesor tiene el Plan Premium activo para destacarlo
   useEffect(() => {
     // Si es tu propio perfil simulado o si añadimos la propiedad en la base de datos
     const planGuardado = localStorage.getItem("plan_profesor") || "Freemium";
-    
+
     // Para la demo, si el nombre coincide con el tuyo o si el objeto ya viene marcado como destacado
     if (planGuardado === "Premium" && (nombre.includes("Juan Jose") || profesor.isPremium)) {
       setEsPremium(true);
@@ -31,18 +31,17 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
   return (
     <>
-      <div 
-        className={`card h-100 border-0 rounded-4 overflow-hidden shadow-sm hover-shadow position-relative ${
-          esPremium ? "border border-2" : ""
-        }`}
-        style={{ 
+      <div
+        className={`card h-100 border-0 rounded-4 overflow-hidden shadow-sm hover-shadow position-relative ${esPremium ? "border border-2" : ""
+          }`}
+        style={{
           borderColor: esPremium ? "#7B1FA2" : "transparent",
           boxShadow: esPremium ? "0 8px 20px rgba(123, 31, 162, 0.15)" : ""
         }}
       >
         {/* INSIGNIA DE PERFIL DESTACADO PARA PLAN PREMIUM */}
         {esPremium && (
-          <span 
+          <span
             className="position-absolute top-0 end-0 m-3 badge rounded-pill text-white shadow-sm d-flex align-items-center gap-1 px-3 py-2"
             style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)", zIndex: 10, fontSize: "0.7rem" }}
           >
@@ -51,14 +50,14 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
         )}
 
         <div className="card-body p-4 d-flex flex-column text-center">
-          
+
           {isTutoria ? (
             <>
               <div className="d-flex align-items-center gap-3 mb-3 text-start">
-                <img 
-                  src={foto} 
-                  className="rounded-circle border border-2 border-light shadow-sm" 
-                  style={{ width: "60px", height: "60px", objectFit: "cover" }} 
+                <img
+                  src={foto}
+                  className="rounded-circle border border-2 border-light shadow-sm"
+                  style={{ width: "60px", height: "60px", objectFit: "cover" }}
                   alt={nombre}
                 />
                 <div className="text-start">
@@ -157,8 +156,8 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
           {/* Botones */}
           <div className="d-grid gap-2 mt-auto">
-            <button 
-              onClick={() => setShowModal(true)} 
+            <button
+              onClick={() => setShowModal(true)}
               className="btn btn-outline-indigo btn-sm rounded-pill fw-bold py-2"
             >
               Ver Perfil
@@ -167,10 +166,11 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
             <button
               className="btn btn-sm rounded-pill fw-bold py-2 text-white border-0"
               style={{
-                background: esPremium 
-                  ? "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)" 
+                background: esPremium
+                  ? "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)"
                   : "linear-gradient(135deg, #493774 0%, #6b51a3 100%)"
               }}
+              onClick={() => onSolicitar && onSolicitar(profesor)}
             >
               Solicitar
             </button>
@@ -180,31 +180,31 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
       {/* --- MODAL DE PERFIL  */}
       {showModal && (
-        <div 
-          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" 
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
           style={{ background: "rgba(0,0,0,0.7)", zIndex: 1060 }}
         >
-          <div 
-            className="bg-white rounded-4 shadow-lg overflow-hidden" 
+          <div
+            className="bg-white rounded-4 shadow-lg overflow-hidden"
             style={{ width: "90%", maxWidth: "550px", animation: "fadeInUp 0.3s ease" }}
           >
             {/* Header del Modal */}
             <div className="p-4 text-center border-bottom bg-light position-relative">
-              <button 
-                onClick={() => setShowModal(false)} 
+              <button
+                onClick={() => setShowModal(false)}
                 className="btn-close position-absolute top-0 end-0 m-3"
               ></button>
-              
-              <img 
-                src={foto} 
-                className="rounded-circle shadow mb-3 mx-auto" 
-                style={{ 
-                  width: "110px", 
-                  height: "110px", 
-                  objectFit: "cover", 
-                  border: esPremium ? "4px solid #7B1FA2" : "4px solid white" 
-                }} 
-                alt={nombre} 
+
+              <img
+                src={foto}
+                className="rounded-circle shadow mb-3 mx-auto"
+                style={{
+                  width: "110px",
+                  height: "110px",
+                  objectFit: "cover",
+                  border: esPremium ? "4px solid #7B1FA2" : "4px solid white"
+                }}
+                alt={nombre}
               />
               <h4 className="fw-bold text-dark mb-0">
                 {nombre} {esPremium && "⭐"}
@@ -228,19 +228,19 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 <div className="col-4">
                   <div className="p-2 bg-light rounded-3">
                     <span className="d-block fw-bold text-warning">{rating} ⭐</span>
-                    <small className="text-muted" style={{fontSize: '0.6rem'}}>RATING</small>
+                    <small className="text-muted" style={{ fontSize: '0.6rem' }}>RATING</small>
                   </div>
                 </div>
                 <div className="col-4">
                   <div className="p-2 bg-light rounded-3">
                     <span className="d-block fw-bold text-info">{dificultad}/10</span>
-                    <small className="text-muted" style={{fontSize: '0.6rem'}}>DIFICULTAD</small>
+                    <small className="text-muted" style={{ fontSize: '0.6rem' }}>DIFICULTAD</small>
                   </div>
                 </div>
                 <div className="col-4">
                   <div className="p-2 bg-light rounded-3">
                     <span className="d-block fw-bold text-success">S/. {precioHora}</span>
-                    <small className="text-muted" style={{fontSize: '0.6rem'}}>PRECIO/H</small>
+                    <small className="text-muted" style={{ fontSize: '0.6rem' }}>PRECIO/H</small>
                   </div>
                 </div>
               </div>
@@ -248,15 +248,19 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
             {/* Acciones del Modal */}
             <div className="p-3 border-top d-flex gap-2 bg-white">
-              <button 
-                onClick={() => setShowModal(false)} 
+              <button
+                onClick={() => setShowModal(false)}
                 className="btn btn-light rounded-pill w-100 fw-bold"
               >
                 Cerrar
               </button>
-              <button 
-                className="btn btn-primary rounded-pill w-100 fw-bold border-0" 
+              <button
+                className="btn btn-primary rounded-pill w-100 fw-bold border-0"
                 style={{ background: esPremium ? "#7B1FA2" : "#493774" }}
+                onClick={() => {
+                  setShowModal(false);
+                  if (onSolicitar) onSolicitar(profesor);
+                }}
               >
                 Solicitar Tutoría
               </button>

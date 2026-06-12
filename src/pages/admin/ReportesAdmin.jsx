@@ -1,172 +1,268 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import Sidebar from "../../components/Sidebar";
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+// IMPORTACIONES PARA EL GRÁFICO ESTADÍSTICO
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
 export default function ReportesAdmin() {
-  // 1. BASE DE DATOS SIMULADA: Reporte mensual de profesores
   const [reporteProfesores, setReporteProfesores] = useState([
-    { id: 1, nombre: "Carlos Gómez", facultad: "Ingeniería", clasesDadas: 12, alumnosAtendidos: 340, calificacion: 4.8, tendencia: "sube" },
-    { id: 2, nombre: "Marta Rivas", facultad: "Sistemas", clasesDadas: 8, alumnosAtendidos: 210, calificacion: 4.9, tendencia: "mantiene" },
+    { id: 1, nombre: "Carlos Gómez", facultad: "Ingeniería", clasesDadas: 18, alumnosAtendidos: 340, calificacion: 4.8, tendencia: "sube" },
+    { id: 2, nombre: "Marta Rivas", facultad: "Sistemas", clasesDadas: 14, alumnosAtendidos: 210, calificacion: 4.9, tendencia: "mantiene" },
     { id: 3, nombre: "Luis Ramírez", facultad: "Ciencias Básicas", clasesDadas: 15, alumnosAtendidos: 450, calificacion: 3.2, tendencia: "baja" },
-    { id: 4, nombre: "Elena Silva", facultad: "Ingeniería", clasesDadas: 5, alumnosAtendidos: 120, calificacion: 4.5, tendencia: "sube" }
+    { id: 4, nombre: "Elena Silva", facultad: "Ingeniería", clasesDadas: 9, alumnosAtendidos: 120, calificacion: 4.5, tendencia: "sube" },
+    { id: 5, nombre: "Jorge Peralta", facultad: "Negocios", clasesDadas: 11, alumnosAtendidos: 180, calificacion: 4.1, tendencia: "mantiene" }
   ]);
 
-  // 2. BASE DE DATOS SIMULADA: Detalle de clases recientes
-  const [detalleClases, setDetalleClases] = useState([
-    { id: 101, materia: "Algoritmos y Estructura de Datos", profesor: "Carlos Gómez", fecha: "12 May 2026", cantAlumnos: 28, alumnosDestacados: "Ana Silva, Juan Pérez..." },
-    { id: 102, materia: "Análisis de Sistemas", profesor: "Marta Rivas", fecha: "10 May 2026", cantAlumnos: 35, alumnosDestacados: "Luis Torres, María López..." },
-    { id: 103, materia: "Estadística Inferencial", profesor: "Luis Ramírez", fecha: "08 May 2026", cantAlumnos: 40, alumnosDestacados: "Daniel Quispe, Pedro Ruiz..." },
-  ]);
+  const [filtroFacultad, setFiltroFacultad] = useState("Todas");
+  const [profesorSeleccionado, setProfesorSeleccionado] = useState(null);
 
-  // 3. FUNCIONES DE EXPORTACIÓN (Simuladas por ahora)
-  const handleExportar = (formato) => {
-    alert(`Generando y descargando el reporte mensual en formato ${formato}... \n\n(Esta función se conectará al backend más adelante).`);
+  const profesoresFiltrados = filtroFacultad === "Todas" 
+    ? reporteProfesores 
+    : reporteProfesores.filter(p => p.facultad === filtroFacultad);
+
+  const datosBarras = {
+    labels: profesoresFiltrados.map(p => p.nombre),
+    datasets: [
+      {
+        label: 'Calificación Promedio',
+        data: profesoresFiltrados.map(p => p.calificacion),
+        backgroundColor: profesoresFiltrados.map(p => p.calificacion >= 4.0 ? '#3F51B5' : '#dc3545'),
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const datosLineas = {
+    labels: ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4 (Actual)'],
+    datasets: [
+      {
+        label: 'Volumen de Clases (Plataforma)',
+        data: [45, 52, 38, 67],
+        borderColor: '#7B1FA2',
+        backgroundColor: 'rgba(123, 31, 162, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: '#3F51B5'
+      },
+    ],
+  };
+
+  const opcionesGrafico = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, max: 5, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+      x: { grid: { display: false } }
+    }
+  };
+
+  const opcionesLineas = {
+    ...opcionesGrafico,
+    scales: { y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } }, x: { grid: { display: false } } }
+  };
+
+  const descargarPDF = () => {
+    try {
+      const doc = new jsPDF();
+      doc.setFontSize(18);
+      doc.text("ProfeMatch - Reporte de Rendimiento Docente", 14, 22);
+      
+      doc.setFontSize(10);
+      doc.text(`Fecha de emisión: ${new Date().toLocaleDateString()}`, 14, 30);
+      doc.text(`Filtro aplicado: ${filtroFacultad}`, 14, 36);
+
+      const columnas = ["Profesor", "Facultad", "Clases Dictadas", "Alumnos", "Calificación"];
+      const filas = profesoresFiltrados.map(p => [
+        p.nombre, p.facultad, p.clasesDadas.toString(), p.alumnosAtendidos.toString(), `${p.calificacion} / 5.0`
+      ]);
+
+      autoTable(doc, {
+        startY: 45,
+        head: [columnas],
+        body: filas,
+        theme: 'striped',
+        headStyles: { fillColor: [63, 81, 181] },
+        styles: { fontSize: 9 }
+      });
+
+      doc.save(`Reporte_Academico_${filtroFacultad.replace(" ", "_")}.pdf`);
+    } catch (error) {
+      console.error("Error al generar PDF:", error);
+      alert("Hubo un error al generar el documento.");
+    }
+  };
+
+  const cardStyle = {
+    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+    borderRadius: '15px'
+  };
+
+  const handleMouseEnter = (e) => {
+    e.currentTarget.style.transform = "translateY(-4px)";
+    e.currentTarget.style.boxShadow = "0 8px 15px rgba(0,0,0,0.1)";
+  };
+
+  const handleMouseLeave = (e) => {
+    e.currentTarget.style.transform = "translateY(0)";
+    e.currentTarget.style.boxShadow = "none";
   };
 
   return (
-    <div className="d-flex" style={{ minHeight: "100vh", backgroundColor: "#f4f7f6" }}>
+    <div className="d-flex">
       <Sidebar role="admin" />
 
-      <div className="flex-grow-1 p-4 p-md-5" style={{ marginLeft: "70px", overflowX: "hidden" }}>
+      {/* CORRECCIÓN APLICADA: Eliminado marginLeft y p-md-5 */}
+      <div className="container-fluid p-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', overflowX: 'hidden' }}>
         
-        {/* ENCABEZADO Y BOTONES DE EXPORTACIÓN */}
-        <div className="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+        {/* ENCABEZADO Y EXPORTACIÓN */}
+        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
           <div>
-            <h1 className="fw-bold text-dark mb-1" style={{ letterSpacing: "-1px" }}>Informes y Estadísticas</h1>
-            <p className="text-muted mb-0">Resumen académico del mes: <strong>Mayo 2026</strong></p>
+            <h2 className="fw-bold mb-1" style={{ color: '#3F51B5' }}>Informes y Estadísticas</h2>
+            <p className="text-muted small mb-0">Análisis académico y rendimiento del profesorado.</p>
           </div>
-          <div className="d-flex gap-2">
-            <button onClick={() => handleExportar('Excel')} className="btn btn-success shadow-sm d-flex align-items-center gap-2">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.781l2.116 2.54a.5.5 0 0 0 .768-.641L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.219l-2.116-2.54z"/><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/></svg>
-              Exportar Excel
-            </button>
-            <button onClick={() => handleExportar('PDF')} className="btn btn-danger shadow-sm d-flex align-items-center gap-2">
-              <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/><path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .471.236c.09.112.145.256.164.41.014.12-.005.258-.04.401a6.38 6.38 0 0 1-.26.792c.153.25.309.52.463.805.15.278.297.558.437.834a3.4 3.4 0 0 1 2.25.381c.21.116.4.267.545.452.146.184.254.401.309.638.056.24.053.493-.01.734-.063.242-.18.468-.344.66a.826.826 0 0 1-.611.304c-.22.016-.44-.025-.63-.117a.835.835 0 0 1-.444-.44c-.11-.23-.153-.49-.126-.745.027-.255.105-.5.228-.722l-.11-.06a4.43 4.43 0 0 0-.82-.375 14.39 14.39 0 0 0-1.42-.486c-.44.89-.92 1.74-1.44 2.53-.41.62-.82 1.21-1.21 1.77-.41.58-.8 1.13-1.15 1.63-.3.44-.57.84-.79 1.19-.2.33-.36.62-.48.86-.11.23-.18.42-.2.57-.02.13-.01.24.03.32a.4.4 0 0 0 .15.17c.07.05.16.08.26.09z"/></svg>
-              Exportar PDF
-            </button>
+          <button className="btn text-white fw-semibold shadow-sm px-4 d-flex align-items-center gap-2" style={{ backgroundColor: '#7B1FA2' }} onClick={descargarPDF}>
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/><path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .471.236c.09.112.145.256.164.41.014.12-.005.258-.04.401a6.38 6.38 0 0 1-.26.792c.153.25.309.52.463.805.15.278.297.558.437.834a3.4 3.4 0 0 1 2.25.381c.21.116.4.267.545.452.146.184.254.401.309.638.056.24.053.493-.01.734-.063.242-.18.468-.344.66a.826.826 0 0 1-.611.304c-.22.016-.44-.025-.63-.117a.835.835 0 0 1-.444-.44c-.11-.23-.153-.49-.126-.745.027-.255.105-.5.228-.722l-.11-.06a4.43 4.43 0 0 0-.82-.375 14.39 14.39 0 0 0-1.42-.486c-.44.89-.92 1.74-1.44 2.53-.41.62-.82 1.21-1.21 1.77-.41.58-.8 1.13-1.15 1.63-.3.44-.57.84-.79 1.19-.2.33-.36.62-.48.86-.11.23-.18.42-.2.57-.02.13-.01.24.03.32a.4.4 0 0 0 .15.17c.07.05.16.08.26.09z"/></svg>
+            Exportar a PDF
+          </button>
+        </div>
+
+        {/* BARRA DE FILTROS AVANZADOS */}
+        <div className="card border-0 shadow-sm mb-4" style={{ borderRadius: '15px' }}>
+          <div className="card-body p-3 d-flex align-items-center gap-3">
+            <span className="fw-bold text-muted small"><i className="bi bi-funnel-fill"></i> Filtros:</span>
+            <select 
+              className="form-select bg-light border-0 w-auto fw-semibold text-secondary" 
+              value={filtroFacultad} 
+              onChange={(e) => setFiltroFacultad(e.target.value)}
+            >
+              <option value="Todas">Todas las Facultades</option>
+              <option value="Ingeniería">Ingeniería</option>
+              <option value="Sistemas">Sistemas</option>
+              <option value="Ciencias Básicas">Ciencias Básicas</option>
+              <option value="Negocios">Negocios</option>
+            </select>
+            <span className="badge bg-primary-subtle text-primary border border-primary-subtle ms-auto">
+              Mostrando: {profesoresFiltrados.length} docentes
+            </span>
           </div>
         </div>
 
         {/* KPIs DEL MES */}
-        <div className="row g-4 mb-4">
-          <div className="col-12 col-md-4">
-            <div className="card shadow-sm border-0 h-100" style={{ borderRadius: "12px", borderLeft: "5px solid #007bff" }}>
-              <div className="card-body">
-                <h6 className="text-muted fw-semibold">Clases Impartidas</h6>
-                <h2 className="fw-bold mb-0 text-dark">40</h2>
-                <small className="text-muted">En el mes de Mayo</small>
+        <div className="row mb-4">
+          <div className="col-md-4 mb-4 mb-md-0">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-primary border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Clases Impartidas</span>
+                <h3 className="fw-bold text-primary mb-1">202</h3>
+                <small className="text-muted d-block mt-2">Mes de Junio (Global)</small>
               </div>
             </div>
           </div>
-          <div className="col-12 col-md-4">
-            <div className="card shadow-sm border-0 h-100" style={{ borderRadius: "12px", borderLeft: "5px solid #20c997" }}>
-              <div className="card-body">
-                <h6 className="text-muted fw-semibold">Alumnos Atendidos</h6>
-                <h2 className="fw-bold mb-0 text-dark">1,120</h2>
-                <small className="text-muted">Participaciones totales</small>
+          <div className="col-md-4 mb-4 mb-md-0">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-success border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Alumnos Atendidos</span>
+                <h3 className="fw-bold text-success mb-1">1,300</h3>
+                <small className="text-muted d-block mt-2">Participaciones totales</small>
               </div>
             </div>
           </div>
-          <div className="col-12 col-md-4">
-            <div className="card shadow-sm border-0 h-100" style={{ borderRadius: "12px", borderLeft: "5px solid #ffc107" }}>
-              <div className="card-body">
-                <h6 className="text-muted fw-semibold">Promedio General</h6>
-                <h2 className="fw-bold mb-0 text-dark">4.2 <span className="fs-5 text-warning">★</span></h2>
-                <small className="text-muted">Calificación docente global</small>
+          <div className="col-md-4">
+            <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+              <div className="card-body p-3 border-start border-warning border-5 rounded-end">
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Calidad Promedio</span>
+                <h3 className="fw-bold mb-1" style={{ color: '#D4AF37' }}>4.3 <span className="fs-5">★</span></h3>
+                <small className="text-muted d-block mt-2">Evaluación general docente</small>
               </div>
             </div>
           </div>
         </div>
 
-        {/* TABLA 1: RENDIMIENTO DOCENTE DETALLADO */}
-        <div className="card shadow-sm border-0 mb-5" style={{ borderRadius: "15px" }}>
-          <div className="card-header bg-white border-bottom-0 pt-4 pb-3">
-            <h5 className="fw-bold mb-0">Rendimiento por Profesor</h5>
-            <p className="text-muted small mb-0">Análisis de volumen de clases y evaluación estudiantil.</p>
+        {/* GRÁFICOS (Chart.js) */}
+        <div className="row mb-4">
+          <div className="col-md-6 mb-4 mb-md-0">
+            <div className="card border-0 shadow-sm bg-white p-4 h-100" style={{ borderRadius: '15px' }}>
+              <h6 className="fw-bold text-dark mb-3">📊 Rendimiento Docente (Calificación)</h6>
+              <div style={{ height: '240px' }}>
+                <Bar data={datosBarras} options={opcionesGrafico} />
+              </div>
+            </div>
           </div>
-          <div className="card-body p-0">
+          <div className="col-md-6">
+            <div className="card border-0 shadow-sm bg-white p-4 h-100" style={{ borderRadius: '15px' }}>
+              <h6 className="fw-bold text-dark mb-3">📈 Volumen de Clases (Últimas 4 Semanas)</h6>
+              <div style={{ height: '240px' }}>
+                <Line data={datosLineas} options={opcionesLineas} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* TABLA PRINCIPAL */}
+        <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: '15px' }}>
+          <div className="card-body p-4">
+            <h5 className="fw-bold text-dark mb-3">📋 Desempeño Detallado por Profesor</h5>
             <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="table-light">
+              <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.85rem' }}>
+                <thead className="table-light text-secondary">
                   <tr>
-                    <th className="ps-4">Profesor</th>
+                    <th className="ps-3">Profesor</th>
+                    <th>Facultad</th>
                     <th>Clases Dictadas</th>
                     <th>Alumnos Impactados</th>
-                    <th>Calificación Promedio</th>
-                    <th className="text-end pe-4">Tendencia</th>
+                    <th>Calificación</th>
+                    <th className="text-end pe-3">Análisis</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {reporteProfesores.map(prof => (
-                    <tr key={prof.id}>
-                      <td className="ps-4 py-3">
-                        <div className="fw-bold text-dark">{prof.nombre}</div>
-                        <div className="small text-muted">{prof.facultad}</div>
-                      </td>
-                      <td>
-                        <span className="badge bg-light text-dark border px-3 py-2 fs-6">
-                          {prof.clasesDadas} clases
-                        </span>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <span className="fw-semibold">{prof.alumnosAtendidos}</span>
-                          <div className="progress w-50" style={{ height: "6px" }}>
-                            <div className="progress-bar bg-info" style={{ width: `${(prof.alumnosAtendidos/500)*100}%` }}></div>
+                  {profesoresFiltrados.length > 0 ? (
+                    profesoresFiltrados.map(prof => (
+                      <tr key={prof.id} style={{ cursor: 'pointer' }} onClick={() => setProfesorSeleccionado(prof)} title="Clic para ver detalles">
+                        <td className="ps-3 py-3 fw-bold text-dark">{prof.nombre}</td>
+                        <td className="text-muted">{prof.facultad}</td>
+                        <td><span className="badge bg-light text-dark border px-2 py-1">{prof.clasesDadas} clases</span></td>
+                        <td>
+                          <div className="d-flex align-items-center gap-2">
+                            <span className="fw-semibold">{prof.alumnosAtendidos}</span>
+                            <div className="progress flex-grow-1" style={{ height: "4px", maxWidth: "80px" }}>
+                              <div className="progress-bar bg-info" style={{ width: `${(prof.alumnosAtendidos/500)*100}%` }}></div>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
+                        </td>
+                        <td>
                           <span className={`fw-bold ${prof.calificacion >= 4.5 ? 'text-success' : prof.calificacion >= 4.0 ? 'text-primary' : 'text-danger'}`}>
-                            {prof.calificacion}/5.0
+                            {prof.calificacion} ★
                           </span>
-                        </div>
-                      </td>
-                      <td className="text-end pe-4">
-                        {prof.tendencia === 'sube' && <span className="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">↑ Mejorando</span>}
-                        {prof.tendencia === 'mantiene' && <span className="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2 py-1">→ Estable</span>}
-                        {prof.tendencia === 'baja' && <span className="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1">↓ En declive</span>}
-                      </td>
+                        </td>
+                        <td className="text-end pe-3">
+                          {prof.tendencia === 'sube' && <span className="badge bg-success-subtle text-success">↑ Subiendo</span>}
+                          {prof.tendencia === 'mantiene' && <span className="badge bg-secondary-subtle text-secondary">→ Estable</span>}
+                          {prof.tendencia === 'baja' && <span className="badge bg-danger-subtle text-danger">↓ En declive</span>}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center py-4 text-muted">No hay datos para esta facultad.</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        {/* TABLA 2: HISTORIAL DE CLASES Y ASISTENCIA */}
-        <div className="card shadow-sm border-0" style={{ borderRadius: "15px" }}>
-          <div className="card-header bg-white border-bottom-0 pt-4 pb-3">
-            <h5 className="fw-bold mb-0">Historial de Clases Recientes</h5>
-            <p className="text-muted small mb-0">Registro detallado de qué alumnos asistieron a qué materia.</p>
-          </div>
-          <div className="card-body p-0">
-            <div className="table-responsive">
-              <table className="table table-borderless table-striped align-middle mb-0">
-                <thead className="border-bottom">
-                  <tr>
-                    <th className="ps-4">Fecha</th>
-                    <th>Materia / Curso</th>
-                    <th>Profesor a Cargo</th>
-                    <th>Asistencia</th>
-                    <th className="pe-4">Alumnos Registrados</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {detalleClases.map(clase => (
-                    <tr key={clase.id}>
-                      <td className="ps-4 py-3 text-muted small fw-semibold">{clase.fecha}</td>
-                      <td className="fw-bold text-dark">{clase.materia}</td>
-                      <td>{clase.profesor}</td>
-                      <td>
-                        <span className="badge bg-primary rounded-pill px-3">{clase.cantAlumnos} alumnos</span>
-                      </td>
-                      <td className="pe-4 text-muted small fst-italic">
-                        {clase.alumnosDestacados} <a href="#" className="text-decoration-none ms-1">Ver todos</a>
-                      </td>
-                    </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -174,6 +270,41 @@ export default function ReportesAdmin() {
         </div>
 
       </div>
+
+      {/* MODAL DE DETALLE */}
+      {profesorSeleccionado && (
+        <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1050, backdropFilter: 'blur(3px)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px', overflow: 'hidden' }}>
+              <div className="text-white d-flex justify-content-between align-items-center p-3" style={{ backgroundColor: '#3F51B5' }}>
+                <h5 className="modal-title fw-bold m-0" style={{ fontSize: '1.1rem' }}>🔍 Perfil Académico: {profesorSeleccionado.nombre}</h5>
+                <button type="button" className="btn-close btn-close-white shadow-none m-0" onClick={() => setProfesorSeleccionado(null)}></button>
+              </div>
+              <div className="modal-body p-4 bg-white text-center">
+                <div className="mb-4">
+                  <h1 className="display-4 fw-bold text-dark mb-0">{profesorSeleccionado.calificacion}</h1>
+                  <div className="text-warning fs-4">{'★'.repeat(Math.round(profesorSeleccionado.calificacion))}{'☆'.repeat(5 - Math.round(profesorSeleccionado.calificacion))}</div>
+                  <span className="text-muted small">Promedio basado en {profesorSeleccionado.clasesDadas} reseñas</span>
+                </div>
+                <div className="row text-start border-top pt-3">
+                  <div className="col-6 mb-3">
+                    <small className="text-muted fw-bold d-block">Facultad</small>
+                    <span className="fw-semibold text-dark">{profesorSeleccionado.facultad}</span>
+                  </div>
+                  <div className="col-6 mb-3">
+                    <small className="text-muted fw-bold d-block">Impacto (Alumnos)</small>
+                    <span className="fw-semibold text-dark">{profesorSeleccionado.alumnosAtendidos} estudiantes</span>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer border-0 bg-light">
+                <button className="btn btn-secondary px-4 fw-semibold rounded-pill w-100" onClick={() => setProfesorSeleccionado(null)}>Cerrar Análisis</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

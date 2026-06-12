@@ -30,7 +30,8 @@ export default function Sidebar({ role }) {
 
   const menuConfig = {
     admin: {
-      color: "#180f2a",
+      // AQUÍ ESTÁ EL CAMBIO: Color Índigo corporativo
+      color: "#3F51B5", 
       items: [
         { name: "Dashboard", icon: "bi-speedometer2", path: "/inicio-admin" },
         { name: "Usuarios", icon: "bi-people", path: "/usuarios-admin" },
@@ -38,7 +39,7 @@ export default function Sidebar({ role }) {
       ]
     },
     profesor: {
-      // CORREGIDO: Degradado de ángulo suavizado entre Índigo (#3F51B5) y Fúxia Medio (#7B1FA2)
+      // Degradado de ángulo suavizado entre Índigo (#3F51B5) y Fúxia Medio (#7B1FA2)
       color: "linear-gradient(180deg, #3F51B5 0%, #7B1FA2 100%)",
       items: [
         { name: "Mi Perfil", icon: "bi-person-badge", path: "/inicio-profesor" },

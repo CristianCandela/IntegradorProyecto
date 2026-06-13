@@ -6,6 +6,7 @@ const KEYS = {
   TUTORING_SESSIONS: "tutoring_sessions",
   REVIEWS: "reviews",
   NOTIFICATIONS: "notifications",
+  NOTIFICATIONS_PROFESOR: "notifications_profesor", // NUEVA CLAVE PARA PROFESOR
 };
 
 const defaultProfessorValues = {
@@ -37,6 +38,10 @@ export const StorageService = {
     }
     if (!localStorage.getItem(KEYS.NOTIFICATIONS)) {
       localStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify([]));
+    }
+    // NUEVO: Inicializar notificaciones de profesor
+    if (!localStorage.getItem(KEYS.NOTIFICATIONS_PROFESOR)) {
+      localStorage.setItem(KEYS.NOTIFICATIONS_PROFESOR, JSON.stringify([]));
     }
   },
 
@@ -192,6 +197,33 @@ export const StorageService = {
       const currentScore = profesores[index].scoreConfiabilidad !== undefined ? profesores[index].scoreConfiabilidad : 100;
       profesores[index].scoreConfiabilidad = Math.max(0, currentScore + pointChange);
       localStorage.setItem(KEYS.PROFESSORS, JSON.stringify(profesores));
+    }
+  },
+
+  // --- NUEVOS MÉTODOS PARA NOTIFICACIONES DE PROFESOR ---
+  
+  getNotificationsProfesor: () => {
+    const data = localStorage.getItem(KEYS.NOTIFICATIONS_PROFESOR);
+    return data ? JSON.parse(data) : [];
+  },
+
+  saveNotificationProfesor: (notification) => {
+    const notifications = StorageService.getNotificationsProfesor();
+    notifications.push({ 
+      ...notification, 
+      id: Date.now(), 
+      read: false,
+      timestamp: Date.now()
+    });
+    localStorage.setItem(KEYS.NOTIFICATIONS_PROFESOR, JSON.stringify(notifications));
+  },
+
+  markNotificationProfesorAsRead: (notificationId) => {
+    const notifications = StorageService.getNotificationsProfesor();
+    const index = notifications.findIndex(n => n.id === notificationId);
+    if (index !== -1) {
+      notifications[index].read = true;
+      localStorage.setItem(KEYS.NOTIFICATIONS_PROFESOR, JSON.stringify(notifications));
     }
   }
 };

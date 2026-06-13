@@ -12,7 +12,7 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
   const [transaccionId, setTransaccionId] = useState("");
   const [errorValidacion, setErrorValidacion] = useState("");
 
-  const duracion = courseDurations[profesor.curso] || 1.5; // Por defecto 1.5h si no encuentra
+  const duracion = courseDurations[profesor.curso] || 1.5;
   const tarifa = profesor.precioHora * duracion;
   const comision = tarifa * 0.15;
   const total = tarifa + comision;
@@ -72,8 +72,11 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
 
     const fechaSeleccionada = new Date(yearStr, monthStr - 1, dayStr, horaStr, minStr);
 
-    if (fechaSeleccionada <= ahora) {
-      setErrorValidacion("La fecha y hora de la tutoría deben ser en el futuro.");
+    // Permitir un margen de 1 minuto para evitar problemas de sincronización
+    const margenMinimo = new Date(ahora.getTime() - 1 * 60 * 1000);
+    
+    if (fechaSeleccionada < margenMinimo) {
+      setErrorValidacion("La fecha y hora de la tutoría deben ser al menos 1 minuto en el futuro.");
       return false;
     }
 
@@ -89,7 +92,6 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
       const duracionExistente = sesion.duracionEstimada || 1.5;
       const tiempoFinExistente = tiempoInicioExistente + duracionExistente * 60 * 60 * 1000;
 
-      // Hay solapamiento si: (InicioA < FinB) y (FinA > InicioB)
       return (tiempoInicioNuevo < tiempoFinExistente) && (tiempoFinNuevo > tiempoInicioExistente);
     });
 
@@ -114,12 +116,12 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
       profesorNombre: profesor.nombre,
       curso: profesor.curso,
       foto: profesor.foto,
-      fechaHora, // ISO
+      fechaHora,
       fechaOriginal: fecha,
       horaOriginal: hora,
       totalPagado: total,
       estado: "Confirmada",
-      duracionEstimada: duracion // Guardamos la duración para usarla luego en la sala virtual
+      duracionEstimada: duracion
     };
 
     StorageService.saveTutoringSession(nuevaTutoria);
@@ -134,7 +136,9 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
     onClose();
   };
 
-  const fechaHoy = new Date().toISOString().split('T')[0];
+  // CORREGIDO: Calcular fecha local en lugar de UTC
+  const ahora = new Date();
+  const fechaHoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
 
   return (
     <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>

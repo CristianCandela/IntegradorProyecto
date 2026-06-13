@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
 import Swal from 'sweetalert2';
+import { StorageService } from "../../core/database/StorageService";
 
 const TutoriasProfesor = () => {
   const [tutorias, setTutorias] = useState([]);
@@ -66,7 +67,23 @@ const TutoriasProfesor = () => {
     if (scoreActual < 100) {
       setAlertaCancelacionEstudiante(true);
     }
+
+    // Generar notificación de bienvenida para el profesor
+    generarNotificacionBienvenidaProfesor();
   }, []);
+
+  const generarNotificacionBienvenidaProfesor = () => {
+    const notificaciones = StorageService.getNotificationsProfesor();
+    const yaExisteBienvenida = notificaciones.some(n => n.tipo === "bienvenida_profesor");
+    
+    if (!yaExisteBienvenida) {
+      StorageService.saveNotificationProfesor({
+        tipo: "bienvenida_profesor",
+        mensaje: "Bienvenido al panel de profesor. Aquí podrás gestionar tus tutorías y evaluaciones.",
+        fechaHoraRef: new Date().toISOString()
+      });
+    }
+  };
 
   const toggleHorario = (index) => {
     const nuevaDisp = disponibilidad.map((item, i) => 
@@ -137,6 +154,13 @@ const TutoriasProfesor = () => {
     const nuevoScore = Math.max(0, scoreActual - puntosPenalizacion);
     localStorage.setItem("score_profesor", nuevoScore);
 
+    // Notificación para el profesor
+    StorageService.saveNotificationProfesor({
+      tipo: "cancelacion_tutoria",
+      mensaje: `Has cancelado la tutoría con ${tutoria.estudiante} de ${tutoria.curso}. Se aplicó una penalización de ${puntosPenalizacion} puntos.`,
+      fechaHoraRef: new Date().toISOString()
+    });
+
     const nuevasTutorias = tutorias.filter((_, i) => i !== indiceACancelar);
     setTutorias(nuevasTutorias);
     localStorage.setItem("tutorias", JSON.stringify(nuevasTutorias));
@@ -162,6 +186,13 @@ const TutoriasProfesor = () => {
         );
         setTutorias(listasActualizadas);
         localStorage.setItem("tutorias", JSON.stringify(listasActualizadas));
+
+        // Notificación para el profesor
+        StorageService.saveNotificationProfesor({
+          tipo: "tutoria_finalizada",
+          mensaje: `La tutoría con ${nombreAlumno} ha finalizado. Procede a registrar la valoración académica.`,
+          fechaHoraRef: new Date().toISOString()
+        });
 
         Swal.fire({
           title: 'Tutoría Finalizada',
@@ -190,6 +221,13 @@ const TutoriasProfesor = () => {
     }
 
     alert(`¡Evaluación enviada con éxito para ${alumnoAEvaluar}!\nCalificación asignada registrada en el sistema.`);
+    
+    // Notificación para el profesor
+    StorageService.saveNotificationProfesor({
+      tipo: "evaluacion_enviada",
+      mensaje: `Evaluación enviada para ${alumnoAEvaluar}. Tu calificación ha sido registrada.`,
+      fechaHoraRef: new Date().toISOString()
+    });
     
     const nuevasTutorias = tutorias.filter((_, i) => i !== indiceAEvaluar);
     setTutorias(nuevasTutorias);
@@ -321,7 +359,7 @@ const TutoriasProfesor = () => {
                         <button 
                           className="btn fw-semibold w-100 py-2 shadow-sm text-white d-flex align-items-center justify-content-center gap-2" 
                           style={{ backgroundColor: '#28a745', border: 'none' }}
-                          onClick={() => handleAbrirEvaluacion(index, tut.estudiante)} // CORREGIDO: Llamado exacto a la función
+                          onClick={() => handleAbrirEvaluacion(index, tut.estudiante)}
                         >
                           <i className="bi bi-clipboard2-check-fill"></i> Evaluar Alumno
                         </button>
@@ -418,7 +456,6 @@ const TutoriasProfesor = () => {
                   <div className="row g-3 mb-4">
                     <div className="col-md-4">
                       <label className="form-label small text-muted">Compromiso y preparación</label>
-                      {/* CORREGIDO: Cambiado setCommitment por setCompromiso */}
                       <input type="range" className="form-range" min="1" max="5" value={compromiso} onChange={(e)=>setCompromiso(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
                       <span className="badge bg-secondary">{compromiso} / 5</span>
                     </div>

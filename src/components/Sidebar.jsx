@@ -33,19 +33,32 @@ export default function Sidebar({ role }) {
         clearInterval(interval);
       };
     } else if (role === "profesor") {
-      const revisarScore = () => {
-        setScoreConfiabilidad(Number(localStorage.getItem("score_profesor")) || 100);
+      cargarDatosProfesor();
+      window.addEventListener("storage", cargarDatosProfesor);
+      
+      const interval = setInterval(() => {
+        cargarDatosProfesor();
+      }, 60000);
+
+      return () => {
+        window.removeEventListener("storage", cargarDatosProfesor);
+        clearInterval(interval);
       };
-      revisarScore();
-      window.addEventListener("storage", revisarScore);
-      return () => window.removeEventListener("storage", revisarScore);
     }
   }, [role]);
 
+  // CAMBIO MÍNIMO: Fallback para leer score correctamente
   const cargarDatosEstudiante = () => {
     const stats = StorageService.getStudentStats();
-    setScoreConfiabilidad(stats.scoreConfiabilidad);
+    // Lee scoreConfiabilidad si existe, sino lee score, sino 100
+    setScoreConfiabilidad(stats?.scoreConfiabilidad ?? stats?.score ?? 100);
     setNotificaciones(StorageService.getNotifications());
+  };
+
+  // NUEVA FUNCIÓN PARA PROFESOR
+  const cargarDatosProfesor = () => {
+    setScoreConfiabilidad(Number(localStorage.getItem("score_profesor")) || 100);
+    setNotificaciones(StorageService.getNotificationsProfesor());
   };
 
   const verificarRecordatorios = () => {
@@ -91,8 +104,9 @@ export default function Sidebar({ role }) {
 
           // Penalizar al estudiante
           const currentStats = StorageService.getStudentStats();
-          const newScore = Math.max(0, currentStats.scoreConfiabilidad - 10);
-          StorageService.saveStudentStats({ scoreConfiabilidad: newScore });
+          const scoreActual = currentStats?.scoreConfiabilidad ?? currentStats?.score ?? 100;
+          const newScore = Math.max(0, scoreActual - 10);
+          StorageService.updateStudentStats({ scoreConfiabilidad: newScore });
 
           StorageService.saveNotification({
             tipo: "inasistencia",
@@ -209,8 +223,13 @@ export default function Sidebar({ role }) {
   };
 
   const marcarComoLeida = (id) => {
-    StorageService.markNotificationAsRead(id);
-    cargarDatosEstudiante();
+    if (role === "estudiante") {
+      StorageService.markNotificationAsRead(id);
+      cargarDatosEstudiante();
+    } else if (role === "profesor") {
+      StorageService.markNotificationProfesorAsRead(id);
+      cargarDatosProfesor();
+    }
   };
 
   const alertasNoLeidas = notificaciones.filter(n => !n.read).length;
@@ -233,7 +252,8 @@ export default function Sidebar({ role }) {
         </div>
       </div>
 
-      {role === "estudiante" && (
+      {/* NOTIFICACIONES - AHORA PARA ESTUDIANTE Y PROFESOR */}
+      {(role === "estudiante" || role === "profesor") && (
         <div className="px-3 py-2 position-relative w-100">
           <button
             className="btn btn-link text-white p-0 d-flex align-items-center gap-2 style-none text-decoration-none"
@@ -255,9 +275,11 @@ export default function Sidebar({ role }) {
             <div className="bg-white rounded shadow p-2 mt-2 position-relative" style={{ zIndex: 1100, border: '1px solid #ddd', maxHeight: '300px', overflowY: 'auto' }}>
               <div className="d-flex justify-content-between align-items-center border-bottom pb-1 mb-1">
                 <h6 className="fw-bold text-dark px-2 pt-1 m-0" style={{ fontSize: '0.8rem' }}>Notificaciones</h6>
-                <button className="btn btn-sm btn-link text-muted p-0" style={{ fontSize: '0.7rem' }} onClick={simularTutoriaFutura} title="Crear tutoría a 59 mins para probar campana">
-                  <i className="bi bi-bug"></i> Debug
-                </button>
+                {role === "estudiante" && (
+                  <button className="btn btn-sm btn-link text-muted p-0" style={{ fontSize: '0.7rem' }} onClick={simularTutoriaFutura} title="Crear tutoría a 59 mins para probar campana">
+                    <i className="bi bi-bug"></i> Debug
+                  </button>
+                )}
               </div>
               {notificaciones.length > 0 ? (
                 notificaciones.slice().reverse().map(n => (

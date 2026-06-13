@@ -176,7 +176,7 @@ const InicioProfesor = () => {
       });
 
       if (totalClasesDictadas >= META_CLASES) {
-        filas.push(["-", "¡BONO EXCELENCIA CUMPLIDO!", "-", "-", "-", `S/. ${MONTO_BONO.toFixed(2)}`, "Asignado"]);
+        filas.push(["-", "BONO EXCELENCIA CUMPLIDO", "-", "-", "-", `S/. ${MONTO_BONO.toFixed(2)}`, "Asignado"]);
       }
 
       autoTable(doc, {
@@ -222,8 +222,8 @@ const InicioProfesor = () => {
             <h2 className="fw-bold mb-1" style={{ color: '#3F51B5' }}>Dashboard Financiero</h2>
             <p className="text-muted small mb-0">Monitorea tus ingresos reales, comisiones y costos de oportunidad de tu negocio educativo.</p>
           </div>
-          <button className="btn text-white fw-semibold shadow-sm px-4" style={{ backgroundColor: '#7B1FA2' }} onClick={descargarPDF}>
-            🖨️ Exportar Balance Financiero
+          <button className="btn text-white fw-semibold shadow-sm px-4 d-flex align-items-center gap-2" style={{ backgroundColor: '#7B1FA2' }} onClick={descargarPDF}>
+            <i className="bi bi-printer"></i> Exportar Balance Financiero
           </button>
         </div>
 
@@ -231,11 +231,14 @@ const InicioProfesor = () => {
         <div className="card border-0 shadow-sm mb-4 p-4" style={{ borderRadius: '15px', backgroundColor: '#ffffff' }}>
           <div className="d-flex justify-content-between align-items-center mb-2">
             <div>
-              <h5 className="fw-bold m-0 text-dark">🎯 Meta de Incentivo Mensual</h5>
+              <h5 className="fw-bold m-0 text-dark">
+                <i className="bi bi-target text-indigo me-2"></i>Meta de Incentivo Mensual
+              </h5>
               <p className="text-muted small m-0">Dicta {META_CLASES} clases completas en el ciclo y recibe un bono de excelencia docente.</p>
             </div>
-            <span className={`badge px-3 py-2 fs-6 fw-bold ${isMetaAlcanzada ? 'bg-success text-white' : 'bg-warning text-dark'}`}>
-              {isMetaAlcanzada ? '¡Bono Activado! 🎉' : 'En Progreso ⏳'}
+            <span className={`badge px-3 py-2 fs-6 fw-bold d-flex align-items-center gap-1 ${isMetaAlcanzada ? 'bg-success text-white' : 'bg-warning text-dark'}`}>
+              <i className={`bi ${isMetaAlcanzada ? 'bi-check-circle-fill' : 'bi-hourglass-split'}`}></i>
+              {isMetaAlcanzada ? 'Bono Activado' : 'En Progreso'}
             </span>
           </div>
 
@@ -258,15 +261,17 @@ const InicioProfesor = () => {
           </div>
 
           <div className="p-2 px-3 bg-light rounded d-flex justify-content-between align-items-center" style={{ fontSize: '0.85rem' }}>
-            <span className="text-secondary fw-semibold">📌 Recompensa extra acumulada por cumplimiento de pauta:</span>
+            <span className="text-secondary fw-semibold">
+              <i className="bi bi-info-circle me-1"></i> Recompensa extra acumulada por cumplimiento de pauta:
+            </span>
             <span className="fw-bold text-success fs-6">+ S/. {MONTO_BONO.toFixed(2)}</span>
           </div>
         </div>
 
         {/* ANALISIS COSTO DE OPORTUNIDAD */}
         <div className="alert border-0 text-white p-3 mb-4 d-flex justify-content-between align-items-center shadow-sm" style={{ backgroundColor: '#D32F2F', borderRadius: '12px' }}>
-          <div className="d-flex align-items-center gap-2">
-            <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+          <div className="d-flex align-items-center gap-3">
+            <i className="bi bi-exclamation-triangle-fill fs-4"></i>
             <div>
               <strong className="d-block">Análisis del Costo de Oportunidad</strong>
               <span className="small opacity-90">Podrías haber ganado S/. {(ingresoNetoFinal + finanzas.perdidasCancelacion).toFixed(2)} este mes si hubieras completado todas tus tutorías publicadas.</span>
@@ -326,7 +331,9 @@ const InicioProfesor = () => {
         <div className="row mb-4">
           <div className="col-md-6 mb-3">
             <div className="card border-0 shadow-sm bg-white p-4" style={{ borderRadius: '15px' }}>
-              <h6 className="fw-bold text-dark mb-3">📊 Ingresos Semanales (Mes Actual)</h6>
+              <h6 className="fw-bold text-dark mb-3">
+                <i className="bi bi-bar-chart-line-fill text-indigo me-2"></i>Ingresos Semanales (Mes Actual)
+              </h6>
               <div style={{ height: '220px' }}>
                 <Bar data={datosBarras} options={opcionesGrafico} />
               </div>
@@ -334,7 +341,9 @@ const InicioProfesor = () => {
           </div>
           <div className="col-md-6 mb-3">
             <div className="card border-0 shadow-sm bg-white p-4" style={{ borderRadius: '15px' }}>
-              <h6 className="fw-bold text-dark mb-3">📈 Tendencia de Ingresos (Últimos 3 Meses)</h6>
+              <h6 className="fw-bold text-dark mb-3">
+                <i className="bi bi-graph-up-arrow text-danger me-2"></i>Tendencia de Ingresos (Últimos 3 Meses)
+              </h6>
               <div style={{ height: '220px' }}>
                 <Line data={datosLineas} options={opcionesGrafico} />
               </div>
@@ -345,12 +354,17 @@ const InicioProfesor = () => {
         {/* HISTORIAL DETALLADO */}
         <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: '15px' }}>
           <div className="card-body p-4">
+            
+            {/* CORREGIDO: Reemplazado emoji por bi-journal-text con espaciado flex */}
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 className="fw-bold text-dark mb-0">📋 Historial de Transacciones Contables</h5>
-              <button className="btn btn-sm btn-outline-secondary px-3" onClick={() => setMostrarCalendario(true)}>
-                📅 Ver Calendario de Cobros
+              <h5 className="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                <i className="bi bi-journal-text text-indigo"></i> Historial de Transacciones Contables
+              </h5>
+              <button className="btn btn-sm btn-outline-secondary px-3 d-flex align-items-center gap-2" onClick={() => setMostrarCalendario(true)}>
+                <i className="bi bi-calendar3"></i> Ver Calendario de Cobros
               </button>
             </div>
+
             <div className="table-responsive">
               <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.85rem' }}>
                 <thead className="table-light text-secondary">
@@ -392,13 +406,12 @@ const InicioProfesor = () => {
           </div>
         </div>
 
-        {/* MODAL CALENDARIO CON ENFOQUE ÍNDIGO SÓLIDO TOTALMENTE SANEADO */}
+        {/* MODAL CALENDARIO */}
         {mostrarCalendario && (
           <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
             <div className="modal-dialog modal-dialog-centered modal-lg">
               <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px', backgroundColor: '#ffffff', overflow: 'hidden' }}>
                 
-                {/* REMOVIDAS TODAS LAS CLASES DE ENTRADA PARA ELIMINAR EL DEGRADADO HEREDADO */}
                 <div 
                   className="text-white d-flex justify-content-between align-items-center p-3" 
                   style={{ 
@@ -406,7 +419,9 @@ const InicioProfesor = () => {
                     background: '#3F51B5'
                   }}
                 >
-                  <h5 className="modal-title fw-bold m-0" style={{ fontSize: '1.1rem' }}>📅 Calendario Académico de Estados</h5>
+                  <h5 className="modal-title fw-bold m-0 d-flex align-items-center gap-2" style={{ fontSize: '1.1rem' }}>
+                    <i className="bi bi-calendar-event"></i> Calendario Académico de Estados
+                  </h5>
                   <button 
                     type="button" 
                     className="btn-close btn-close-white shadow-none m-0" 
@@ -441,7 +456,6 @@ const InicioProfesor = () => {
                   <button className="btn btn-secondary px-4 fw-semibold" onClick={() => setMostrarCalendario(false)}>Cerrar</button>
                 </div>
               </div>
-
             </div>
           </div>
         )}

@@ -1,19 +1,46 @@
 import { useState } from "react";
 import Sidebar from "../../components/Sidebar";
 import ProfesorCard from "../../components/ProfesorCard";
-import { profesoresData } from "../../data/profesoresData";
+import { StorageService } from "../../core/database/StorageService";
 
 export default function BuscarEstudiante() {
 
   const [busqueda, setBusqueda] = useState("");
   const [deptoSel, setDeptoSel] = useState("Todos");
+  const [filtrosAvanzados, setFiltrosAvanzados] = useState(false);
   const [ratingMin, setRatingMin] = useState(0);
   const [difMax, setDifMax] = useState(10);
 
+  const profesores = StorageService.getCompleteProfessors();
   const especialidades = [
     "Todos",
-    ...new Set(profesoresData.map(p => p.departamento))
+    ...new Set(profesores.map(p => p.departamento))
   ];
+
+  // AGRUPAR PROFESORES POLÍMATAS
+  const profesoresUnificados = Object.values(profesores.reduce((acc, p) => {
+    if (!acc[p.nombre]) {
+      acc[p.nombre] = {
+        ...p,
+        ratingTotal: p.rating,
+        dificultadTotal: p.dificultad,
+        count: 1,
+        cursosAsociados: [p]
+      };
+    } else {
+      acc[p.nombre].ratingTotal += p.rating;
+      acc[p.nombre].dificultadTotal += p.dificultad;
+      acc[p.nombre].count += 1;
+      acc[p.nombre].cursosAsociados.push(p);
+    }
+    return acc;
+  }, {})).map(g => ({
+    ...g,
+    rating: Number((g.ratingTotal / g.count).toFixed(1)),
+    dificultad: Math.round((g.dificultadTotal / g.count) * 10) / 10,
+    curso: g.count > 1 ? "Múltiples Materias" : g.curso,
+    departamento: g.count > 1 ? "Varios Departamentos" : g.departamento
+  }));
 
   // TEXTO DINÁMICO DIFICULTAD
   const getDificultadLabel = (val) => {
@@ -30,24 +57,21 @@ export default function BuscarEstudiante() {
     return "Excelentes";
   };
 
-  // FILTRADO DINÁMICO
-  const profesoresFiltrados = profesoresData.filter((profe) => {
+  // FILTRADO DINÁMICO SOBRE UNIFICADOS
+  let profesoresFiltrados = profesoresUnificados.filter((profe) => {
 
     const textoBusqueda = busqueda.trim().toLowerCase();
 
     const cumpleBusqueda =
       profe.nombre.toLowerCase().includes(textoBusqueda) ||
-      profe.curso.toLowerCase().includes(textoBusqueda);
+      profe.cursosAsociados.some(c => c.curso.toLowerCase().includes(textoBusqueda));
 
     const cumpleDepto =
       deptoSel === "Todos" ||
-      profe.departamento === deptoSel;
+      profe.cursosAsociados.some(c => c.departamento === deptoSel);
 
-    const cumpleRating =
-      profe.rating >= ratingMin;
-
-    const cumpleDificultad =
-      profe.dificultad <= difMax;
+    const cumpleRating = !filtrosAvanzados || profe.rating >= ratingMin;
+    const cumpleDificultad = !filtrosAvanzados || profe.dificultad <= difMax;
 
     return (
       cumpleBusqueda &&
@@ -57,6 +81,18 @@ export default function BuscarEstudiante() {
     );
   });
 
+  // LÍMITE DE 10 SI NO HAY BÚSQUEDA ACTIVA
+  const isBuscando = busqueda.trim() !== "" || deptoSel !== "Todos" || filtrosAvanzados;
+  if (!isBuscando) {
+    profesoresFiltrados = profesoresFiltrados.slice(0, 10);
+  }
+
+  const textGradient = {
+    background: "linear-gradient(135deg, #57227ae5 0%, #9f39c7fa 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent"
+  };
+
   return (
     <div className="main-layout">
 
@@ -65,7 +101,7 @@ export default function BuscarEstudiante() {
       <main className="dashboard-content">
 
         <header className="mb-4">
-          <h2 className="fw-bold text-indigo">
+          <h2 className="fw-bold" style={textGradient}>
             Explorar Profesores
           </h2>
 
@@ -76,6 +112,23 @@ export default function BuscarEstudiante() {
 
         {/* FILTROS */}
         <section className="card border-0 shadow-sm p-4 rounded-4 mb-5 bg-white">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h6 className="fw-bold mb-0">Búsqueda Principal</h6>
+            <div className="form-check form-switch d-flex align-items-center">
+              <input
+                className="form-check-input mt-0 me-2"
+                type="checkbox"
+                role="switch"
+                id="flexSwitchCheckDefault"
+                checked={filtrosAvanzados}
+                onChange={() => setFiltrosAvanzados(!filtrosAvanzados)}
+                style={{ cursor: 'pointer' }}
+              />
+              <label className="form-check-label small fw-bold text-secondary mb-0" htmlFor="flexSwitchCheckDefault">
+                Filtros Avanzados
+              </label>
+            </div>
+          </div>
 
           <div className="row g-4 align-items-end">
 
@@ -126,12 +179,12 @@ export default function BuscarEstudiante() {
             </div>
 
             {/* RATING */}
-            <div className="col-md-4 col-lg-2">
+            <div className="col-md-4 col-lg-2" style={{ opacity: filtrosAvanzados ? 1 : 0.4, transition: 'opacity 0.3s' }}>
 
               <div className="d-flex justify-content-between align-items-center">
 
                 <label className="form-label small fw-bold text-secondary mb-1">
-                  Rating mínimo
+                  Valoración Mínima
                 </label>
 
                 <span className="badge bg-warning text-dark">
@@ -154,27 +207,27 @@ export default function BuscarEstudiante() {
                 onChange={(e) =>
                   setRatingMin(parseFloat(e.target.value))
                 }
+                disabled={!filtrosAvanzados}
               />
 
             </div>
 
             {/* DIFICULTAD */}
-            <div className="col-md-4 col-lg-2">
+            <div className="col-md-4 col-lg-2" style={{ opacity: filtrosAvanzados ? 1 : 0.4, transition: 'opacity 0.3s' }}>
 
               <div className="d-flex justify-content-between align-items-center">
 
                 <label className="form-label small fw-bold text-secondary mb-1">
-                  Dificultad máxima
+                  Nivel de Exigencia
                 </label>
 
                 <span
-                  className={`badge ${
-                    difMax <= 3
-                      ? "bg-success"
-                      : difMax <= 7
+                  className={`badge ${difMax <= 3
+                    ? "bg-success"
+                    : difMax <= 7
                       ? "bg-info"
                       : "bg-danger"
-                  }`}
+                    }`}
                 >
                   {difMax}
                 </span>
@@ -195,6 +248,7 @@ export default function BuscarEstudiante() {
                 onChange={(e) =>
                   setDifMax(parseInt(e.target.value))
                 }
+                disabled={!filtrosAvanzados}
               />
 
             </div>
@@ -207,9 +261,11 @@ export default function BuscarEstudiante() {
                 onClick={() => {
                   setBusqueda("");
                   setDeptoSel("Todos");
+                  setFiltrosAvanzados(false);
                   setRatingMin(0);
                   setDifMax(10);
                 }}
+                title="Limpiar filtros"
               >
                 <i className="bi bi-arrow-counterclockwise"></i>
               </button>
@@ -239,7 +295,7 @@ export default function BuscarEstudiante() {
                 key={profe.id}
                 className="col-sm-6 col-lg-4 col-xl-3"
               >
-                <ProfesorCard profesor={profe} />
+                <ProfesorCard profesor={profe} isTutoria={false} />
               </div>
 
             ))}

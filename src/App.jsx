@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   useLocation,
 } from "react-router-dom";
+
+import { StorageService } from "./core/database/StorageService";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -61,6 +64,12 @@ function LayoutWrapper({ children }) {
   const isAdmin = adminRoutes.includes(location.pathname);
   const isProfesor = profesorRoutes.includes(location.pathname);
   const isEstudiante = estudianteRoutes.includes(location.pathname);
+
+  useEffect(() => {
+    if (isEstudiante) {
+      StorageService.initialize();
+    }
+  }, [isEstudiante]);
 
   const isDashboard =
     isAdmin || isProfesor || isEstudiante;

@@ -48,7 +48,7 @@ const InicioProfesor = () => {
       { id: 4, estudiante: "Celia Benavides", curso: "Cálculo Avanzado", fecha: "2026-05-28", horas: 2, estado: "Completada" },
       { id: 5, estudiante: "Luis carlos Mendez Chavez", curso: "Desarrollo de software", fecha: "2026-06-12", horas: 2, estado: "Pendiente" },
       { id: 6, estudiante: "Carlos Mendoza", curso: "Física de Campos", fecha: "2026-06-02", horas: 1, estado: "Cancelada por Estudiante" },
-      { id: 7, estudiante: "Gerson Aldair", curso: "Diseño de Sistemas Web", fecha: "2026-06-04", horas: 2, estado: "Cancelada por Profesor" }
+      { id: 7, estudiante: "Gerson Aldair", curso: "Diseño de Sistemas Web", fecha: "2026-06-04", hours: 2, estado: "Cancelada por Profesor" }
     ];
 
     if (!localStorage.getItem("tutorias_financieras")) {
@@ -57,24 +57,32 @@ const InicioProfesor = () => {
 
     const records = JSON.parse(localStorage.getItem("tutorias_financieras")) || datosTutoriasFinanzas;
 
-    let bruto = 0;
+    let brutoAcumulado = 0;
+    let comisionAcumulada = 0;
+    let netoAcumulado = 0;
     let pendientes = 0;
     let perdidas = 0;
     let contadorCompletadas = 0;
 
     const listaProcesada = records.map(item => {
       const horas = Number(item.horas) || 0;
-      const pagoBruto = horas * TARIFA_POR_HORA;
-      const comision = pagoBruto * COMISION_PORCENTAJE;
-      const pagoNeto = pagoBruto - comision;
+      
+      // El pago base/neto del docente corresponde directamente a sus horas por la tarifa
+      const pagoNeto = horas * TARIFA_POR_HORA;
+      // La comisión del 15% es un extra cobrado al estudiante
+      const comision = pagoNeto * COMISION_PORCENTAJE;
+      // El bruto total cobrado al estudiante es el neto del profesor + la comisión de la plataforma
+      const pagoBruto = pagoNeto + comision;
 
       if (item.estado === "Completada") {
-        bruto += pagoBruto;
+        netoAcumulado += pagoNeto;
+        comisionAcumulada += comision;
+        brutoAcumulado += pagoBruto;
         contadorCompletadas += 1;
       } else if (item.estado === "Pendiente") {
-        pendientes += pagoBruto;
+        pendientes += pagoNeto;
       } else if (item.estado && item.estado.startsWith("Cancelada")) {
-        perdidas += pagoBruto;
+        perdidas += pagoNeto;
       }
 
       return {
@@ -87,16 +95,13 @@ const InicioProfesor = () => {
       };
     });
 
-    const comisionTotal = bruto * COMISION_PORCENTAJE;
-    const netoTotal = bruto - comisionTotal;
-
     setTotalClasesDictadas(contadorCompletadas);
     setIsMetaAlcanzada(contadorCompletadas >= META_CLASES);
 
     setFinanzas({
-      ingresoBruto: bruto,
-      comisionPlataforma: comisionTotal,
-      ingresoNeto: netoTotal,
+      ingresoBruto: brutoAcumulado,
+      comisionPlataforma: comisionAcumulada,
+      ingresoNeto: netoAcumulado,
       ingresosPendientes: pendientes,
       perdidasCancelacion: perdidas
     });
@@ -154,15 +159,15 @@ const InicioProfesor = () => {
       doc.text(`Fecha de corte: ${new Date().toLocaleDateString()}`, 14, 30);
       doc.text("Profesor: Juan Jose Silva N.", 14, 36);
 
-      const columnas = ["Fecha", "Estudiante", "Horas", "Bruto", "Comisión (15%)", "Neto", "Estado"];
+      const columnas = ["Fecha", "Estudiante", "Horas", "Bruto Est.", "Comisión (15%)", "Neto Docente", "Estado"];
       
       const registrosSeguros = JSON.parse(localStorage.getItem("tutorias_financieras")) || [];
       
       const filas = registrosSeguros.map(t => {
         const h = Number(t.horas) || 0;
-        const b = h * 50;
-        const c = b * 0.15;
-        const n = b - c;
+        const n = h * 50;
+        const c = n * 0.15;
+        const b = n + c;
         
         return [
           String(t.fecha || ""), 
@@ -191,7 +196,7 @@ const InicioProfesor = () => {
       doc.save(`Reporte_Financiero_ProfeMatch.pdf`);
     } catch (error) {
       console.error("Error en jsPDF:", error);
-      alert("Error al construir el documento PDF. Por favor, limpia la consola.");
+      alert("Error al construir el documento PDF.");
     }
   };
 
@@ -296,9 +301,9 @@ const InicioProfesor = () => {
           <div className="col-md-3 mb-4">
             <div className="card border-0 shadow-sm h-100 bg-white" style={cardStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
               <div className="card-body p-3 border-start border-danger border-5 rounded-end">
-                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Cancelaciones (Rojo)</span>
+                <span className="text-muted small fw-bold text-uppercase d-block mb-1">Cancelaciones</span>
                 <h3 className="fw-bold text-danger mb-1">S/. {finanzas.perdidasCancelacion.toFixed(2)}</h3>
-                <small className="text-muted d-block mt-2">Comisión ProfeMatch: 15%</small>
+                <small className="text-muted d-block mt-2">Tarifa Base por hora: S/. 50.00</small>
                 <span className="badge bg-danger-subtle text-danger px-2 py-1" style={{ fontSize: '0.7rem' }}>Métrica Crítica</span>
               </div>
             </div>
@@ -355,7 +360,6 @@ const InicioProfesor = () => {
         <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: '15px' }}>
           <div className="card-body p-4">
             
-            {/* CORREGIDO: Reemplazado emoji por bi-journal-text con espaciado flex */}
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h5 className="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
                 <i className="bi bi-journal-text text-indigo"></i> Historial de Transacciones Contables
@@ -374,7 +378,7 @@ const InicioProfesor = () => {
                     <th>Materia</th>
                     <th>Horas</th>
                     <th>Tarifa/h</th>
-                    <th>Comisión (15%)</th>
+                    <th>Comisión Est. (15%)</th>
                     <th>Neto Docente</th>
                     <th className="text-center">Estado</th>
                   </tr>
@@ -387,7 +391,7 @@ const InicioProfesor = () => {
                       <td className="py-2 text-muted">{t.curso}</td>
                       <td className="py-2 text-dark">{t.horas} hrs</td>
                       <td className="py-2 text-muted">S/. {t.tarifa.toFixed(2)}</td>
-                      <td className="py-2 text-danger">- S/. {t.comision.toFixed(2)}</td>
+                      <td className="py-2 text-secondary">S/. {t.comision.toFixed(2)}</td>
                       <td className="py-2 text-success fw-bold">S/. {t.neto.toFixed(2)}</td>
                       <td className="py-2 text-center">
                         <span className={`badge px-2 py-1 rounded ${

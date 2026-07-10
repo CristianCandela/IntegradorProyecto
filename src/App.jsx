@@ -30,6 +30,8 @@ import InicioProfesor from "./pages/profesor/InicioProfesor";
 import EvaluacionesProfesor from "./pages/profesor/EvaluacionesProfesor";
 import TutoriasProfesor from "./pages/profesor/TutoriasProfesor";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
@@ -123,21 +125,41 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
 
-          {/* Admin */}
-          <Route path="/inicio-admin" element={<InicioAdmin />} />
-          <Route path="/usuarios-admin" element={<UsuariosAdmin />} />
-          <Route path="/reportes-admin" element={<ReportesAdmin />} />
+          {/* Admin — protegidas, solo rol admin */}
+          <Route path="/inicio-admin" element={
+            <ProtectedRoute rolesPermitidos={["admin"]}><InicioAdmin /></ProtectedRoute>
+          } />
+          <Route path="/usuarios-admin" element={
+            <ProtectedRoute rolesPermitidos={["admin"]}><UsuariosAdmin /></ProtectedRoute>
+          } />
+          <Route path="/reportes-admin" element={
+            <ProtectedRoute rolesPermitidos={["admin"]}><ReportesAdmin /></ProtectedRoute>
+          } />
 
-          {/* Estudiante */}
-          <Route path="/inicio-estudiante" element={<InicioEstudiante />} />
-          <Route path="/buscar-estudiante" element={<BuscarEstudiante />} />
-          <Route path="/resenas-estudiante" element={<ReseñasEstudiante />} />
-          <Route path="/tutorias-estudiante" element={<TutoriasEstudiante />} />
+          {/* Estudiante — protegidas, solo rol estudiante */}
+          <Route path="/inicio-estudiante" element={
+            <ProtectedRoute rolesPermitidos={["estudiante"]}><InicioEstudiante /></ProtectedRoute>
+          } />
+          <Route path="/buscar-estudiante" element={
+            <ProtectedRoute rolesPermitidos={["estudiante"]}><BuscarEstudiante /></ProtectedRoute>
+          } />
+          <Route path="/resenas-estudiante" element={
+            <ProtectedRoute rolesPermitidos={["estudiante"]}><ReseñasEstudiante /></ProtectedRoute>
+          } />
+          <Route path="/tutorias-estudiante" element={
+            <ProtectedRoute rolesPermitidos={["estudiante"]}><TutoriasEstudiante /></ProtectedRoute>
+          } />
 
-          {/* Profesor */}
-          <Route path="/inicio-profesor" element={<InicioProfesor />} />
-          <Route path="/evaluaciones-profesor" element={<EvaluacionesProfesor />} />
-          <Route path="/tutorias-profesor" element={<TutoriasProfesor />} />
+          {/* Profesor — protegidas, solo rol profesor */}
+          <Route path="/inicio-profesor" element={
+            <ProtectedRoute rolesPermitidos={["profesor"]}><InicioProfesor /></ProtectedRoute>
+          } />
+          <Route path="/evaluaciones-profesor" element={
+            <ProtectedRoute rolesPermitidos={["profesor"]}><EvaluacionesProfesor /></ProtectedRoute>
+          } />
+          <Route path="/tutorias-profesor" element={
+            <ProtectedRoute rolesPermitidos={["profesor"]}><TutoriasProfesor /></ProtectedRoute>
+          } />
 
         </Routes>
       </LayoutWrapper>

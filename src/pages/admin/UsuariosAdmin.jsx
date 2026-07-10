@@ -29,26 +29,10 @@ export default function UsuariosAdmin() {
   const obtenerUsuarios = async () => {
     setCargando(true);
     
-    if (vistaActual === "pendientes") {
-      // Mock flow from StorageService
-      const pendingUsers = StorageService.getUsers().filter(u => u.status === "pendiente");
-      const mapped = pendingUsers.map(u => ({
-        id: u.id,
-        nombre: u.nombres,
-        email: u.email,
-        rol: u.role,
-        score_confiabilidad: 100,
-        plan: "N/A"
-      }));
-      setUsuarios(mapped);
-      setCargando(false);
-      return;
-    }
-
     // Cambiamos la URL según la pestaña seleccionada
-    const url = vistaActual === "activos" 
-      ? "http://localhost:3006/api/usuarios" 
-      : "http://localhost:3006/api/usuarios/papelera";
+    let url = "http://localhost:3006/api/usuarios";
+    if (vistaActual === "papelera") url = "http://localhost:3006/api/usuarios/papelera";
+    if (vistaActual === "pendientes") url = "http://localhost:3006/api/usuarios/pendientes";
 
     try {
       const respuesta = await fetch(url);
@@ -64,8 +48,12 @@ export default function UsuariosAdmin() {
         confirmButtonColor: "#1F0954",
         background: "#f8f9fa"
       });
-      // Fallback a los usuarios aprobados en el mock
-      const mockUsers = StorageService.getUsers().filter(u => u.status === "aprobado");
+      // Fallback a los usuarios en el mock según la vista actual
+      let mockUsers = [];
+      if (vistaActual === "activos") mockUsers = StorageService.getUsers().filter(u => u.status === "aprobado");
+      else if (vistaActual === "pendientes") mockUsers = StorageService.getUsers().filter(u => u.status === "pendiente");
+      else if (vistaActual === "papelera") mockUsers = StorageService.getUsers().filter(u => u.status === "bloqueado");
+
       setUsuarios(mockUsers.map(u => ({
         id: u.id,
         nombre: u.nombres || u.nombre,
@@ -256,11 +244,23 @@ export default function UsuariosAdmin() {
       confirmButtonColor: "#1F0954",
       cancelButtonText: "Cancelar",
       confirmButtonText: "Sí, Aprobar"
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        StorageService.updateUserStatus(id, "aprobado");
-        Swal.fire("¡Aprobado!", "El usuario ya puede iniciar sesión.", "success");
-        obtenerUsuarios();
+        try {
+          const respuesta = await fetch(`http://localhost:3006/api/usuarios/aprobar/${id}`, {
+            method: "PUT"
+          });
+          
+          if (!respuesta.ok) throw new Error("Error en el servidor al aprobar");
+          
+          Swal.fire("¡Aprobado!", "El usuario ya puede iniciar sesión.", "success");
+          obtenerUsuarios();
+        } catch (error) {
+          // Fallback a LocalStorage si falla la API
+          StorageService.updateUserStatus(id, "aprobado");
+          Swal.fire("¡Aprobado (Local)!", "El usuario ya puede iniciar sesión.", "success");
+          obtenerUsuarios();
+        }
       }
     });
   };

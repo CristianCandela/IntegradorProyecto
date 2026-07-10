@@ -145,8 +145,14 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               </h5>
 
               {/* Curso */}
-              <p className="text-muted small mb-3">
+              <p className="text-muted small mb-1">
                 {departamento} | {cursos && cursos.length > 0 ? cursos.join(", ") : curso}
+              </p>
+              
+              {/* Universidad */}
+              <p className="text-primary small mb-3 fw-bold" style={{ fontSize: "0.8rem" }}>
+                <i className="bi bi-building me-1"></i>
+                {universidad}
               </p>
 
               {/* Rating */}
@@ -221,7 +227,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                   if (cursos && cursos.length > 1) {
                     setShowModal(true);
                   } else {
-                    const cursoTarget = cursos && cursos.length > 0 ? cursos[0] : curso;
+                    const cursoTarget = cursos && cursos.length > 0 ? (cursos[0].nombre || cursos[0]) : curso;
                     navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
                   }
                 }
@@ -380,15 +386,16 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                     {cursos.map((c, idx) => (
                       <div key={idx} className="border rounded-3 p-3 bg-white shadow-sm d-flex justify-content-between align-items-center">
                         <div>
-                          <strong className="d-block text-dark">{c}</strong>
+                          <strong className="d-block text-dark">{c.nombre || c}</strong>
                           <small className="text-muted">S/. {precioHora}/h | ⭐ {rating} | 📊 {dificultad}/10</small>
                         </div>
                         <button
                           className="btn btn-sm btn-outline-primary rounded-pill fw-bold"
                           onClick={() => {
                             setShowModal(false);
-                            if (onSolicitar) onSolicitar({ ...profesor, curso: c });
-                            else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: c } });
+                            const cursoTarget = c.nombre || c;
+                            if (onSolicitar) onSolicitar({ ...profesor, curso: cursoTarget });
+                            else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
                           }}
                         >
                           Solicitar
@@ -438,7 +445,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
                 onClick={() => {
                   setShowModal(false);
-                  const cursoTarget = cursos && cursos.length > 0 ? cursos[0] : curso;
+                  const cursoTarget = cursos && cursos.length > 0 ? (cursos[0].nombre || cursos[0]) : curso;
                   if (onSolicitar) onSolicitar(profesor);
                   else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
                 }}

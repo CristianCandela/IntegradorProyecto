@@ -13,6 +13,7 @@ const TutoriasProfesor = () => {
   const [fechaNuevaSesion, setFechaNuevaSesion] = useState('');
   const [horaNuevaSesion, setHoraNuevaSesion] = useState('');
   const [horaNuevaSesionFin, setHoraNuevaSesionFin] = useState('');
+  const [enlaceReunion, setEnlaceReunion] = useState('');
 
   // ALERTA VISUAL
   const [alertaCancelacionEstudiante, setAlertaCancelacionEstudiante] = useState(false);
@@ -37,15 +38,12 @@ const TutoriasProfesor = () => {
 
     // Cargar los cursos que dicta el profesor desde su perfil
     const userSession = JSON.parse(localStorage.getItem('userSession'));
-    if (userSession && userSession.email) {
-      const profProfile = StorageService.getProfessorByEmail(userSession.email);
-      if (profProfile && profProfile.cursos && profProfile.cursos.length > 0) {
-        setMisCursos(profProfile.cursos);
-        setCursoNuevaSesion(profProfile.cursos[0]);
-      } else {
-        setMisCursos(["Pendiente de asignar"]);
-        setCursoNuevaSesion("Pendiente de asignar");
-      }
+    if (userSession && userSession.cursos && userSession.cursos.length > 0) {
+      setMisCursos(userSession.cursos);
+      setCursoNuevaSesion(userSession.cursos[0].id);
+    } else {
+      setMisCursos([{ id: "", nombre: "Pendiente de asignar" }]);
+      setCursoNuevaSesion("");
     }
   }, []);
 
@@ -57,18 +55,27 @@ const TutoriasProfesor = () => {
 
   const handleCrearSesion = (e) => {
     e.preventDefault();
-    if (!cursoNuevaSesion || !fechaNuevaSesion || !horaNuevaSesion || !horaNuevaSesionFin) {
+    if (!cursoNuevaSesion || cursoNuevaSesion === "Pendiente de asignar") {
+      Swal.fire('Error', 'Debes seleccionar un curso válido antes de crear la sesión.', 'error');
+      return;
+    }
+    if (!fechaNuevaSesion || !horaNuevaSesion || !horaNuevaSesionFin) {
       Swal.fire('Error', 'Completa todos los campos (Inicio y Fin).', 'error');
       return;
     }
 
     const todasSesiones = StorageService.getSessions();
     const nuevaFechaHora = new Date(`${fechaNuevaSesion}T${horaNuevaSesion}:00`);
-    const nuevaFechaHoraFin = new Date(`${fechaNuevaSesion}T${horaNuevaSesionFin}:00`);
+    let nuevaFechaHoraFin = new Date(`${fechaNuevaSesion}T${horaNuevaSesionFin}:00`);
+    
+    // Si la hora de fin es menor a la hora de inicio (madrugada), le sumamos un día
+    if (nuevaFechaHoraFin < nuevaFechaHora) {
+      nuevaFechaHoraFin.setDate(nuevaFechaHoraFin.getDate() + 1);
+    }
     
     // Evitar crear sesiones en el pasado
     if (nuevaFechaHora < new Date()) {
-      Swal.fire('Atención', 'No puedes programar una sesión en el pasado.', 'warning');
+      Swal.fire('Atención', 'No puedes programar una sesión en una hora que ya pasó.', 'warning');
       return;
     }
 
@@ -76,7 +83,7 @@ const TutoriasProfesor = () => {
     const duracionMs = nuevaFechaHoraFin - nuevaFechaHora;
     const minDuracionMs = 1.5 * 60 * 60 * 1000;
     if (duracionMs < minDuracionMs) {
-      Swal.fire('Atención', 'La sesión debe durar al menos 1.5 horas (90 minutos).', 'warning');
+      Swal.fire('Atención', 'La sesión debe durar al menos una hora y media (90 minutos).', 'warning');
       return;
     }
 
@@ -84,8 +91,10 @@ const TutoriasProfesor = () => {
       if (s.estado !== 'Programada') return false;
       const sInicio = new Date(`${s.fecha}T${s.hora}:00`);
       // Si el formato antiguo no tenía horaFin, usa una duración estimada para choque
-      const sFin = s.horaFin ? new Date(`${s.fecha}T${s.horaFin}:00`) : new Date(sInicio.getTime() + 1.5 * 60 * 60 * 1000);
-      
+      let sFin = s.horaFin ? new Date(`${s.fecha}T${s.horaFin}:00`) : new Date(sInicio.getTime() + 1.5 * 60 * 60 * 1000);
+      if (s.horaFin && sFin < sInicio) {
+        sFin.setDate(sFin.getDate() + 1);
+      }
       return (nuevaFechaHora < sFin && nuevaFechaHoraFin > sInicio);
     });
 
@@ -98,27 +107,57 @@ const TutoriasProfesor = () => {
       return;
     }
 
-    // Obtenemos al usuario activo para extraer su nombre o usar "Prof. Ejemplo (Tú)"
+    // Obtenemos al usuario activo
     const userSession = JSON.parse(localStorage.getItem('userSession'));
     const userName = userSession?.nombres || "Prof. Ejemplo (Tú)";
     const duracionHoras = (duracionMs / (1000 * 60 * 60)).toFixed(1);
 
-    StorageService.saveSession({
-      profesorId: userSession?.id || 1,
-      profesorNombre: userName, 
-      curso: cursoNuevaSesion,
-      fecha: fechaNuevaSesion,
-      hora: horaNuevaSesion,
-      horaFin: horaNuevaSesionFin,
-      duracion: duracionHoras,
-      foto: "https://i.pravatar.cc/150?img=11",
-      precioHora: 20
-    });
+    const payload = {
+      profesor_id: userSession?.id || 1,
+      curso_id: parseInt(cursoNuevaSesion), // ahora es ID
+      fecha_hora_inicio: nuevaFechaHora.toISOString(),
+      fecha_hora_fin: nuevaFechaHoraFin.toISOString(),
+      cupos_maximos: 40,
+      enlace_reunion: enlaceReunion || null
+    };
 
-    Swal.fire('¡Éxito!', 'La sesión ha sido publicada y está disponible para los alumnos.', 'success');
-    setFechaNuevaSesion('');
-    setHoraNuevaSesion('');
-    setHoraNuevaSesionFin('');
+    fetch('http://localhost:3006/api/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al crear la sesión en el backend');
+      }
+
+      // Fallback temporal para la UI hasta que el Backend cree el GET /api/sessions
+      const nombreCursoReal = misCursos.find(c => c.id === payload.curso_id)?.nombre || "Curso ID " + payload.curso_id;
+      StorageService.saveSession({
+        id: data.sesion_id,
+        profesorId: payload.profesor_id,
+        profesorNombre: userName, 
+        curso: nombreCursoReal,
+        fecha: fechaNuevaSesion,
+        hora: horaNuevaSesion,
+        horaFin: horaNuevaSesionFin,
+        duracion: duracionHoras,
+        foto: "https://i.pravatar.cc/150?img=11",
+        precioHora: 20
+      });
+
+      Swal.fire('¡Éxito!', 'La sesión ha sido publicada y está disponible para los alumnos.', 'success');
+      setFechaNuevaSesion('');
+      setHoraNuevaSesion('');
+      setHoraNuevaSesionFin('');
+      setEnlaceReunion('');
+      cargarSesiones();
+    })
+    .catch(err => {
+      console.error(err);
+      Swal.fire('Error', err.message, 'error');
+    });
     cargarSesiones();
   };
 
@@ -311,7 +350,7 @@ const TutoriasProfesor = () => {
                           style={{ padding: '0.6rem 1rem' }}
                         >
                           {misCursos.map(curso => (
-                            <option key={curso} value={curso}>{curso}</option>
+                            <option key={curso.id || curso} value={curso.id || curso}>{curso.nombre || curso}</option>
                           ))}
                         </select>
                     </div>
@@ -355,6 +394,20 @@ const TutoriasProfesor = () => {
                         value={horaNuevaSesionFin}
                         onChange={(e) => setHoraNuevaSesionFin(e.target.value)}
                         required
+                        style={{ padding: '0.6rem 1rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-12">
+                    <label className="form-label small fw-bold text-secondary">Enlace de la Reunión (Opcional)</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-0 rounded-start-3 text-muted"><i className="bi bi-link-45deg"></i></span>
+                      <input 
+                        type="url" 
+                        className="form-control bg-light border-0 shadow-none rounded-end-3"
+                        placeholder="https://zoom.us/j/..."
+                        value={enlaceReunion}
+                        onChange={(e) => setEnlaceReunion(e.target.value)}
                         style={{ padding: '0.6rem 1rem' }}
                       />
                     </div>

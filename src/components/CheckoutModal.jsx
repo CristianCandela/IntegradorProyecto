@@ -72,12 +72,24 @@ export default function CheckoutModal({ sesion, onClose, onSuccess }) {
     }
 
     // Validación de conflicto de horarios para el alumno
-    const misSesiones = StorageService.getTutoringSessions();
+    const todasSesiones = StorageService.getSessions();
+    const misSesionesRaw = StorageService.getTutoringSessions();
+    
+    // Sincronizar el estado de la reserva con el estado real de la sesión (igual que en TutoriasEstudiante)
+    const misSesiones = misSesionesRaw.map(reserva => {
+      const sesionReal = todasSesiones.find(s => s.id === reserva.sesionId);
+      if (sesionReal && sesionReal.estado === "Finalizada" && reserva.estado !== "Cancelada") {
+        return { ...reserva, estado: "Completada" };
+      }
+      return reserva;
+    });
+
     const fechaHoraSesion = new Date(`${sesion.fecha}T${sesion.hora}:00`);
     const tiempoInicioNuevo = fechaHoraSesion.getTime();
     const tiempoFinNuevo = tiempoInicioNuevo + duracion * 60 * 60 * 1000;
 
     const hayConflicto = misSesiones.some(miSesion => {
+      // Ignorar sesiones que no estén activamente programadas/confirmadas
       if (miSesion.estado !== "Confirmada") return false;
       
       const tiempoInicioExistente = new Date(miSesion.fechaHora).getTime();

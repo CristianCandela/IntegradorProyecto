@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import CheckoutModal from "../../components/CheckoutModal";
 import ModalCancelacion from "../../components/ModalCancelacion";
-import ModalSalaVirtual from "../../components/ModalSalaVirtual";
 import { StorageService } from "../../core/database/StorageService";
 import { courseDurations } from "../../data/profesoresData";
+import Swal from 'sweetalert2';
 
 export default function TutoriasEstudiante() {
   const [tab, setTab] = useState("mis-tutorias"); // 'mis-tutorias' o 'explorar'
@@ -17,7 +17,6 @@ export default function TutoriasEstudiante() {
   // Modals state
   const [sesionSeleccionada, setSesionSeleccionada] = useState(null);
   const [tutoriaACancelar, setTutoriaACancelar] = useState(null);
-  const [tutoriaEnSala, setTutoriaEnSala] = useState(null);
 
   // Grouping by course
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
@@ -220,7 +219,17 @@ export default function TutoriasEstudiante() {
                               <button 
                                 className="btn rounded-pill fw-bold py-2 text-white border-0 shadow-sm hover-shadow animation-pulse"
                                 style={gradientStyle}
-                                onClick={() => setTutoriaEnSala(tut)}
+                                onClick={() => {
+                                  Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Conectado a la Sala!',
+                                    text: 'Has entrado exitosamente a la sala virtual. Recuerda que la clase se marcará como Completada solo cuando el Profesor la finalice.',
+                                    confirmButtonColor: '#7B1FA2'
+                                  });
+                                  if (tut.enlace_reunion) {
+                                    window.open(tut.enlace_reunion, '_blank');
+                                  }
+                                }}
                               >
                                 <i className="bi bi-camera-video-fill me-2"></i> Entrar a Sala Virtual
                               </button>
@@ -312,8 +321,8 @@ export default function TutoriasEstudiante() {
                     const estaLleno = sesion.inscritos >= sesion.cuposMaximos;
                     const quedanPocos = (sesion.cuposMaximos - sesion.inscritos) <= 5;
                     
-                    // Comprobar si ya estoy inscrito
-                    const yaInscrito = misTutoriasAgendadas.some(mt => mt.sesionId === sesion.id && mt.estado === "Confirmada");
+                    // Comprobar si ya estoy inscrito (Confirmada o Completada, permitimos recompra si canceló)
+                    const yaInscrito = misTutoriasAgendadas.some(mt => mt.sesionId === sesion.id && mt.estado !== "Cancelada");
 
                     return (
                       <div key={sesion.id} className="col-md-6 col-lg-4">
@@ -391,14 +400,6 @@ export default function TutoriasEstudiante() {
           tutoria={tutoriaACancelar}
           onClose={() => setTutoriaACancelar(null)}
           onSuccess={() => { setTutoriaACancelar(null); cargarDatos(); }}
-        />
-      )}
-
-      {tutoriaEnSala && (
-        <ModalSalaVirtual 
-          tutoria={tutoriaEnSala}
-          onClose={() => setTutoriaEnSala(null)}
-          onSuccess={() => { setTutoriaEnSala(null); cargarDatos(); }}
         />
       )}
     </div>

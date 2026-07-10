@@ -16,8 +16,7 @@ const roleOptions = {
     path: "/inicio-estudiante",
     fields: [
       { name: "nombres", label: "Nombres completos", icon: "bi-person", type: "text", placeholder: "Ej: Juan Carlos" },
-      { name: "email", label: "Correo universitario", icon: "bi-envelope", type: "email", placeholder: "tu.nombre@u.edu.pe" },
-      { name: "codigo", label: "Código estudiantil", icon: "bi-hash", type: "text", placeholder: "Ej: 202101234" },
+      { name: "email", label: "Correo electrónico", icon: "bi-envelope", type: "email", placeholder: "tu.nombre@email.com" },
       { name: "pass", label: "Contraseña", icon: "bi-lock", type: "password", placeholder: "Mínimo 6 caracteres" },
       { name: "confirmPassword", label: "Confirmar contraseña", icon: "bi-lock-fill", type: "password", placeholder: "Repite tu contraseña" }
     ]
@@ -30,8 +29,7 @@ const roleOptions = {
     path: "/inicio-profesor",
     fields: [
       { name: "nombres", label: "Nombres completos", icon: "bi-person", type: "text", placeholder: "Ej: María García" },
-      { name: "email", label: "Correo institucional", icon: "bi-envelope", type: "email", placeholder: "profesor@universidad.edu.pe" },
-      { name: "especialidad", label: "Área de especialidad", icon: "bi-bookmark", type: "text", placeholder: "Ej: Base de Datos" },
+      { name: "email", label: "Correo electrónico", icon: "bi-envelope", type: "email", placeholder: "profesor@email.com" },
       { name: "universidad", label: "Universidad", icon: "bi-building", type: "text", placeholder: "Ej: PUCP, UNMSM, UPC" },
       { name: "pass", label: "Contraseña", icon: "bi-lock", type: "password", placeholder: "Mínimo 6 caracteres" },
       { name: "confirmPassword", label: "Confirmar contraseña", icon: "bi-lock-fill", type: "password", placeholder: "Repite tu contraseña" }
@@ -89,7 +87,7 @@ export default function Registro() {
       return false;
     }
 
-    if (!email || !email.includes("@")) {
+    if (!email || !email.includes("@") || !email.includes(".")) {
       Swal.fire({
         icon: "warning",
         title: "Correo inválido",
@@ -129,35 +127,58 @@ export default function Registro() {
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      // Registrar usuario con estado 'pendiente' a través del mock StorageService
-      const userData = {
-        role: role,
+    try {
+      const payload = {
+        nombre: formData.nombres,
         email: formData.email,
-        pass: formData.pass,
-        nombres: formData.nombres,
-        ...formData
+        password: formData.pass,
+        rol: role
       };
-      
-      StorageService.registerUser(userData);
 
-      // Mostrar alerta de que requiere aprobación del admin
-      Swal.fire({
-        title: "¡Cuenta creada!",
-        text: `Gracias por registrarte, ${formData.nombres.split(' ')[0]}. Tu cuenta está a la espera de aprobación por un administrador.`,
-        icon: "info",
-        timer: 4000,
-        showConfirmButton: true,
-        confirmButtonText: "Ir al Login",
-        confirmButtonColor: currentRole.color,
-        timerProgressBar: true,
-      }).then(() => {
-        // Redirigimos al login, NO lo dejamos entrar directamente
-        navigate("/login");
+      if (role === 'profesor') {
+        payload.universidad = formData.universidad;
+      }
+
+      const response = await fetch("http://localhost:3006/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       });
-      
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          title: "¡Cuenta creada!",
+          text: `Gracias por registrarte, ${formData.nombres.split(' ')[0]}. Tu cuenta está a la espera de aprobación por un administrador.`,
+          icon: "info",
+          timer: 4000,
+          showConfirmButton: true,
+          confirmButtonText: "Ir al Login",
+          confirmButtonColor: currentRole.color,
+          timerProgressBar: true,
+        }).then(() => {
+          navigate("/login");
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error al registrar",
+          text: data.error || "Ocurrió un error al crear la cuenta",
+          confirmButtonColor: currentRole.color
+        });
+      }
+    } catch (error) {
+      console.error("Error en el registro:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error de conexión",
+        text: "No se pudo conectar con el servidor.",
+        confirmButtonColor: currentRole.color
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const handleSocialRegister = (provider) => {

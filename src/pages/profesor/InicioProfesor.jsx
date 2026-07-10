@@ -53,8 +53,7 @@ const InicioProfesor = () => {
     // Comprobar si es un profesor nuevo
     const userSession = JSON.parse(localStorage.getItem('userSession'));
     if (userSession && userSession.role === 'profesor') {
-      const profProfile = StorageService.getProfessorByEmail(userSession.email);
-      if (!profProfile || !profProfile.perfilCompletado) {
+      if (userSession.perfil_completado === false || userSession.perfil_completado === 0) {
         setMostrarModalPerfil(true);
       }
     }

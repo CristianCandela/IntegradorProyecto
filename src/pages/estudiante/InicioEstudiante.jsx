@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import { StorageService } from "../../core/database/StorageService";
-import { profesoresData } from "../../data/profesoresData";
 
 export default function InicioEstudiante() {
   const [userName, setUserName] = useState("Estudiante");

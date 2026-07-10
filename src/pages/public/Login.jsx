@@ -55,14 +55,22 @@ export default function Login() {
         const user = data.user || data; 
         const userRole = user.role || user.rol;
         
-        // Guardar sesión incluyendo el token
-        localStorage.setItem("userSession", JSON.stringify({ 
+        const sessionData = {
           token: data.token,
           id: user.id,
           role: userRole, 
           email: user.email, 
           nombres: user.nombres || user.nombre 
-        }));
+        };
+
+        if (userRole === 'profesor') {
+          sessionData.universidad = user.universidad;
+          sessionData.perfil_completado = user.perfil_completado;
+          sessionData.cursos = user.cursos;
+        }
+
+        // Guardar sesión incluyendo el token y los datos de perfil
+        localStorage.setItem("userSession", JSON.stringify(sessionData));
 
         Swal.fire({
           title: "¡Bienvenido!",

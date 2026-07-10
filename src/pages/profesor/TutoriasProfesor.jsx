@@ -222,7 +222,12 @@ const TutoriasProfesor = () => {
   const handleIniciarSesionVirtual = (sesion) => {
     const ahora = new Date();
     const fechaHoraInicio = new Date(`${sesion.fecha}T${sesion.hora}:00`);
-    const fechaHoraFin = sesion.horaFin ? new Date(`${sesion.fecha}T${sesion.horaFin}:00`) : new Date(fechaHoraInicio.getTime() + 1.5 * 60 * 60 * 1000);
+    let fechaHoraFin = sesion.horaFin ? new Date(`${sesion.fecha}T${sesion.horaFin}:00`) : new Date(fechaHoraInicio.getTime() + 1.5 * 60 * 60 * 1000);
+    
+    // Si la hora de fin es menor a la de inicio (cruza la medianoche), sumamos un día
+    if (fechaHoraFin < fechaHoraInicio) {
+      fechaHoraFin.setDate(fechaHoraFin.getDate() + 1);
+    }
     
     const userSession = JSON.parse(localStorage.getItem('userSession'));
     const esProfesorDemo = userSession?.email === "prof@profematch.com" || userSession?.nombres === "Profesor Ejemplo";
@@ -262,8 +267,8 @@ const TutoriasProfesor = () => {
       allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        // Validar si puede finalizar
-        if (!esProfesorDemo && ahora < fechaHoraFin) {
+        // Validar si puede finalizar usando el tiempo exacto en el que hizo clic
+        if (!esProfesorDemo && new Date() < fechaHoraFin) {
           Swal.fire('No puedes finalizar aún', 'La clase aún no ha cumplido su horario establecido. Los alumnos siguen conectados.', 'error');
           return;
         }

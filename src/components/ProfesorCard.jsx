@@ -445,9 +445,8 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
                 onClick={() => {
                   setShowModal(false);
-                  const cursoTarget = cursos && cursos.length > 0 ? (cursos[0].nombre || cursos[0]) : curso;
                   if (onSolicitar) onSolicitar(profesor);
-                  else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
+                  else navigate("/tutorias-estudiante");
                 }}
               >
                 Solicitar Tutoría

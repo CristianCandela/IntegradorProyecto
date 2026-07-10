@@ -181,17 +181,6 @@ export default function Registro() {
     }
   };
 
-  const handleSocialRegister = (provider) => {
-    Swal.fire({
-      title: `Registro con ${provider}`,
-      text: "Se ha solicitado el registro. Tu cuenta está a la espera de aprobación por un administrador.",
-      icon: "info",
-      confirmButtonColor: currentRole.color,
-    }).then(() => {
-      navigate("/login");
-    });
-  };
-
   return (
     <main className="container-fluid p-0 min-vh-100 overflow-hidden" style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="row g-0 flex-grow-1">
@@ -308,30 +297,6 @@ export default function Registro() {
                 </button>
               </div>
             </form>
-
-            {/* Divider */}
-            <div className="text-center position-relative my-4">
-              <hr className="text-muted opacity-25" />
-              <span className="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">
-                O regístrate con
-              </span>
-            </div>
-
-            {/* Social login */}
-            <div className="row g-2 mb-3">
-              <div className="col-6">
-                <button type="button" onClick={() => handleSocialRegister('Google')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                  <i className="bi bi-google text-danger"></i>
-                  <span className="small">Google</span>
-                </button>
-              </div>
-              <div className="col-6">
-                <button type="button" onClick={() => handleSocialRegister('Microsoft')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                  <i className="bi bi-microsoft text-primary"></i>
-                  <span className="small">Microsoft</span>
-                </button>
-              </div>
-            </div>
 
             {/* Info adicional */}
             <div className="text-center mt-4 p-3" style={{ backgroundColor: '#f8f7ff', borderRadius: '12px' }}>

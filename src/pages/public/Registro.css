@@ -127,20 +127,7 @@
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
 }
 
-/* BOTONES SOCIALES */
-.registro-card .btn-outline-secondary {
-  border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  border: 1px solid #e2e8f0;
-}
 
-.registro-card .btn-outline-secondary:hover {
-  background-color: #f5f3ff;
-  border-color: var(--violet-main);
-  color: var(--violet-main);
-  transform: translateY(-1px);
-}
 
 /* SECCIÓN INFORMATIVA */
 .bg-light-soft {

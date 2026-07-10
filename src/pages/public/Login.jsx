@@ -46,8 +46,9 @@ export default function Login() {
           }
         }
         
-        if (roleData[sessionData.role]) {
-          navigate(roleData[sessionData.role].path);
+        // IMPORTANTE: el backend devuelve "rol" (no "role"), usamos ese campo.
+        if (roleData[sessionData.rol]) {
+          navigate(roleData[sessionData.rol].path);
         }
       } catch (e) {
         // En caso de que el token esté corrupto o haya un error, limpiar sesión
@@ -83,9 +84,9 @@ export default function Login() {
         const sessionData = {
           token: data.token,
           id: user.id,
-          role: userRole, 
-          email: user.email, 
-          nombres: user.nombres || user.nombre 
+          rol: userRole, // "rol" para coincidir con lo que envía el backend
+          email: user.email,
+          nombres: user.nombres || user.nombre,
         };
 
         if (userRole === 'profesor') {
@@ -137,15 +138,6 @@ export default function Login() {
     }
   };
 
-  const handleSocialLogin = (provider) => {
-    Swal.fire({
-      title: `Iniciar sesión con ${provider}`,
-      text: "Funcionalidad de proveedor social pendiente de conexión con el backend.",
-      icon: "info",
-      confirmButtonColor: roleData[role].color,
-    });
-  };
-
   return (
     <main className="container-fluid p-0 vh-100 overflow-hidden">
   
@@ -188,28 +180,6 @@ export default function Login() {
                       <button type="button" onClick={() => handleRoleChange(r)} className="btn w-100 py-2 small hover-effect text-capitalize border">Soy {r}</button>
                     </div>
                   ))}
-                </div>
-              </div>
-
-              <div className="text-center position-relative my-4">
-                <hr className="text-muted opacity-25" />
-                <span className="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">
-                  O ingresa con
-                </span>
-              </div>
-
-              <div className="row g-2 mb-4">
-                <div className="col-6">
-                  <button type="button" onClick={() => handleSocialLogin('Google')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                    <i className="bi bi-google text-danger"></i>
-                    <span className="small">Google</span>
-                  </button>
-                </div>
-                <div className="col-6">
-                  <button type="button" onClick={() => handleSocialLogin('Microsoft')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                    <i className="bi bi-microsoft text-primary"></i>
-                    <span className="small">Microsoft</span>
-                  </button>
                 </div>
               </div>
 

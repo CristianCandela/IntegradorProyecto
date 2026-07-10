@@ -1,29 +1,33 @@
 import "./Login.css";
-import { useState, useEffect } from "react"; // Añadimos useEffect
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
 import LoginHero from "../../components/LoginHero";
 import heroVideo from "../../images/hero.mp4";
 import WhatsappBtn from "../../components/WhatsappBtn";
 import Swal from "sweetalert2"; 
+import { StorageService } from "../../core/database/StorageService";
 
+// Role styling data
 const roleData = {
-  admin: { email: "admin@profematch.com", pass: "admin123", path: "/inicio-admin", color: "#180f2a" },
-  profesor: { email: "prof@profematch.com", pass: "prof123", path: "/inicio-profesor", color: "#1f1c64" },
-  estudiante: { email: "estu@profematch.com", pass: "estu123", path: "/inicio-estudiante", color: "#493774" },
+  admin: { path: "/inicio-admin", color: "#180f2a" },
+  profesor: { path: "/inicio-profesor", color: "#1f1c64" },
+  estudiante: { path: "/inicio-estudiante", color: "#493774" },
 };
 
 export default function Login() {
   const navigate = useNavigate(); 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("admin");
+  const [role, setRole] = useState("admin"); // Solo para UI styling
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     const sessionActiva = localStorage.getItem("userSession");
     if (sessionActiva) {
       const { role: savedRole } = JSON.parse(sessionActiva);
-      navigate(roleData[savedRole].path);
+      if (roleData[savedRole]) {
+        navigate(roleData[savedRole].path);
+      }
     }
   }, [navigate]);
 
@@ -35,28 +39,78 @@ export default function Login() {
     }
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    const user = roleData[role];
+    
+    try {
+      const response = await fetch("http://localhost:3006/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
 
-    if (email === user.email && password === user.pass) {
-      
-      localStorage.setItem("userSession", JSON.stringify({ role: role, email: email }));
+      const data = await response.json();
 
-      Swal.fire({
-        title: "¡Bienvenido!",
-        text: `Entrando como ${role}`,
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-        timerProgressBar: true,
-        background: user.color,
-        color: "#fff",
-        iconColor: "#fff"
-      }).then(() => navigate(user.path));
-    } else {
-      Swal.fire({ title: "Error", text: "Credenciales incorrectas", icon: "error", confirmButtonColor: user.color });
+      if (response.ok) {
+        const user = data.user || data; 
+        const userRole = user.role || user.rol;
+        
+        // Guardar sesión incluyendo el token
+        localStorage.setItem("userSession", JSON.stringify({ 
+          token: data.token,
+          id: user.id,
+          role: userRole, 
+          email: user.email, 
+          nombres: user.nombres || user.nombre 
+        }));
+
+        Swal.fire({
+          title: "¡Bienvenido!",
+          text: `Entrando como ${userRole}`,
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false,
+          timerProgressBar: true,
+          background: roleData[userRole]?.color || roleData['estudiante'].color,
+          color: "#fff",
+          iconColor: "#fff"
+        }).then(() => navigate(roleData[userRole]?.path || "/"));
+
+      } else {
+        if (data.message === "pending_approval" || data.error === "pending_approval") {
+          Swal.fire({ 
+            title: "Cuenta en revisión", 
+            text: "Tu cuenta ha sido creada, pero aún está pendiente de aprobación por un administrador.", 
+            icon: "info", 
+            confirmButtonColor: roleData[role].color 
+          });
+        } else {
+          Swal.fire({ 
+            title: "Error", 
+            text: data.message || data.error || "Credenciales incorrectas", 
+            icon: "error", 
+            confirmButtonColor: roleData[role].color 
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error en login:", error);
+      Swal.fire({ 
+        title: "Error de conexión", 
+        text: "No se pudo conectar con el servidor Backend (http://localhost:3006). Asegúrate de que el servidor esté corriendo.", 
+        icon: "error", 
+        confirmButtonColor: roleData[role].color 
+      });
     }
+  };
+
+  const handleSocialLogin = (provider) => {
+    Swal.fire({
+      title: `Iniciar sesión con ${provider}`,
+      text: "Funcionalidad de proveedor social pendiente de conexión con el backend.",
+      icon: "info",
+      confirmButtonColor: roleData[role].color,
+    });
   };
 
   return (
@@ -93,7 +147,7 @@ export default function Login() {
                 <input type="password" className="form-control bg-light border-0 py-3 rounded-end-4" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
               </div>
 
-              <div className="d-grid gap-3">
+              <div className="d-grid gap-3 mb-4">
                 <button type="submit" className={`btn btn-auth py-3 shadow btn-${role}-grad`}>Iniciar Sesión</button>
                 <div className="row g-2">
                   {['admin', 'profesor', 'estudiante'].filter(r => r !== role).map(r => (
@@ -103,14 +157,37 @@ export default function Login() {
                   ))}
                 </div>
               </div>
+
+              <div className="text-center position-relative my-4">
+                <hr className="text-muted opacity-25" />
+                <span className="position-absolute top-50 start-50 translate-middle px-3 bg-white text-muted small">
+                  O ingresa con
+                </span>
+              </div>
+
+              <div className="row g-2 mb-4">
+                <div className="col-6">
+                  <button type="button" onClick={() => handleSocialLogin('Google')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                    <i className="bi bi-google text-danger"></i>
+                    <span className="small">Google</span>
+                  </button>
+                </div>
+                <div className="col-6">
+                  <button type="button" onClick={() => handleSocialLogin('Microsoft')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                    <i className="bi bi-microsoft text-primary"></i>
+                    <span className="small">Microsoft</span>
+                  </button>
+                </div>
+              </div>
+
             </form>
 
             <div className="demo-section p-3 rounded-4">
               <div className="text-center mb-2"><span className="demo-label">CREDENCIALES DEMO</span></div>
               <div className="d-flex justify-content-center gap-2">
-                {Object.keys(roleData).map(r => (
-                  <button key={r} type="button" onClick={() => { setEmail(roleData[r].email); setPassword(roleData[r].pass); }} className="btn-tag text-capitalize">{r.slice(0, 5)}</button>
-                ))}
+                <button type="button" onClick={() => { setEmail("admin@profematch.com"); setPassword("admin123"); }} className="btn-tag text-capitalize">Admin</button>
+                <button type="button" onClick={() => { setEmail("prof@profematch.com"); setPassword("prof123"); }} className="btn-tag text-capitalize">Profe</button>
+                <button type="button" onClick={() => { setEmail("estu@profematch.com"); setPassword("estu123"); }} className="btn-tag text-capitalize">Estu</button>
               </div>
             </div>
           </div>

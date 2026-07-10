@@ -26,25 +26,33 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
   const [esPremium, setEsPremium] = useState(false);
 
   const {
-    nombre,
-    departamento,
-    rating,
-    dificultad,
-    foto,
-    precioHora,
-    etiquetas,
-    curso,
-    descripcion,
-    metodologia,
-    cursosAsociados,
-    universidad,
-    metricas,
-    reconocimientos,
-    modalidades,
-    horarios,
-    criteriosEvaluacion,
-    resenasDestacadas
-  } = profesor;
+    nombre = "Profesor Anónimo",
+    departamento = "General",
+    rating = 0,
+    dificultad = 0,
+    foto = "https://ui-avatars.com/api/?name=Profe&background=random",
+    precioHora = 50,
+    etiquetas = [],
+    curso = "",
+    cursos = [],
+    descripcion = "Sin descripción",
+    metodologia = "Sin especificar",
+    cursosAsociados = [],
+    universidad = "Sin especificar",
+    metricas = { claridad: 0, exigencia: 0, puntualidad: 0, empatia: 0, material: 0, estudiantesAtendidos: 0, tasaAprobacion: 0 },
+    reconocimientos = [],
+    modalidades = [],
+    horarios = {},
+    criteriosEvaluacion = {
+      Puntualidad: 1,
+      Claridad: 1,
+      Dominio: 1,
+      Profesionalismo: 1,
+      Exigencia: 1,
+      Disponibilidad: 1
+    },
+    resenasDestacadas = []
+  } = profesor || {};
 
   const navigate = useNavigate();
 
@@ -138,7 +146,7 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
 
               {/* Curso */}
               <p className="text-muted small mb-3">
-                {departamento} | {curso}
+                {departamento} | {cursos && cursos.length > 0 ? cursos.join(", ") : curso}
               </p>
 
               {/* Rating */}
@@ -210,10 +218,10 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                 if (onSolicitar) {
                   onSolicitar(profesor);
                 } else {
-                  if (cursosAsociados && cursosAsociados.length > 1) {
+                  if (cursos && cursos.length > 1) {
                     setShowModal(true);
                   } else {
-                    const cursoTarget = cursosAsociados ? cursosAsociados[0].curso : curso;
+                    const cursoTarget = cursos && cursos.length > 0 ? cursos[0] : curso;
                     navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
                   }
                 }
@@ -268,22 +276,18 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
                   {universidad && <span className="badge bg-light text-dark border me-2"><i className="bi bi-building me-1"></i> {universidad}</span>}
                   {modalidades?.map(m => <span key={m} className="badge bg-light text-primary border me-2">{m}</span>)}
                 </div>
-                <div className="col-4">
+                <div className="col-6">
                   <div className="p-3 bg-light rounded-4 shadow-sm border border-white h-100 d-flex flex-column justify-content-center">
-                    <h3 className="fw-bold text-success mb-0">{metricas?.tasaAprobacion || 'N/A'}%</h3>
+                    <h3 className="fw-bold text-success mb-0">
+                      {(!metricas?.estudiantesAtendidos || metricas.estudiantesAtendidos === 0) ? 'N/A' : `${metricas?.tasaAprobacion || 0}%`}
+                    </h3>
                     <small className="text-muted d-block mt-1" style={{ fontSize: '0.65rem', lineHeight: '1' }}>Tasa Aprobación</small>
                   </div>
                 </div>
-                <div className="col-4">
+                <div className="col-6">
                   <div className="p-3 bg-light rounded-4 shadow-sm border border-white h-100 d-flex flex-column justify-content-center">
-                    <h3 className="fw-bold text-indigo mb-0">{metricas?.estudiantesAtendidos || 'N/A'}</h3>
+                    <h3 className="fw-bold text-indigo mb-0">{metricas?.estudiantesAtendidos || 0}</h3>
                     <small className="text-muted d-block mt-1" style={{ fontSize: '0.65rem', lineHeight: '1' }}>Estudiantes Atendidos</small>
-                  </div>
-                </div>
-                <div className="col-4">
-                  <div className="p-3 bg-light rounded-4 shadow-sm border border-white h-100 d-flex flex-column justify-content-center">
-                    <h4 className="fw-bold text-info mb-0 pt-1">{metricas?.tiempoRespuesta || 'N/A'}</h4>
-                    <small className="text-muted d-block mt-1" style={{ fontSize: '0.65rem', lineHeight: '1' }}>Tiempo de Respuesta</small>
                   </div>
                 </div>
               </div>
@@ -369,22 +373,22 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               )}
 
               {/* Cursos Extra (Si los tiene) */}
-              {cursosAsociados && cursosAsociados.length > 1 && (
+              {cursos && cursos.length > 1 && (
                 <div className="mb-4 text-start">
                   <h6 className="fw-bold text-indigo border-bottom pb-2">Cursos que dicta</h6>
                   <div className="d-flex flex-column gap-2 mt-2">
-                    {cursosAsociados.map(c => (
-                      <div key={c.id} className="border rounded-3 p-3 bg-white shadow-sm d-flex justify-content-between align-items-center">
+                    {cursos.map((c, idx) => (
+                      <div key={idx} className="border rounded-3 p-3 bg-white shadow-sm d-flex justify-content-between align-items-center">
                         <div>
-                          <strong className="d-block text-dark">{c.curso}</strong>
-                          <small className="text-muted">S/. {c.precioHora}/h | ⭐ {c.rating} | 📊 {c.dificultad}/10</small>
+                          <strong className="d-block text-dark">{c}</strong>
+                          <small className="text-muted">S/. {precioHora}/h | ⭐ {rating} | 📊 {dificultad}/10</small>
                         </div>
                         <button
                           className="btn btn-sm btn-outline-primary rounded-pill fw-bold"
                           onClick={() => {
                             setShowModal(false);
-                            if (onSolicitar) onSolicitar(c);
-                            else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: c.curso } });
+                            if (onSolicitar) onSolicitar({ ...profesor, curso: c });
+                            else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: c } });
                           }}
                         >
                           Solicitar
@@ -429,20 +433,18 @@ export default function ProfesorCard({ profesor, showPrice = false, isTutoria = 
               >
                 Cerrar
               </button>
-              {!(cursosAsociados && cursosAsociados.length > 1) && (
-                <button
-                  className="btn btn-primary rounded-pill w-100 fw-bold border-0 hover-shadow"
-                  style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
-                  onClick={() => {
-                    setShowModal(false);
-                    const cursoTarget = cursosAsociados ? cursosAsociados[0] : profesor;
-                    if (onSolicitar) onSolicitar(cursoTarget);
-                    else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget.curso } });
-                  }}
-                >
-                  Solicitar Tutoría
-                </button>
-              )}
+              <button
+                className="btn btn-primary rounded-pill w-100 fw-bold border-0 hover-shadow"
+                style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}
+                onClick={() => {
+                  setShowModal(false);
+                  const cursoTarget = cursos && cursos.length > 0 ? cursos[0] : curso;
+                  if (onSolicitar) onSolicitar(profesor);
+                  else navigate("/tutorias-estudiante", { state: { cursoSeleccionado: cursoTarget } });
+                }}
+              >
+                Solicitar Tutoría
+              </button>
             </div>
           </div>
         </div>

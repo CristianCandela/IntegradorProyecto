@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
 import Swal from "sweetalert2";
+import { StorageService } from "../../core/database/StorageService";
 
 export default function UsuariosAdmin() {
   // 1. ESTADOS PRINCIPALES
@@ -10,7 +11,7 @@ export default function UsuariosAdmin() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroRol, setFiltroRol] = useState("Todos");
   
-  // CONTROL DE VISTA: 'activos' o 'papelera'
+  // CONTROL DE VISTA: 'activos' o 'papelera' o 'pendientes'
   const [vistaActual, setVistaActual] = useState("activos");
   
   // Estados para Modales
@@ -27,6 +28,23 @@ export default function UsuariosAdmin() {
   // 2. LECTURA DINÁMICA DE LA BASE DE DATOS SEGÚN LA VISTA
   const obtenerUsuarios = async () => {
     setCargando(true);
+    
+    if (vistaActual === "pendientes") {
+      // Mock flow from StorageService
+      const pendingUsers = StorageService.getUsers().filter(u => u.status === "pendiente");
+      const mapped = pendingUsers.map(u => ({
+        id: u.id,
+        nombre: u.nombres,
+        email: u.email,
+        rol: u.role,
+        score_confiabilidad: 100,
+        plan: "N/A"
+      }));
+      setUsuarios(mapped);
+      setCargando(false);
+      return;
+    }
+
     // Cambiamos la URL según la pestaña seleccionada
     const url = vistaActual === "activos" 
       ? "http://localhost:3006/api/usuarios" 
@@ -41,11 +59,21 @@ export default function UsuariosAdmin() {
       console.error("Error al cargar usuarios:", error);
       Swal.fire({
         title: "Error de Conexión",
-        text: "No se pudo sincronizar el directorio con el servidor backend.",
-        icon: "error",
+        text: "No se pudo sincronizar el directorio con el servidor backend. Mostrando datos locales mockeados como fallback.",
+        icon: "warning",
         confirmButtonColor: "#1F0954",
         background: "#f8f9fa"
       });
+      // Fallback a los usuarios aprobados en el mock
+      const mockUsers = StorageService.getUsers().filter(u => u.status === "aprobado");
+      setUsuarios(mockUsers.map(u => ({
+        id: u.id,
+        nombre: u.nombres || u.nombre,
+        email: u.email,
+        rol: u.role || u.rol,
+        score_confiabilidad: 100,
+        plan: "N/A"
+      })));
     } finally {
       setCargando(false);
     }
@@ -218,6 +246,25 @@ export default function UsuariosAdmin() {
     });
   };
 
+  // 6.5 APROBAR USUARIO PENDIENTE
+  const aprobarUsuario = (id) => {
+    Swal.fire({
+      title: "¿Aprobar registro?",
+      text: "El usuario tendrá acceso a la plataforma.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#1F0954",
+      cancelButtonText: "Cancelar",
+      confirmButtonText: "Sí, Aprobar"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        StorageService.updateUserStatus(id, "aprobado");
+        Swal.fire("¡Aprobado!", "El usuario ya puede iniciar sesión.", "success");
+        obtenerUsuarios();
+      }
+    });
+  };
+
   // 7. FILTRADO LOCAL EN FRONTEND
   const usuariosFiltrados = usuarios.filter(u => {
     const correoSeguro = u.email || "";
@@ -263,6 +310,12 @@ export default function UsuariosAdmin() {
             <i className="bi bi-person-check-fill"></i> Cuentas Activas
           </button>
           <button 
+            className={`btn rounded-pill px-4 fw-semibold shadow-sm d-flex align-items-center gap-2 transition-all ${vistaActual === 'pendientes' ? 'btn-warning text-dark border-warning' : 'btn-white text-secondary border'}`}
+            onClick={() => setVistaActual('pendientes')}
+          >
+            <i className="bi bi-hourglass-split"></i> Solicitudes Pendientes
+          </button>
+          <button 
             className={`btn rounded-pill px-4 fw-semibold shadow-sm d-flex align-items-center gap-2 transition-all ${vistaActual === 'papelera' ? 'btn-danger text-white' : 'btn-white text-secondary border'}`}
             onClick={() => setVistaActual('papelera')}
           >
@@ -305,10 +358,10 @@ export default function UsuariosAdmin() {
         {/* TABLA PRINCIPAL */}
         <div className="card border-0 shadow-sm bg-white" style={{ borderRadius: '15px' }}>
           <div className="card-body p-4">
-            <h5 className="fw-bold text-dark mb-3">
-              <i className={`bi ${vistaActual === 'activos' ? 'bi-people-fill' : 'bi-trash-fill'} me-2`} style={{ color: vistaActual === 'activos' ? '#1F0954' : '#dc3545' }}></i>
-              {vistaActual === 'activos' ? 'Cuentas Registradas' : 'Historial de Cuentas Inhabilitadas'}
-            </h5>
+              <h5 className="fw-bold text-dark mb-3">
+                <i className={`bi ${vistaActual === 'activos' ? 'bi-people-fill' : vistaActual === 'pendientes' ? 'bi-hourglass' : 'bi-trash-fill'} me-2`} style={{ color: vistaActual === 'activos' ? '#1F0954' : vistaActual === 'pendientes' ? '#ffc107' : '#dc3545' }}></i>
+                {vistaActual === 'activos' ? 'Cuentas Registradas' : vistaActual === 'pendientes' ? 'Nuevos Registros en Revisión' : 'Historial de Cuentas Inhabilitadas'}
+              </h5>
             <div className="table-responsive">
               <table className="table table-hover align-middle mb-0" style={{ fontSize: '0.85rem' }}>
                 <thead className="table-light text-secondary">
@@ -388,6 +441,10 @@ export default function UsuariosAdmin() {
                                 Bloquear
                               </button>
                             </>
+                          ) : vistaActual === 'pendientes' ? (
+                            <button className="btn btn-sm fw-bold px-3 rounded-pill shadow-sm text-white" style={{ backgroundColor: '#1F0954' }} onClick={() => aprobarUsuario(u.id)}>
+                              <i className="bi bi-check-circle me-1"></i> Aprobar Cuenta
+                            </button>
                           ) : (
                             <button className="btn btn-sm btn-outline-success fw-bold px-3 rounded-pill shadow-sm" onClick={() => restaurarUsuario(u.id)}>
                               <i className="bi bi-arrow-counterclockwise me-1"></i> Restaurar Cuenta

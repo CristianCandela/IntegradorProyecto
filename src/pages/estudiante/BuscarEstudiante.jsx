@@ -1,7 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar";
 import ProfesorCard from "../../components/ProfesorCard";
-import { StorageService } from "../../core/database/StorageService";
 
 export default function BuscarEstudiante() {
 
@@ -11,36 +10,33 @@ export default function BuscarEstudiante() {
   const [ratingMin, setRatingMin] = useState(0);
   const [difMax, setDifMax] = useState(10);
 
-  const profesores = StorageService.getCompleteProfessors();
+  const [profesores, setProfesores] = useState([]);
+  const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProfesores = async () => {
+      try {
+        const res = await fetch("http://localhost:3006/api/professors");
+        const data = await res.json();
+        if (res.ok) {
+          setProfesores(data);
+        } else {
+          setError(data.message || "Error al cargar los profesores");
+        }
+      } catch (err) {
+        setError("Error de conexión al servidor");
+      } finally {
+        setCargando(false);
+      }
+    };
+    fetchProfesores();
+  }, []);
+
   const especialidades = [
     "Todos",
     ...new Set(profesores.map(p => p.departamento))
   ];
-
-  // AGRUPAR PROFESORES POLÍMATAS
-  const profesoresUnificados = Object.values(profesores.reduce((acc, p) => {
-    if (!acc[p.nombre]) {
-      acc[p.nombre] = {
-        ...p,
-        ratingTotal: p.rating,
-        dificultadTotal: p.dificultad,
-        count: 1,
-        cursosAsociados: [p]
-      };
-    } else {
-      acc[p.nombre].ratingTotal += p.rating;
-      acc[p.nombre].dificultadTotal += p.dificultad;
-      acc[p.nombre].count += 1;
-      acc[p.nombre].cursosAsociados.push(p);
-    }
-    return acc;
-  }, {})).map(g => ({
-    ...g,
-    rating: Number((g.ratingTotal / g.count).toFixed(1)),
-    dificultad: Math.round((g.dificultadTotal / g.count) * 10) / 10,
-    curso: g.count > 1 ? "Múltiples Materias" : g.curso,
-    departamento: g.count > 1 ? "Varios Departamentos" : g.departamento
-  }));
 
   // TEXTO DINÁMICO DIFICULTAD
   const getDificultadLabel = (val) => {
@@ -57,18 +53,22 @@ export default function BuscarEstudiante() {
     return "Excelentes";
   };
 
-  // FILTRADO DINÁMICO SOBRE UNIFICADOS
-  let profesoresFiltrados = profesoresUnificados.filter((profe) => {
+  // FILTRADO DINÁMICO SOBRE PROFESORES
+  let profesoresFiltrados = profesores.filter((profe) => {
 
     const textoBusqueda = busqueda.trim().toLowerCase();
+    
+    // Convertir el arreglo de cursos a string para la búsqueda
+    const cursosStr = Array.isArray(profe.cursos) ? profe.cursos.join(" ").toLowerCase() : "";
 
     const cumpleBusqueda =
       profe.nombre.toLowerCase().includes(textoBusqueda) ||
-      profe.cursosAsociados.some(c => c.curso.toLowerCase().includes(textoBusqueda));
+      cursosStr.includes(textoBusqueda) ||
+      (profe.curso && profe.curso.toLowerCase().includes(textoBusqueda)); // Respaldo por si hay profes antiguos
 
     const cumpleDepto =
       deptoSel === "Todos" ||
-      profe.cursosAsociados.some(c => c.departamento === deptoSel);
+      profe.departamento === deptoSel;
 
     const cumpleRating = !filtrosAvanzados || profe.rating >= ratingMin;
     const cumpleDificultad = !filtrosAvanzados || profe.dificultad <= difMax;
@@ -279,20 +279,34 @@ export default function BuscarEstudiante() {
         <div className="d-flex justify-content-between align-items-center mb-4">
 
           <h5 className="fw-bold mb-0">
-            Resultados ({profesoresFiltrados.length})
+            Resultados ({cargando ? "..." : profesoresFiltrados.length})
           </h5>
 
         </div>
 
         {/* CARDS */}
-        {profesoresFiltrados.length > 0 ? (
+        {cargando ? (
+          <div className="text-center py-5">
+            <div className="spinner-border text-primary mb-3" role="status">
+              <span className="visually-hidden">Cargando...</span>
+            </div>
+            <h5 className="text-muted">Cargando profesores...</h5>
+          </div>
+        ) : error ? (
+          <div className="text-center py-5">
+            <div className="bg-light d-inline-block p-4 rounded-circle mb-3">
+              <i className="bi bi-exclamation-triangle fs-1 text-danger"></i>
+            </div>
+            <h5 className="text-danger">{error}</h5>
+          </div>
+        ) : profesoresFiltrados.length > 0 ? (
 
           <div className="row g-4">
 
-            {profesoresFiltrados.map((profe) => (
+            {profesoresFiltrados.map((profe, index) => (
 
               <div
-                key={profe.id}
+                key={profe.id || `profe-${index}`}
                 className="col-sm-6 col-lg-4 col-xl-3"
               >
                 <ProfesorCard profesor={profe} isTutoria={false} />
@@ -311,7 +325,9 @@ export default function BuscarEstudiante() {
             </div>
 
             <h5 className="text-muted">
-              No encontramos resultados para tu búsqueda.
+              {profesores.length === 0 
+                ? "Aún no hay profesores registrados en la plataforma." 
+                : "No encontramos resultados para tu búsqueda."}
             </h5>
 
           </div>

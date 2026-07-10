@@ -2,9 +2,7 @@ import { useState } from "react";
 import { StorageService } from "../core/database/StorageService";
 import { courseDurations } from "../data/profesoresData";
 
-export default function CheckoutModal({ profesor, onClose, onSuccess }) {
-  const [fecha, setFecha] = useState("");
-  const [hora, setHora] = useState("");
+export default function CheckoutModal({ sesion, onClose, onSuccess }) {
   const [tarjeta, setTarjeta] = useState("");
   const [vencimiento, setVencimiento] = useState("");
   const [cvv, setCvv] = useState("");
@@ -12,8 +10,9 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
   const [transaccionId, setTransaccionId] = useState("");
   const [errorValidacion, setErrorValidacion] = useState("");
 
-  const duracion = courseDurations[profesor.curso] || 1.5;
-  const tarifa = profesor.precioHora * duracion;
+  const duracion = courseDurations[sesion.curso] || 1.5;
+  const precioHora = sesion.precioHora || 20; // Default if not set
+  const tarifa = precioHora * duracion;
   const comision = tarifa * 0.15;
   const total = tarifa + comision;
 
@@ -38,8 +37,8 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
   };
 
   const validarFormulario = () => {
-    if (!fecha || !hora || !tarjeta || !vencimiento || !cvv) {
-      setErrorValidacion("Por favor completa todos los campos.");
+    if (!tarjeta || !vencimiento || !cvv) {
+      setErrorValidacion("Por favor completa todos los campos de la tarjeta.");
       return false;
     }
 
@@ -65,38 +64,31 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
       return false;
     }
 
-    // Validación de fecha y hora
-    const ahora = new Date();
-    const [yearStr, monthStr, dayStr] = fecha.split("-");
-    const [horaStr, minStr] = hora.split(":");
-
-    const fechaSeleccionada = new Date(yearStr, monthStr - 1, dayStr, horaStr, minStr);
-
-    // Permitir un margen de 1 minuto para evitar problemas de sincronización
-    const margenMinimo = new Date(ahora.getTime() - 1 * 60 * 1000);
-    
-    if (fechaSeleccionada < margenMinimo) {
-      setErrorValidacion("La fecha y hora de la tutoría deben ser al menos 1 minuto en el futuro.");
+    // Ya no se valida fecha/hora aquí porque la sesión ya tiene un horario fijo válido.
+    // Solo validamos que la sesión aún no se haya llenado
+    if (sesion.inscritos >= sesion.cuposMaximos) {
+      setErrorValidacion("Lo sentimos, esta sesión ya ha alcanzado su límite de cupos.");
       return false;
     }
 
-    // Validación de conflicto de horarios
-    const sesionesAgendadas = StorageService.getTutoringSessions();
-    const tiempoInicioNuevo = fechaSeleccionada.getTime();
+    // Validación de conflicto de horarios para el alumno
+    const misSesiones = StorageService.getTutoringSessions();
+    const fechaHoraSesion = new Date(`${sesion.fecha}T${sesion.hora}:00`);
+    const tiempoInicioNuevo = fechaHoraSesion.getTime();
     const tiempoFinNuevo = tiempoInicioNuevo + duracion * 60 * 60 * 1000;
 
-    const hayConflicto = sesionesAgendadas.some(sesion => {
-      if (sesion.estado !== "Confirmada") return false;
+    const hayConflicto = misSesiones.some(miSesion => {
+      if (miSesion.estado !== "Confirmada") return false;
       
-      const tiempoInicioExistente = new Date(sesion.fechaHora).getTime();
-      const duracionExistente = sesion.duracionEstimada || 1.5;
+      const tiempoInicioExistente = new Date(miSesion.fechaHora).getTime();
+      const duracionExistente = miSesion.duracionEstimada || 1.5;
       const tiempoFinExistente = tiempoInicioExistente + duracionExistente * 60 * 60 * 1000;
 
       return (tiempoInicioNuevo < tiempoFinExistente) && (tiempoFinNuevo > tiempoInicioExistente);
     });
 
     if (hayConflicto) {
-      setErrorValidacion("Ya tienes una tutoría agendada que se cruza con este horario. Por favor elige otra hora.");
+      setErrorValidacion("Ya tienes una tutoría agendada que se cruza con este horario. Por favor elige otra sesión.");
       return false;
     }
 
@@ -108,23 +100,29 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
     e.preventDefault();
     if (!validarFormulario()) return;
 
-    const fechaHoraStr = `${fecha}T${hora}:00`;
+    const fechaHoraStr = `${sesion.fecha}T${sesion.hora}:00`;
     const fechaHora = new Date(fechaHoraStr).toISOString();
 
-    const nuevaTutoria = {
-      profesorId: profesor.id,
-      profesorNombre: profesor.nombre,
-      curso: profesor.curso,
-      foto: profesor.foto,
+    const nuevaInscripcion = {
+      sesionId: sesion.id,
+      profesorId: sesion.profesorId,
+      profesorNombre: sesion.profesorNombre,
+      curso: sesion.curso,
+      foto: sesion.foto,
       fechaHora,
-      fechaOriginal: fecha,
-      horaOriginal: hora,
+      fechaOriginal: sesion.fecha,
+      horaOriginal: sesion.hora,
       totalPagado: total,
       estado: "Confirmada",
       duracionEstimada: duracion
     };
 
-    StorageService.saveTutoringSession(nuevaTutoria);
+    // Guardar inscripción del alumno
+    StorageService.saveTutoringSession(nuevaInscripcion);
+    
+    // Actualizar cupos de la sesión en el profesor
+    StorageService.updateSession(sesion.id, { inscritos: (sesion.inscritos || 0) + 1 });
+
     setTransaccionId(`TXN-${Math.floor(Math.random() * 1000000)}`);
     setPaso(2);
   };
@@ -136,10 +134,6 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
     onClose();
   };
 
-  // CORREGIDO: Calcular fecha local en lugar de UTC
-  const ahora = new Date();
-  const fechaHoy = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
-
   return (
     <div className="modal show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
       <div className="modal-dialog modal-dialog-centered">
@@ -147,47 +141,28 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
           {paso === 1 ? (
             <>
               <div className="modal-header border-bottom-0 pb-0" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #E91E63 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                <h5 className="modal-title fw-bold">Agendar Tutoría</h5>
+                <h5 className="modal-title fw-bold">Confirmar Inscripción</h5>
                 <button type="button" className="btn-close" onClick={onClose} style={{ filter: "invert(0)" }}></button>
               </div>
               <div className="modal-body pt-2">
-                <div className="d-flex align-items-center mb-4">
-                  <img src={profesor.foto} alt={profesor.nombre} className="rounded-circle me-3" width="50" height="50" style={{ objectFit: 'cover' }} />
+                <div className="d-flex align-items-center mb-4 bg-light p-3 rounded-3">
+                  <img src={sesion.foto} alt={sesion.profesorNombre} className="rounded-circle me-3" width="50" height="50" style={{ objectFit: 'cover' }} />
                   <div>
-                    <h6 className="mb-0 fw-bold">{profesor.nombre}</h6>
-                    <small className="text-muted">{profesor.curso} • Duración: {duracion}h</small>
+                    <h6 className="mb-0 fw-bold">{sesion.curso} con {sesion.profesorNombre}</h6>
+                    <small className="text-muted d-block">
+                      <i className="bi bi-calendar-event me-1"></i> {sesion.fecha} a las {sesion.hora}
+                    </small>
+                    <small className="text-muted d-block">
+                      <i className="bi bi-clock me-1"></i> Duración: {duracion}h
+                    </small>
                   </div>
                 </div>
 
                 <form onSubmit={handleConfirmar}>
-                  <div className="row g-3 mb-4">
-                    <div className="col-6">
-                      <label className="form-label small fw-bold text-secondary">Fecha</label>
-                      <input
-                        type="date"
-                        className="form-control"
-                        value={fecha}
-                        onChange={e => setFecha(e.target.value)}
-                        min={fechaHoy}
-                        required
-                      />
-                    </div>
-                    <div className="col-6">
-                      <label className="form-label small fw-bold text-secondary">Hora</label>
-                      <input
-                        type="time"
-                        className="form-control"
-                        value={hora}
-                        onChange={e => setHora(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
-
                   <div className="bg-light p-3 rounded-3 mb-4">
                     <h6 className="fw-bold mb-3">Detalle de Pago</h6>
                     <div className="d-flex justify-content-between mb-1 small">
-                      <span className="text-muted">Tarifa base (S/ {profesor.precioHora}/h x {duracion}h)</span>
+                      <span className="text-muted">Tarifa base (S/ {precioHora}/h x {duracion}h)</span>
                       <span>S/ {tarifa.toFixed(2)}</span>
                     </div>
                     <div className="d-flex justify-content-between mb-2 small">
@@ -243,7 +218,7 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
                   )}
 
                   <button type="submit" className="btn btn-primary w-100 fw-bold py-2 border-0 hover-shadow" style={{ background: "linear-gradient(135deg, #7B1FA2 0%, #403fa0ff 100%)" }}>
-                    Confirmar y Pagar
+                    Confirmar y Unirse a la Clase
                   </button>
                 </form>
               </div>
@@ -253,8 +228,8 @@ export default function CheckoutModal({ profesor, onClose, onSuccess }) {
               <div className="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style={{ width: "60px", height: "60px" }}>
                 <i className="bi bi-check-lg fs-1"></i>
               </div>
-              <h4 className="fw-bold text-dark mb-2">¡Pago Exitoso!</h4>
-              <p className="text-muted mb-4">Tu tutoría ha sido agendada y confirmada.</p>
+              <h4 className="fw-bold text-dark mb-2">¡Inscripción Exitosa!</h4>
+              <p className="text-muted mb-4">Te has unido a la sesión correctamente.</p>
               <div className="bg-light rounded p-3 mb-4 text-start">
                 <small className="d-block text-muted mb-1">ID de Transacción</small>
                 <strong className="text-dark">{transaccionId}</strong>

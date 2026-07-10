@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
-import ProfesorCard from "../../components/ProfesorCard";
 import CheckoutModal from "../../components/CheckoutModal";
 import ModalCancelacion from "../../components/ModalCancelacion";
 import ModalSalaVirtual from "../../components/ModalSalaVirtual";
@@ -12,11 +11,11 @@ export default function TutoriasEstudiante() {
   const [tab, setTab] = useState("mis-tutorias"); // 'mis-tutorias' o 'explorar'
 
   // Data
-  const [profesores, setProfesores] = useState([]);
-  const [tutoriasAgendadas, setTutoriasAgendadas] = useState([]);
+  const [misTutoriasAgendadas, setMisTutoriasAgendadas] = useState([]);
+  const [sesionesDisponibles, setSesionesDisponibles] = useState([]);
 
   // Modals state
-  const [selectedProfesor, setSelectedProfesor] = useState(null);
+  const [sesionSeleccionada, setSesionSeleccionada] = useState(null);
   const [tutoriaACancelar, setTutoriaACancelar] = useState(null);
   const [tutoriaEnSala, setTutoriaEnSala] = useState(null);
 
@@ -30,36 +29,39 @@ export default function TutoriasEstudiante() {
     cargarDatos();
   }, []);
 
-  // Recibir navegación desde el buscador
   useEffect(() => {
     if (location.state?.cursoSeleccionado) {
       setTab("explorar");
       setCursoSeleccionado(location.state.cursoSeleccionado);
-      
-      // Limpiar el estado para no quedarse pegado si recarga
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location.state, navigate, location.pathname]);
 
   const cargarDatos = () => {
-    setProfesores(StorageService.getCompleteProfessors());
-    const sesiones = StorageService.getTutoringSessions();
-    // Orden cronológico
-    sesiones.sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora));
-    setTutoriasAgendadas(sesiones);
+    const todasSesiones = StorageService.getSessions();
+    const misSesiones = StorageService.getTutoringSessions().map(reserva => {
+      // Sincronizar el estado de la reserva con el estado real de la sesión dictada por el profe
+      const sesionReal = todasSesiones.find(s => s.id === reserva.sesionId);
+      if (sesionReal && sesionReal.estado === "Finalizada" && reserva.estado !== "Cancelada") {
+        return { ...reserva, estado: "Completada" };
+      }
+      if (sesionReal && sesionReal.estado === "Cancelada") {
+        return { ...reserva, estado: "Cancelada" };
+      }
+      return reserva;
+    });
+    
+    misSesiones.sort((a, b) => new Date(a.fechaHora) - new Date(b.fechaHora));
+    setMisTutoriasAgendadas(misSesiones);
+    setSesionesDisponibles(todasSesiones);
   };
 
-  const cursosUnicos = [...new Set(profesores.map(p => p.curso))];
+  const cursosUnicos = Object.keys(courseDurations);
 
-  const handleTutoriaAgendada = () => {
-    setSelectedProfesor(null);
+  const handleInscripcionExitosa = () => {
+    setSesionSeleccionada(null);
     cargarDatos();
     setTab("mis-tutorias");
-  };
-
-  const handleTutoriaCancelada = () => {
-    setTutoriaACancelar(null);
-    cargarDatos();
   };
 
   const isHoy = (fechaISO) => {
@@ -68,17 +70,21 @@ export default function TutoriasEstudiante() {
     return hoy.toDateString() === fecha.toDateString();
   };
 
-  const isHoraDeClase = (fechaISO) => {
+  const isHoraDeClase = (fechaISO, duracionHoras = 1.5) => {
     const ahora = new Date();
     const fechaInicio = new Date(fechaISO);
-    return ahora >= fechaInicio;
+    const diezMinutosAntes = new Date(fechaInicio.getTime() - 10 * 60000);
+    const horaFin = new Date(fechaInicio.getTime() + duracionHoras * 60 * 60 * 1000);
+    
+    // Puede entrar desde 10 mins antes hasta que acabe la clase
+    return ahora >= diezMinutosAntes && ahora <= horaFin;
   };
 
   const getStatusColor = (estado) => {
     switch (estado) {
-      case "Confirmada": return "success"; // Verde
-      case "Completada": return "secondary"; // Gris
-      case "Cancelada": return "danger"; // Rojo
+      case "Confirmada": return "success";
+      case "Completada": return "secondary";
+      case "Cancelada": return "danger";
       default: return "primary";
     }
   };
@@ -102,7 +108,6 @@ export default function TutoriasEstudiante() {
     return icons[curso] || "bi-book";
   };
 
-  // Corporate Gradient Style
   const gradientStyle = {
     background: "linear-gradient(135deg, #801caaff 0%, rgba(127, 56, 221, 1) 100%)",
     color: "white"
@@ -114,6 +119,15 @@ export default function TutoriasEstudiante() {
     WebkitTextFillColor: "transparent"
   };
 
+  // Filtrado de sesiones válidas (Regla de los 10 minutos para explorar sesiones)
+  const sesionesVigentes = sesionesDisponibles.filter(s => {
+    if (s.estado !== 'Programada') return false;
+    const inicio = new Date(`${s.fecha}T${s.hora}:00`);
+    const limiteIngreso = new Date(inicio.getTime() + 10 * 60000); // 10 min de gracia máximo para inscribirse
+    const ahora = new Date();
+    return ahora <= limiteIngreso;
+  });
+
   return (
     <div className="main-layout">
       <Sidebar role="estudiante" />
@@ -121,7 +135,7 @@ export default function TutoriasEstudiante() {
       <main className="dashboard-content">
         <header className="mb-4">
           <h2 className="fw-bold" style={textGradient}>Centro de Tutorías</h2>
-          <p className="text-muted">Gestiona tus sesiones programadas o explora nuevas materias.</p>
+          <p className="text-muted">Gestiona tus sesiones programadas o explora nuevas clases.</p>
         </header>
 
         {/* TABS */}
@@ -144,14 +158,14 @@ export default function TutoriasEstudiante() {
                 setCursoSeleccionado(null);
               }}
             >
-              Explorar Cursos
+              Explorar Sesiones
             </button>
           </li>
         </ul>
 
         {tab === "mis-tutorias" && (
           <section>
-            {tutoriasAgendadas.length === 0 ? (
+            {misTutoriasAgendadas.length === 0 ? (
               <div className="text-center py-5 bg-light rounded-4">
                 <i className="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
                 <h5 className="text-muted">No tienes tutorías programadas</h5>
@@ -165,7 +179,7 @@ export default function TutoriasEstudiante() {
               </div>
             ) : (
               <div className="row g-4">
-                {tutoriasAgendadas.map(tut => (
+                {misTutoriasAgendadas.map(tut => (
                   <div key={tut.id} className="col-md-6 col-lg-4">
                     <div className={`card border-0 shadow-sm rounded-4 h-100 border-start border-4 border-${getStatusColor(tut.estado)}`}>
                       <div className="card-body">
@@ -236,9 +250,9 @@ export default function TutoriasEstudiante() {
                 <h5 className="fw-bold mb-4">¿En qué curso necesitas ayuda?</h5>
                 <div className="row g-4">
                   {cursosUnicos.map(curso => {
-                    const profesDelCurso = profesores.filter(p => p.curso === curso);
                     const duracion = courseDurations[curso] || 1.5;
-                    const numProfesores = profesDelCurso.length;
+                    // Count only available sessions for this course
+                    const numSesiones = sesionesVigentes.filter(s => s.curso === curso).length;
 
                     return (
                       <div key={curso} className="col-md-4 col-lg-3">
@@ -266,8 +280,8 @@ export default function TutoriasEstudiante() {
                             <small className="text-muted">
                               <i className="bi bi-clock me-1"></i> {duracion}h estimadas
                             </small>
-                            <small className="text-muted fw-bold">
-                              {numProfesores} {numProfesores === 1 ? "profesor disponible" : "profesores disponibles"}
+                            <small className={numSesiones > 0 ? "text-success fw-bold" : "text-muted fw-bold"}>
+                              {numSesiones} {numSesiones === 1 ? "sesión disponible" : "sesiones disponibles"}
                             </small>
                           </div>
                         </div>
@@ -286,7 +300,7 @@ export default function TutoriasEstudiante() {
                     <i className={`bi ${getCourseIcon(cursoSeleccionado)} fs-4`} style={textGradient}></i>
                   </div>
                   <div>
-                    <h4 className="fw-bold mb-0" style={textGradient}>Profesores de {cursoSeleccionado}</h4>
+                    <h4 className="fw-bold mb-0" style={textGradient}>Sesiones disponibles para {cursoSeleccionado}</h4>
                     <span className="badge mt-1 shadow-sm" style={gradientStyle}>
                       <i className="bi bi-clock me-1"></i> {courseDurations[cursoSeleccionado] || 1.5}h
                     </span>
@@ -294,15 +308,67 @@ export default function TutoriasEstudiante() {
                 </div>
 
                 <div className="row g-4">
-                  {profesores.filter(p => p.curso === cursoSeleccionado).map((profe) => (
-                    <div key={profe.id} className="col-sm-6 col-lg-4 col-xl-3">
-                      <ProfesorCard
-                        profesor={profe}
-                        isTutoria={true}
-                        onSolicitar={setSelectedProfesor}
-                      />
+                  {sesionesVigentes.filter(s => s.curso === cursoSeleccionado).map((sesion) => {
+                    const estaLleno = sesion.inscritos >= sesion.cuposMaximos;
+                    const quedanPocos = (sesion.cuposMaximos - sesion.inscritos) <= 5;
+                    
+                    // Comprobar si ya estoy inscrito
+                    const yaInscrito = misTutoriasAgendadas.some(mt => mt.sesionId === sesion.id && mt.estado === "Confirmada");
+
+                    return (
+                      <div key={sesion.id} className="col-md-6 col-lg-4">
+                        <div className="card border-0 shadow-sm rounded-4 h-100 p-4" style={{ transition: "all 0.2s ease" }}>
+                          <div className="d-flex justify-content-between align-items-start mb-3">
+                            <div className="d-flex align-items-center">
+                              <img src={sesion.foto} alt={sesion.profesorNombre} className="rounded-circle me-3" width="45" height="45" style={{ objectFit: 'cover' }} />
+                              <div>
+                                <h6 className="fw-bold mb-0">{sesion.profesorNombre}</h6>
+                                <small className="text-muted d-block">{sesion.fecha} - {sesion.hora}</small>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="p-3 bg-light rounded-3 mb-3 text-center">
+                            <small className="text-uppercase fw-bold text-muted d-block mb-1">Cupos Disponibles</small>
+                            <h4 className={`fw-bold mb-0 ${estaLleno ? 'text-danger' : quedanPocos ? 'text-warning' : 'text-success'}`}>
+                              {sesion.inscritos} / {sesion.cuposMaximos}
+                            </h4>
+                            {quedanPocos && !estaLleno && (
+                              <span className="badge bg-warning text-dark mt-2">¡Pocos lugares!</span>
+                            )}
+                          </div>
+
+                          {yaInscrito ? (
+                            <button className="btn btn-secondary w-100 rounded-pill fw-bold" disabled>
+                              Ya estás inscrito
+                            </button>
+                          ) : estaLleno ? (
+                            <button className="btn btn-danger w-100 rounded-pill fw-bold" disabled>
+                              Sesión Llena
+                            </button>
+                          ) : (
+                            <button 
+                              className="btn text-white w-100 rounded-pill fw-bold border-0 shadow-sm"
+                              style={gradientStyle}
+                              onClick={() => setSesionSeleccionada(sesion)}
+                            >
+                              Reservar Cupo (S/ {((sesion.precioHora || 20) * (courseDurations[sesion.curso] || 1.5) * 1.15).toFixed(2)})
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  {sesionesVigentes.filter(s => s.curso === cursoSeleccionado).length === 0 && (
+                    <div className="col-12 text-center py-5">
+                      <div className="bg-light p-4 rounded-4 d-inline-block shadow-sm">
+                        <i className="bi bi-clock-history fs-1 text-muted d-block mb-2"></i>
+                        <h5 className="text-muted">Por el momento no hay sesiones publicadas para este curso.</h5>
+                        <p className="text-muted small mb-0">Vuelve más tarde o explora otros cursos.</p>
+                      </div>
                     </div>
-                  ))}
+                  )}
                 </div>
               </>
             )}
@@ -312,11 +378,11 @@ export default function TutoriasEstudiante() {
       </main>
 
       {/* MODALS */}
-      {selectedProfesor && (
+      {sesionSeleccionada && (
         <CheckoutModal
-          profesor={selectedProfesor}
-          onClose={() => setSelectedProfesor(null)}
-          onSuccess={handleTutoriaAgendada}
+          sesion={sesionSeleccionada}
+          onClose={() => setSesionSeleccionada(null)}
+          onSuccess={handleInscripcionExitosa}
         />
       )}
 
@@ -324,7 +390,7 @@ export default function TutoriasEstudiante() {
         <ModalCancelacion
           tutoria={tutoriaACancelar}
           onClose={() => setTutoriaACancelar(null)}
-          onSuccess={handleTutoriaCancelada}
+          onSuccess={() => { setTutoriaACancelar(null); cargarDatos(); }}
         />
       )}
 
@@ -332,10 +398,7 @@ export default function TutoriasEstudiante() {
         <ModalSalaVirtual 
           tutoria={tutoriaEnSala}
           onClose={() => setTutoriaEnSala(null)}
-          onSuccess={() => {
-            setTutoriaEnSala(null);
-            cargarDatos();
-          }}
+          onSuccess={() => { setTutoriaEnSala(null); cargarDatos(); }}
         />
       )}
     </div>

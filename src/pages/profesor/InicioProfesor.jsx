@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable'; 
+import { StorageService } from "../../core/database/StorageService";
+import Swal from 'sweetalert2';
+import { courseDurations } from "../../data/profesoresData";
 
 // IMPORTACIONES PARA EL GRÁFICO ESTADÍSTICO
 import {
@@ -31,11 +34,88 @@ const InicioProfesor = () => {
   const [historialTransacciones, setHistorialTransacciones] = useState([]);
   const [mostrarCalendario, setMostrarCalendario] = useState(false);
 
-  // CONFIGURACIÓN DEL INCENTIVO / BONO AUTOMATIZADO
   const META_CLASES = 10;
   const MONTO_BONO = 100;
   const [totalClasesDictadas, setTotalClasesDictadas] = useState(0);
   const [isMetaAlcanzada, setIsMetaAlcanzada] = useState(false);
+
+  // ESTADO PARA COMPLETAR PERFIL
+  const [mostrarModalPerfil, setMostrarModalPerfil] = useState(false);
+  const [datosPerfil, setDatosPerfil] = useState({
+    descripcion: '',
+    metodologia: '',
+    reconocimientos: '',
+    horarios: '',
+    cursos: []
+  });
+
+  useEffect(() => {
+    // Comprobar si es un profesor nuevo
+    const userSession = JSON.parse(localStorage.getItem('userSession'));
+    if (userSession && userSession.role === 'profesor') {
+      const profProfile = StorageService.getProfessorByEmail(userSession.email);
+      if (!profProfile || !profProfile.perfilCompletado) {
+        setMostrarModalPerfil(true);
+      }
+    }
+  }, []);
+
+  const handleGuardarPerfil = async (e) => {
+    e.preventDefault();
+    const userSession = JSON.parse(localStorage.getItem('userSession'));
+    
+    if (datosPerfil.cursos.length === 0) {
+      Swal.fire('Error', 'Debes seleccionar al menos un curso que dictas.', 'error');
+      return;
+    }
+
+    const reconocimientosArray = datosPerfil.reconocimientos.split(',').map(r => r.trim()).filter(r => r);
+    const horariosObj = { "Lunes a Viernes": [datosPerfil.horarios] };
+
+    const profileData = {
+      descripcion: datosPerfil.descripcion,
+      metodologia: datosPerfil.metodologia,
+      reconocimientos: reconocimientosArray,
+      horarios: horariosObj,
+      cursos: datosPerfil.cursos
+    };
+
+    try {
+      // Intentar actualizar en el backend usando el token
+      const res = await fetch(`http://localhost:3006/api/professors/${userSession.id}/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userSession.token}`
+        },
+        body: JSON.stringify(profileData)
+      });
+
+      if (res.ok) {
+        // Por si acaso, actualizamos el StorageService para mantener compatibilidad 
+        // temporal con otras vistas que aún no migran, pero la verdad está en el backend.
+        StorageService.saveProfessorProfile({
+          nombre: userSession.nombres,
+          email: userSession.email,
+          ...profileData,
+          departamento: "Tutoría General"
+        });
+
+        Swal.fire({
+          title: "Perfil Completado",
+          text: "Tus datos ahora son visibles para los estudiantes.",
+          icon: "success",
+          confirmButtonColor: '#3F51B5'
+        });
+        setMostrarModalPerfil(false);
+      } else {
+        const errData = await res.json();
+        Swal.fire('Error', errData.message || 'Error al guardar el perfil en el servidor', 'error');
+      }
+    } catch (err) {
+      Swal.fire('Error', 'Problema de conexión con el servidor', 'error');
+    }
+  };
 
   useEffect(() => {
     const TARIFA_POR_HORA = 50;
@@ -459,6 +539,81 @@ const InicioProfesor = () => {
                 <div className="modal-footer border-0 bg-light">
                   <button className="btn btn-secondary px-4 fw-semibold" onClick={() => setMostrarCalendario(false)}>Cerrar</button>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL COMPLETAR PERFIL (PARA NUEVOS PROFESORES) */}
+        {mostrarModalPerfil && (
+          <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1060 }}>
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
+                <div className="modal-header bg-indigo text-white" style={{ backgroundColor: '#3F51B5' }}>
+                  <h5 className="modal-title fw-bold">
+                    <i className="bi bi-person-lines-fill me-2"></i>Completa tu Perfil
+                  </h5>
+                </div>
+                <form onSubmit={handleGuardarPerfil}>
+                  <div className="modal-body p-4">
+                    <div className="alert alert-info border-0 bg-info-subtle text-info-emphasis rounded-3">
+                      <i className="bi bi-info-circle-fill me-2"></i>
+                      Como profesor nuevo, necesitamos algunos datos para mostrarlos a los estudiantes. Puedes llenarlo ahora o más tarde.
+                    </div>
+                    
+                    <div className="row g-3">
+                      <div className="col-12">
+                        <label className="form-label fw-bold small">Sobre Mí (Descripción)</label>
+                        <textarea className="form-control bg-light" rows="2" placeholder="Ej: Especialista en desarrollo web..." value={datosPerfil.descripcion} onChange={e => setDatosPerfil({...datosPerfil, descripcion: e.target.value})} required></textarea>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-bold small">Metodología</label>
+                        <input type="text" className="form-control bg-light" placeholder="Ej: Aprendizaje basado en proyectos..." value={datosPerfil.metodologia} onChange={e => setDatosPerfil({...datosPerfil, metodologia: e.target.value})} required />
+                      </div>
+                      <div className="col-12">
+                        <label className="form-label fw-bold small">Cursos que dictas (Selecciona uno o varios)</label>
+                        <div className="d-flex flex-wrap gap-3 mt-1 bg-light p-3 rounded border">
+                          {Object.keys(courseDurations).map(curso => (
+                            <div key={curso} className="form-check">
+                              <input 
+                                className="form-check-input" 
+                                type="checkbox" 
+                                id={`curso-${curso}`}
+                                checked={datosPerfil.cursos.includes(curso)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setDatosPerfil({...datosPerfil, cursos: [...datosPerfil.cursos, curso]});
+                                  } else {
+                                    setDatosPerfil({...datosPerfil, cursos: datosPerfil.cursos.filter(c => c !== curso)});
+                                  }
+                                }}
+                              />
+                              <label className="form-check-label small" htmlFor={`curso-${curso}`}>
+                                {curso}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-bold small">Reconocimientos (Separados por coma)</label>
+                        <input type="text" className="form-control bg-light" placeholder="Ej: Premio Excelencia 2023, Certificación AWS..." value={datosPerfil.reconocimientos} onChange={e => setDatosPerfil({...datosPerfil, reconocimientos: e.target.value})} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="form-label fw-bold small">Horarios Habituales</label>
+                        <input type="text" className="form-control bg-light" placeholder="Ej: 16:00 - 20:00" value={datosPerfil.horarios} onChange={e => setDatosPerfil({...datosPerfil, horarios: e.target.value})} required />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer bg-light border-0">
+                    <button type="button" className="btn btn-outline-secondary rounded-pill px-4 fw-bold" onClick={() => setMostrarModalPerfil(false)}>
+                      Llenar más tarde
+                    </button>
+                    <button type="submit" className="btn text-white rounded-pill px-4 fw-bold shadow-sm" style={{ backgroundColor: '#3F51B5' }}>
+                      Guardar Perfil
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>

@@ -1,5 +1,4 @@
-import { profesoresData } from "../../data/profesoresData";
-
+// Import removed to avoid static data hydration
 const KEYS = {
   PROFESSORS: "professors",
   STUDENT_STATS: "student_stats",
@@ -7,6 +6,8 @@ const KEYS = {
   REVIEWS: "reviews",
   NOTIFICATIONS: "notifications",
   NOTIFICATIONS_PROFESOR: "notifications_profesor", // NUEVA CLAVE PARA PROFESOR
+  SESSIONS: "sessions", // SESIONES CREADAS POR PROFESORES
+  USERS: "users", // MOCK PARA AUTENTICACIÓN
 };
 
 const defaultProfessorValues = {
@@ -43,6 +44,19 @@ export const StorageService = {
     if (!localStorage.getItem(KEYS.NOTIFICATIONS_PROFESOR)) {
       localStorage.setItem(KEYS.NOTIFICATIONS_PROFESOR, JSON.stringify([]));
     }
+    // NUEVO: Inicializar Sesiones Creadas por Profesores
+    if (!localStorage.getItem(KEYS.SESSIONS)) {
+      localStorage.setItem(KEYS.SESSIONS, JSON.stringify([]));
+    }
+    // NUEVO: Inicializar Usuarios (Auth Mock)
+    if (!localStorage.getItem(KEYS.USERS)) {
+      const demoUsers = [
+        { id: 1, email: "admin@profematch.com", pass: "admin123", role: "admin", status: "aprobado", nombres: "Admin" },
+        { id: 2, email: "prof@profematch.com", pass: "prof123", role: "profesor", status: "aprobado", nombres: "Profesor Demo" },
+        { id: 3, email: "estu@profematch.com", pass: "estu123", role: "estudiante", status: "aprobado", nombres: "Estudiante Demo" }
+      ];
+      localStorage.setItem(KEYS.USERS, JSON.stringify(demoUsers));
+    }
   },
 
   hydrateProfessors: () => {
@@ -55,13 +69,9 @@ export const StorageService = {
       console.error("Error leyendo profesores del storage", e);
     }
 
-    // 2. Si está vacío, cargar directamente el archivo estático
+    // 2. Si está vacío, iniciar como arreglo vacío (para esperar datos del backend)
     if (storedProfessors.length === 0) {
-      const initialProfessors = profesoresData.map(prof => ({
-        ...prof,
-        perfilCompletado: true
-      }));
-      localStorage.setItem(KEYS.PROFESSORS, JSON.stringify(initialProfessors));
+      localStorage.setItem(KEYS.PROFESSORS, JSON.stringify([]));
       return;
     }
 
@@ -105,6 +115,22 @@ export const StorageService = {
   getProfessors: () => {
     const data = localStorage.getItem(KEYS.PROFESSORS);
     return data ? JSON.parse(data) : [];
+  },
+
+  getProfessorByEmail: (email) => {
+    const profs = StorageService.getProfessors();
+    return profs.find(p => p.email === email) || null;
+  },
+
+  saveProfessorProfile: (profData) => {
+    const profs = StorageService.getProfessors();
+    const index = profs.findIndex(p => p.email === profData.email);
+    if (index !== -1) {
+      profs[index] = { ...profs[index], ...profData, perfilCompletado: true };
+    } else {
+      profs.push({ ...defaultProfessorValues, ...profData, perfilCompletado: true, id: Date.now() });
+    }
+    localStorage.setItem(KEYS.PROFESSORS, JSON.stringify(profs));
   },
 
   // Helper para buscar profesores que sí tienen perfil completo
@@ -225,5 +251,93 @@ export const StorageService = {
       notifications[index].read = true;
       localStorage.setItem(KEYS.NOTIFICATIONS_PROFESOR, JSON.stringify(notifications));
     }
+  },
+
+  // --- NUEVOS MÉTODOS PARA SESIONES CREADAS POR PROFESORES ---
+  
+  getSessions: () => {
+    const data = localStorage.getItem(KEYS.SESSIONS);
+    return data ? JSON.parse(data) : [];
+  },
+
+  saveSession: (session) => {
+    const sessions = StorageService.getSessions();
+    sessions.push({ 
+      ...session, 
+      id: Date.now(), 
+      inscritos: 0,
+      cuposMaximos: 40,
+      estado: "Programada", // Programada, Finalizada, Cancelada
+      timestamp: Date.now()
+    });
+    localStorage.setItem(KEYS.SESSIONS, JSON.stringify(sessions));
+  },
+
+  updateSession: (sessionId, updatedFields) => {
+    const sessions = StorageService.getSessions();
+    const index = sessions.findIndex(s => s.id === sessionId);
+    if (index !== -1) {
+      sessions[index] = { ...sessions[index], ...updatedFields };
+      localStorage.setItem(KEYS.SESSIONS, JSON.stringify(sessions));
+    }
+  },
+
+  // --- NUEVOS MÉTODOS DE AUTENTICACIÓN Y USUARIOS (MOCK DB) ---
+  
+  getUsers: () => {
+    const data = localStorage.getItem(KEYS.USERS);
+    let users = data ? JSON.parse(data) : [];
+    
+    // Forzar inyección de usuarios DEMO si la lista está vacía
+    if (users.length === 0) {
+      const demoUsers = [
+        { id: 1, email: "admin@profematch.com", pass: "admin123", role: "admin", status: "aprobado", nombres: "Admin" },
+        { id: 2, email: "prof@profematch.com", pass: "prof123", role: "profesor", status: "aprobado", nombres: "Profesor Demo" },
+        { id: 3, email: "estu@profematch.com", pass: "estu123", role: "estudiante", status: "aprobado", nombres: "Estudiante Demo" }
+      ];
+      localStorage.setItem(KEYS.USERS, JSON.stringify(demoUsers));
+      users = demoUsers;
+    }
+    return users;
+  },
+
+  registerUser: (userData) => {
+    const users = StorageService.getUsers();
+    // Ambos roles ahora entran como pendientes por defecto, a menos que se sobreescriba en el objeto
+    const newUser = {
+      ...userData,
+      id: Date.now(),
+      status: userData.status || "pendiente", // 'pendiente' o 'aprobado'
+      registeredAt: new Date().toISOString()
+    };
+    users.push(newUser);
+    localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+    return newUser;
+  },
+
+  loginUser: (email, password) => {
+    const users = StorageService.getUsers();
+    const user = users.find(u => u.email === email && u.pass === password);
+    
+    if (!user) {
+      return { success: false, error: "invalid_credentials" };
+    }
+
+    if (user.status === "pendiente") {
+      return { success: false, error: "pending_approval" };
+    }
+
+    return { success: true, user };
+  },
+
+  updateUserStatus: (userId, newStatus) => {
+    const users = StorageService.getUsers();
+    const index = users.findIndex(u => u.id === userId);
+    if (index !== -1) {
+      users[index].status = newStatus;
+      localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+      return true;
+    }
+    return false;
   }
 };

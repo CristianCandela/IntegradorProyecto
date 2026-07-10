@@ -5,6 +5,7 @@ import LoginHero from "../../components/LoginHero";
 import heroVideo from "../../images/hero.mp4";
 import WhatsappBtn from "../../components/WhatsappBtn";
 import Swal from "sweetalert2";
+import { StorageService } from "../../core/database/StorageService";
 
 const roleOptions = {
   estudiante: { 
@@ -17,7 +18,7 @@ const roleOptions = {
       { name: "nombres", label: "Nombres completos", icon: "bi-person", type: "text", placeholder: "Ej: Juan Carlos" },
       { name: "email", label: "Correo universitario", icon: "bi-envelope", type: "email", placeholder: "tu.nombre@u.edu.pe" },
       { name: "codigo", label: "Código estudiantil", icon: "bi-hash", type: "text", placeholder: "Ej: 202101234" },
-      { name: "password", label: "Contraseña", icon: "bi-lock", type: "password", placeholder: "Mínimo 6 caracteres" },
+      { name: "pass", label: "Contraseña", icon: "bi-lock", type: "password", placeholder: "Mínimo 6 caracteres" },
       { name: "confirmPassword", label: "Confirmar contraseña", icon: "bi-lock-fill", type: "password", placeholder: "Repite tu contraseña" }
     ]
   },
@@ -32,7 +33,7 @@ const roleOptions = {
       { name: "email", label: "Correo institucional", icon: "bi-envelope", type: "email", placeholder: "profesor@universidad.edu.pe" },
       { name: "especialidad", label: "Área de especialidad", icon: "bi-bookmark", type: "text", placeholder: "Ej: Base de Datos" },
       { name: "universidad", label: "Universidad", icon: "bi-building", type: "text", placeholder: "Ej: PUCP, UNMSM, UPC" },
-      { name: "password", label: "Contraseña", icon: "bi-lock", type: "password", placeholder: "Mínimo 6 caracteres" },
+      { name: "pass", label: "Contraseña", icon: "bi-lock", type: "password", placeholder: "Mínimo 6 caracteres" },
       { name: "confirmPassword", label: "Confirmar contraseña", icon: "bi-lock-fill", type: "password", placeholder: "Repite tu contraseña" }
     ]
   }
@@ -76,7 +77,7 @@ export default function Registro() {
   };
 
   const validateForm = () => {
-    const { password, confirmPassword, email, nombres } = formData;
+    const { pass, confirmPassword, email, nombres } = formData;
     
     if (!nombres || nombres.trim().length < 3) {
       Swal.fire({
@@ -98,7 +99,7 @@ export default function Registro() {
       return false;
     }
 
-    if (!password || password.length < 6) {
+    if (!pass || pass.length < 6) {
       Swal.fire({
         icon: "warning",
         title: "Contraseña débil",
@@ -108,7 +109,7 @@ export default function Registro() {
       return false;
     }
 
-    if (password !== confirmPassword) {
+    if (pass !== confirmPassword) {
       Swal.fire({
         icon: "error",
         title: "Contraseñas no coinciden",
@@ -129,32 +130,45 @@ export default function Registro() {
     setIsLoading(true);
 
     setTimeout(() => {
+      // Registrar usuario con estado 'pendiente' a través del mock StorageService
       const userData = {
         role: role,
         email: formData.email,
+        pass: formData.pass,
         nombres: formData.nombres,
-        registeredAt: new Date().toISOString()
+        ...formData
       };
       
-      localStorage.setItem("userSession", JSON.stringify(userData));
+      StorageService.registerUser(userData);
 
+      // Mostrar alerta de que requiere aprobación del admin
       Swal.fire({
-        title: "¡Registro exitoso!",
-        text: `Bienvenido a ProfeMatch, ${formData.nombres.split(' ')[0]}`,
-        icon: "success",
-        timer: 2500,
-        showConfirmButton: false,
+        title: "¡Cuenta creada!",
+        text: `Gracias por registrarte, ${formData.nombres.split(' ')[0]}. Tu cuenta está a la espera de aprobación por un administrador.`,
+        icon: "info",
+        timer: 4000,
+        showConfirmButton: true,
+        confirmButtonText: "Ir al Login",
+        confirmButtonColor: currentRole.color,
         timerProgressBar: true,
-        background: currentRole.color,
-        color: "#fff",
-        iconColor: "#fff"
       }).then(() => {
-        const redirectPath = role === "estudiante" ? "/inicio-estudiante" : "/inicio-profesor";
-        navigate(redirectPath);
+        // Redirigimos al login, NO lo dejamos entrar directamente
+        navigate("/login");
       });
       
       setIsLoading(false);
     }, 1500);
+  };
+
+  const handleSocialRegister = (provider) => {
+    Swal.fire({
+      title: `Registro con ${provider}`,
+      text: "Se ha solicitado el registro. Tu cuenta está a la espera de aprobación por un administrador.",
+      icon: "info",
+      confirmButtonColor: currentRole.color,
+    }).then(() => {
+      navigate("/login");
+    });
   };
 
   return (
@@ -285,13 +299,13 @@ export default function Registro() {
             {/* Social login */}
             <div className="row g-2 mb-3">
               <div className="col-6">
-                <button className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                <button type="button" onClick={() => handleSocialRegister('Google')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                   <i className="bi bi-google text-danger"></i>
                   <span className="small">Google</span>
                 </button>
               </div>
               <div className="col-6">
-                <button className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                <button type="button" onClick={() => handleSocialRegister('Microsoft')} className="btn btn-outline-secondary w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                   <i className="bi bi-microsoft text-primary"></i>
                   <span className="small">Microsoft</span>
                 </button>

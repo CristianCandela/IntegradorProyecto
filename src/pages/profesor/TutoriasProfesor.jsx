@@ -2,122 +2,144 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from "../../components/Sidebar";
 import Swal from 'sweetalert2';
 import { StorageService } from "../../core/database/StorageService";
+import { courseDurations } from "../../data/profesoresData";
 
 const TutoriasProfesor = () => {
-  const [tutorias, setTutorias] = useState([]);
+  const [sesionesCreadas, setSesionesCreadas] = useState([]);
+  
+  // ESTADOS FORMULARIO CREAR SESIÓN
+  const [misCursos, setMisCursos] = useState([]);
+  const [cursoNuevaSesion, setCursoNuevaSesion] = useState('');
+  const [fechaNuevaSesion, setFechaNuevaSesion] = useState('');
+  const [horaNuevaSesion, setHoraNuevaSesion] = useState('');
+  const [horaNuevaSesionFin, setHoraNuevaSesionFin] = useState('');
 
-  // ESTADO PARA EL CALENDARIO DE DISPONIBILIDAD (BLOQUEO DE HORARIOS)
-  const [disponibilidad, setDisponibilidad] = useState([
-    { hora: "08:00 - 09:30", disponible: true },
-    { hora: "09:45 - 11:15", disponible: true },
-    { hora: "11:30 - 13:00", disponible: false }, 
-    { hora: "14:00 - 15:30", disponible: true },
-    { hora: "15:45 - 17:15", disponible: true },
-    { hora: "18:30 - 20:00", disponible: true }
-  ]);
-
-  // ALERTA VISUAL DE CANCELACIÓN RECIENTE POR PARTE DE UN ESTUDIANTE
+  // ALERTA VISUAL
   const [alertaCancelacionEstudiante, setAlertaCancelacionEstudiante] = useState(false);
 
   // ESTADOS PARA MODAL DE CANCELACIÓN (PENALIZACIONES)
   const [mostrarModalCancelacion, setMostrarModalCancelacion] = useState(false);
-  const [indiceACancelar, setIndiceACancelar] = useState(null);
+  const [sesionACancelar, setSesionACancelar] = useState(null);
   const [motivoCancelacion, setMotivoCancelacion] = useState('');
   const [comentarioCancelacion, setComentarioCancelacion] = useState('');
 
   // ESTADOS PARA MODAL DE VALORACIÓN POST-TUTORÍA
   const [mostrarModalValoracion, setMostrarModalValoracion] = useState(false);
-  const [alumnoAEvaluar, setAlumnoAEvaluar] = useState('');
-  const [indiceAEvaluar, setIndiceAEvaluar] = useState(null);
-  const [estrellas, setEstrellas] = useState(5);
-  const [compromiso, setCompromiso] = useState(5);
-  const [respeto, setRespeto] = useState(5);
-  const [participacion, setParticipacion] = useState(5);
+  const [sesionAEvaluar, setSesionAEvaluar] = useState(null);
   const [comentarioLibre, setComentarioLibre] = useState('');
-  const [quejaFormal, setQuejaFormal] = useState(false);
-  const [detalleQueja, setDetalleQueja] = useState('');
 
   useEffect(() => {
-    const datosGuardados = localStorage.getItem("tutorias");
-    
-    if (!datosGuardados) {
-      const datosTutoriasPreinstalados = [
-        { estudiante: "Luis carlos Mendez Chavez", curso: "Desarrollo de software", fecha: "2026-06-12", claseTerminada: false },
-        { estudiante: "Ana Maria Gomez", curso: "Física de Campos", fecha: "2026-06-14", claseTerminada: false },
-        { estudiante: "Guillermo Palacios", curso: "Diseño de Sistemas Web", fecha: "2026-06-15", claseTerminada: false }
-      ];
-      localStorage.setItem("tutorias", JSON.stringify(datosTutoriasPreinstalados));
-      setTutorias(datosTutoriasPreinstalados);
-    } else {
-      const procesados = JSON.parse(datosGuardados).map(t => ({
-        ...t,
-        claseTerminada: t.claseTerminada || false
-      }));
-      setTutorias(procesados);
-    }
-
-    const bloquesGuardados = localStorage.getItem("disponibilidad_profesor");
-    if (bloquesGuardados) {
-      setDisponibilidad(JSON.parse(bloquesGuardados));
-    } else {
-      localStorage.setItem("disponibilidad_profesor", JSON.stringify(disponibilidad));
-    }
-
+    cargarSesiones();
     const scoreActual = Number(localStorage.getItem("score_profesor")) || 100;
     if (scoreActual < 100) {
       setAlertaCancelacionEstudiante(true);
     }
 
-    // Generar notificación de bienvenida para el profesor
-    generarNotificacionBienvenidaProfesor();
+    // Cargar los cursos que dicta el profesor desde su perfil
+    const userSession = JSON.parse(localStorage.getItem('userSession'));
+    if (userSession && userSession.email) {
+      const profProfile = StorageService.getProfessorByEmail(userSession.email);
+      if (profProfile && profProfile.cursos && profProfile.cursos.length > 0) {
+        setMisCursos(profProfile.cursos);
+        setCursoNuevaSesion(profProfile.cursos[0]);
+      } else {
+        setMisCursos(["Pendiente de asignar"]);
+        setCursoNuevaSesion("Pendiente de asignar");
+      }
+    }
   }, []);
 
-  const generarNotificacionBienvenidaProfesor = () => {
-    const notificaciones = StorageService.getNotificationsProfesor();
-    const yaExisteBienvenida = notificaciones.some(n => n.tipo === "bienvenida_profesor");
-    
-    if (!yaExisteBienvenida) {
-      StorageService.saveNotificationProfesor({
-        tipo: "bienvenida_profesor",
-        mensaje: "Bienvenido al panel de profesor. Aquí podrás gestionar tus tutorías y evaluaciones.",
-        fechaHoraRef: new Date().toISOString()
-      });
-    }
+  const cargarSesiones = () => {
+    const sesiones = StorageService.getSessions();
+    // Filtramos para mostrar solo las programadas. Las finalizadas se ocultan.
+    setSesionesCreadas(sesiones.filter(s => s.estado === "Programada"));
   };
 
-  const toggleHorario = (index) => {
-    const nuevaDisp = disponibilidad.map((item, i) => 
-      i === index ? { ...item, disponible: !item.disponible } : item
-    );
-    setDisponibilidad(nuevaDisp);
-    localStorage.setItem("disponibilidad_profesor", JSON.stringify(nuevaDisp));
+  const handleCrearSesion = (e) => {
+    e.preventDefault();
+    if (!cursoNuevaSesion || !fechaNuevaSesion || !horaNuevaSesion || !horaNuevaSesionFin) {
+      Swal.fire('Error', 'Completa todos los campos (Inicio y Fin).', 'error');
+      return;
+    }
+
+    const todasSesiones = StorageService.getSessions();
+    const nuevaFechaHora = new Date(`${fechaNuevaSesion}T${horaNuevaSesion}:00`);
+    const nuevaFechaHoraFin = new Date(`${fechaNuevaSesion}T${horaNuevaSesionFin}:00`);
+    
+    // Evitar crear sesiones en el pasado
+    if (nuevaFechaHora < new Date()) {
+      Swal.fire('Atención', 'No puedes programar una sesión en el pasado.', 'warning');
+      return;
+    }
+
+    // Validar duración mínima (1.5 horas = 90 minutos)
+    const duracionMs = nuevaFechaHoraFin - nuevaFechaHora;
+    const minDuracionMs = 1.5 * 60 * 60 * 1000;
+    if (duracionMs < minDuracionMs) {
+      Swal.fire('Atención', 'La sesión debe durar al menos 1.5 horas (90 minutos).', 'warning');
+      return;
+    }
+
+    const hayChoque = todasSesiones.some(s => {
+      if (s.estado !== 'Programada') return false;
+      const sInicio = new Date(`${s.fecha}T${s.hora}:00`);
+      // Si el formato antiguo no tenía horaFin, usa una duración estimada para choque
+      const sFin = s.horaFin ? new Date(`${s.fecha}T${s.horaFin}:00`) : new Date(sInicio.getTime() + 1.5 * 60 * 60 * 1000);
+      
+      return (nuevaFechaHora < sFin && nuevaFechaHoraFin > sInicio);
+    });
+
+    if (hayChoque) {
+      Swal.fire({
+        title: 'Conflicto de Horario',
+        text: 'Ya tienes una sesión programada en este horario. Por favor elige otra hora.',
+        icon: 'warning'
+      });
+      return;
+    }
+
+    // Obtenemos al usuario activo para extraer su nombre o usar "Prof. Ejemplo (Tú)"
+    const userSession = JSON.parse(localStorage.getItem('userSession'));
+    const userName = userSession?.nombres || "Prof. Ejemplo (Tú)";
+    const duracionHoras = (duracionMs / (1000 * 60 * 60)).toFixed(1);
+
+    StorageService.saveSession({
+      profesorId: userSession?.id || 1,
+      profesorNombre: userName, 
+      curso: cursoNuevaSesion,
+      fecha: fechaNuevaSesion,
+      hora: horaNuevaSesion,
+      horaFin: horaNuevaSesionFin,
+      duracion: duracionHoras,
+      foto: "https://i.pravatar.cc/150?img=11",
+      precioHora: 20
+    });
+
+    Swal.fire('¡Éxito!', 'La sesión ha sido publicada y está disponible para los alumnos.', 'success');
+    setFechaNuevaSesion('');
+    setHoraNuevaSesion('');
+    setHoraNuevaSesionFin('');
+    cargarSesiones();
   };
 
   const formatearFechaEspanol = (fechaString) => {
-    if (!fechaString || typeof fechaString !== 'string') return "Fecha por asignar";
-    
+    if (!fechaString) return "Fecha por asignar";
     const partes = fechaString.split("-");
     if (partes.length === 3) {
       const anio = partes[0];
       const mes = partes[1];
       const dia = partes[2];
-      
-      if (parseInt(anio, 10) > 2030 || parseInt(anio, 10) < 2025) {
-        return `${parseInt(dia, 10)}/${mes}/${anio}`; 
-      }
-
       const meses = [
         "enero", "febrero", "marzo", "abril", "mayo", "junio", 
         "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
       ];
-      const nombreMes = meses[parseInt(mes, 10) - 1];
-      return `${parseInt(dia, 10)} de ${nombreMes} de ${anio}`;
+      return `${parseInt(dia, 10)} de ${meses[parseInt(mes, 10) - 1]} de ${anio}`;
     }
     return fechaString;
   };
 
-  const solicitarCancelacion = (index) => {
-    setIndiceACancelar(index);
+  const solicitarCancelacion = (sesion) => {
+    setSesionACancelar(sesion);
     setMotivoCancelacion('');
     setComentarioCancelacion('');
     setMostrarModalCancelacion(true);
@@ -129,8 +151,7 @@ const TutoriasProfesor = () => {
       return;
     }
 
-    const tutoria = tutorias[indiceACancelar];
-    const fechaTutoria = new Date(tutoria.fecha);
+    const fechaTutoria = new Date(`${sesionACancelar.fecha}T${sesionACancelar.hora}:00`);
     const ahora = new Date();
     const diferenciaHoras = (fechaTutoria - ahora) / (1000 * 60 * 60);
 
@@ -148,114 +169,98 @@ const TutoriasProfesor = () => {
       mensajeTiempo = "con más de 24 horas de anticipación (-5 puntos)";
     }
 
-    alert(`Cancelación registrada.\nMotivo: ${motivoCancelacion}\nConsecuencia: Tu Score de Confiabilidad disminuirá en ${puntosPenalizacion} puntos por cancelar ${mensajeTiempo}.`);
+    alert(`Cancelación registrada.\nConsecuencia: Tu Score disminuirá en ${puntosPenalizacion} puntos por cancelar ${mensajeTiempo}.`);
 
     const scoreActual = Number(localStorage.getItem("score_profesor")) || 100;
-    const nuevoScore = Math.max(0, scoreActual - puntosPenalizacion);
-    localStorage.setItem("score_profesor", nuevoScore);
+    localStorage.setItem("score_profesor", Math.max(0, scoreActual - puntosPenalizacion));
 
-    // Notificación para el profesor
-    StorageService.saveNotificationProfesor({
-      tipo: "cancelacion_tutoria",
-      mensaje: `Has cancelado la tutoría con ${tutoria.estudiante} de ${tutoria.curso}. Se aplicó una penalización de ${puntosPenalizacion} puntos.`,
-      fechaHoraRef: new Date().toISOString()
-    });
-
-    const nuevasTutorias = tutorias.filter((_, i) => i !== indiceACancelar);
-    setTutorias(nuevasTutorias);
-    localStorage.setItem("tutorias", JSON.stringify(nuevasTutorias));
+    StorageService.updateSession(sesionACancelar.id, { estado: 'Cancelada' });
     
     setMostrarModalCancelacion(false);
-    window.location.reload();
+    cargarSesiones();
   };
 
-  const handleIniciarSesionVirtual = (index, nombreAlumno) => {
+  const handleIniciarSesionVirtual = (sesion) => {
+    const ahora = new Date();
+    const fechaHoraInicio = new Date(`${sesion.fecha}T${sesion.hora}:00`);
+    const fechaHoraFin = sesion.horaFin ? new Date(`${sesion.fecha}T${sesion.horaFin}:00`) : new Date(fechaHoraInicio.getTime() + 1.5 * 60 * 60 * 1000);
+    
+    const userSession = JSON.parse(localStorage.getItem('userSession'));
+    const esProfesorDemo = userSession?.email === "prof@profematch.com" || userSession?.nombres === "Profesor Ejemplo";
+
+    // Validar hora de ingreso: solo desde 10 min antes hasta la hora de fin.
+    const diezMinutosAntes = new Date(fechaHoraInicio.getTime() - 10 * 60000);
+    if (!esProfesorDemo && ahora < diezMinutosAntes) {
+      Swal.fire('Atención', 'Aún es muy pronto. Solo puedes ingresar a la sala desde 10 minutos antes de la hora de inicio.', 'warning');
+      return;
+    }
+
+    // Lista simulada de estudiantes
+    const numeroInscritos = sesion.inscritos || Math.floor(Math.random() * 5) + 1;
+    let htmlAlumnos = '<ul class="list-group text-start mt-3 mb-3" style="max-height: 150px; overflow-y: auto;">';
+    for (let i = 1; i <= numeroInscritos; i++) {
+      htmlAlumnos += `<li class="list-group-item d-flex align-items-center">
+        <span class="bg-success rounded-circle me-2" style="width: 10px; height: 10px; display: inline-block;"></span>
+        Estudiante ${i} (Conectado)
+      </li>`;
+    }
+    htmlAlumnos += '</ul>';
+
     Swal.fire({
-      title: 'Conectando a la sala virtual...',
-      text: `Entrando a la videoconferencia privada con ${nombreAlumno}`,
+      title: 'Sala Virtual Activa',
+      html: `
+        <p>Dictando clase de <strong>${sesion.curso}</strong></p>
+        <p class="small text-muted mb-1">Alumnos en la sala: ${numeroInscritos}</p>
+        ${htmlAlumnos}
+        <p class="text-danger small">Atención: Solo puedes finalizar la clase cuando se cumpla la hora programada (${sesion.horaFin || 'fin estimado'}).</p>
+      `,
       icon: 'info',
       showCancelButton: true,
       confirmButtonText: 'Finalizar Clase',
-      cancelButtonText: 'Salir de la sala',
+      cancelButtonText: 'Minimizar Sala (Seguir dando clase)',
       confirmButtonColor: '#3F51B5',
-      cancelButtonColor: '#6c757d'
+      cancelButtonColor: '#6c757d',
+      allowOutsideClick: false
     }).then((result) => {
       if (result.isConfirmed) {
-        const listasActualizadas = tutorias.map((t, i) => 
-          i === index ? { ...t, claseTerminada: true } : t
-        );
-        setTutorias(listasActualizadas);
-        localStorage.setItem("tutorias", JSON.stringify(listasActualizadas));
+        // Validar si puede finalizar
+        if (!esProfesorDemo && ahora < fechaHoraFin) {
+          Swal.fire('No puedes finalizar aún', 'La clase aún no ha cumplido su horario establecido. Los alumnos siguen conectados.', 'error');
+          return;
+        }
 
-        // Notificación para el profesor
-        StorageService.saveNotificationProfesor({
-          tipo: "tutoria_finalizada",
-          mensaje: `La tutoría con ${nombreAlumno} ha finalizado. Procede a registrar la valoración académica.`,
-          fechaHoraRef: new Date().toISOString()
-        });
-
+        StorageService.updateSession(sesion.id, { estado: 'Finalizada' });
+        
         Swal.fire({
-          title: 'Tutoría Finalizada',
-          text: 'La sesión ha concluido con éxito. Procede a registrar la valoración académica del estudiante.',
+          title: 'Clase Finalizada',
+          text: 'La sesión ha sido marcada como completada y los alumnos ya pueden dejar su reseña.',
           icon: 'success',
           confirmButtonColor: '#28a745'
+        }).then(() => {
+          handleAbrirEvaluacion(sesion);
         });
       }
     });
   };
 
-  const handleAbrirEvaluacion = (index, estudiante) => {
-    setAlumnoAEvaluar(estudiante);
-    setIndiceAEvaluar(index);
+  const handleAbrirEvaluacion = (sesion) => {
+    setSesionAEvaluar(sesion);
     setComentarioLibre('');
-    setQuejaFormal(false);
-    setDetalleQueja('');
     setMostrarModalValoracion(true);
   };
 
   const guardarValoracionDocente = (e) => {
     e.preventDefault();
-    if (quejaFormal && !detalleQueja.trim()) {
-      alert("Al marcar una queja formal, es obligatorio describir el problema.");
-      return;
-    }
-
-    alert(`¡Evaluación enviada con éxito para ${alumnoAEvaluar}!\nCalificación asignada registrada en el sistema.`);
-    
-    // Notificación para el profesor
-    StorageService.saveNotificationProfesor({
-      tipo: "evaluacion_enviada",
-      mensaje: `Evaluación enviada para ${alumnoAEvaluar}. Tu calificación ha sido registrada.`,
-      fechaHoraRef: new Date().toISOString()
-    });
-    
-    const nuevasTutorias = tutorias.filter((_, i) => i !== indiceAEvaluar);
-    setTutorias(nuevasTutorias);
-    localStorage.setItem("tutorias", JSON.stringify(nuevasTutorias));
-
+    alert(`Evaluación general de la clase guardada con éxito.`);
     setMostrarModalValoracion(false);
+    cargarSesiones();
   };
 
-  const colores = {
-    indigo: '#3F51B5',
-    violet: '#7B1FA2',
-    fuchsia: '#E91E63'
-  };
+  const colores = { indigo: '#3F51B5', violet: '#7B1FA2', fuchsia: '#E91E63' };
+  const cardStyle = { borderRadius: '12px', transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)" };
 
-  const cardStyle = {
-    borderRadius: '12px',
-    transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)"
-  };
-
-  const handleMouseEnter = (e) => {
-    e.currentTarget.style.transform = "translateY(-5px)";
-    e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
-  };
-
-  const handleMouseLeave = (e) => {
-    e.currentTarget.style.transform = "translateY(0)";
-    e.currentTarget.style.boxShadow = "0 .125rem .25rem";
-  };
+  const ahora = new Date();
+  const fechaHoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
 
   return (
     <div className="d-flex">
@@ -268,102 +273,161 @@ const TutoriasProfesor = () => {
               <i className="bi bi-exclamation-triangle-fill text-warning fs-4"></i>
               <div>
                 <strong className="d-block text-dark">Alerta de Agenda</strong>
-                <span className="small text-secondary">El estudiante Carlos Mendoza canceló la tutoría de hoy. Tu espacio ha sido liberado automáticamente.</span>
+                <span className="small text-secondary">Tu Score de confiabilidad ha disminuido debido a cancelaciones recientes.</span>
               </div>
             </div>
             <button className="btn btn-sm btn-outline-secondary rounded-pill px-3" onClick={() => setAlertaCancelacionEstudiante(false)}>Entendido</button>
           </div>
         )}
 
-        <h2 className="mb-4 fw-bold" style={{ color: colores.indigo }}>Control de Horarios y Tutorías</h2>
+        <h2 className="mb-4 fw-bold" style={{ color: colores.indigo }}>Gestión de Sesiones de Tutoría</h2>
         
-        <div className="row mb-4">
-          <div className="col-12">
-            <div className="card shadow-sm border-0 p-4" style={{ borderRadius: '15px' }}>
-              <h5 className="fw-bold mb-1 text-dark">
-                <i className="bi bi-shield-lock-fill text-indigo me-2"></i>Gestor de Disponibilidad y Horarios de Atención
-              </h5>
-              <p className="text-muted small mb-3">Establece las franjas en las que estás apto para dictar. Los estudiantes solo podrán agendar en los bloques marcados como <b>Disponible</b>.</p>
+        <div className="row mb-5">
+          <div className="col-12 col-xl-8">
+            <div className="card shadow-lg border-0" style={{ borderRadius: '20px', overflow: 'hidden' }}>
+              <div className="p-4 text-white position-relative" style={{ background: `linear-gradient(135deg, ${colores.indigo} 0%, #283593 100%)` }}>
+                <div className="position-absolute top-0 end-0 p-3 opacity-25">
+                  <i className="bi bi-calendar-plus-fill" style={{ fontSize: '4rem' }}></i>
+                </div>
+                <h5 className="fw-bold mb-2 position-relative z-1">
+                  <i className="bi bi-plus-circle-fill me-2"></i>Crear Nueva Sesión
+                </h5>
+                <p className="small mb-0 position-relative z-1" style={{ opacity: 0.9 }}>
+                  Programa una clase. El límite por defecto es 40 alumnos por sesión.
+                </p>
+              </div>
               
-              <div className="row g-3">
-                {disponibilidad.map((item, idx) => (
-                  <div className="col-md-4 col-sm-6" key={idx}>
-                    <div 
-                      className={`p-3 rounded-3 text-center border fw-semibold small ${
-                        item.disponible 
-                          ? 'bg-success-subtle border-success-subtle text-success' 
-                          : 'bg-secondary-subtle border-secondary-subtle text-secondary text-decoration-line-through opacity-75'
-                      }`}
-                      style={{ cursor: 'pointer', transition: 'all 0.2s' }}
-                      onClick={() => toggleHorario(idx)}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                    >
-                      <i className={`bi ${item.disponible ? 'bi-calendar-check-fill' : 'bi-calendar-x-fill'} me-2`}></i>
-                      {item.hora} <br />
-                      <span className="badge mt-1" style={{ backgroundColor: item.disponible ? '#28a745' : '#6c757d' }}>
-                        {item.disponible ? 'Disponible' : 'Bloqueado'}
-                      </span>
+              <div className="p-4 bg-white">
+                <form onSubmit={handleCrearSesion} className="row g-4">
+                  <div className="col-md-3">
+                    <label className="form-label small fw-bold text-secondary">Curso a Dictar</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-0 rounded-start-3 text-muted"><i className="bi bi-book"></i></span>
+                        <select 
+                          className="form-select bg-light border-0 shadow-none rounded-end-3"
+                          value={cursoNuevaSesion}
+                          onChange={(e) => setCursoNuevaSesion(e.target.value)}
+                          required
+                          style={{ padding: '0.6rem 1rem' }}
+                        >
+                          {misCursos.map(curso => (
+                            <option key={curso} value={curso}>{curso}</option>
+                          ))}
+                        </select>
                     </div>
                   </div>
-                ))}
+                  <div className="col-md-3">
+                    <label className="form-label small fw-bold text-secondary">Fecha</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-0 rounded-start-3 text-muted"><i className="bi bi-calendar-event"></i></span>
+                      <input 
+                        type="date" 
+                        className="form-control bg-light border-0 shadow-none rounded-end-3"
+                        value={fechaNuevaSesion}
+                        onChange={(e) => setFechaNuevaSesion(e.target.value)}
+                        min={fechaHoyStr}
+                        required
+                        style={{ padding: '0.6rem 1rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-label small fw-bold text-secondary">Hora Inicio</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-0 rounded-start-3 text-muted"><i className="bi bi-clock"></i></span>
+                      <input 
+                        type="time" 
+                        className="form-control bg-light border-0 shadow-none rounded-end-3"
+                        value={horaNuevaSesion}
+                        onChange={(e) => setHoraNuevaSesion(e.target.value)}
+                        required
+                        style={{ padding: '0.6rem 1rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-label small fw-bold text-secondary">Hora Fin</label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-0 rounded-start-3 text-muted"><i className="bi bi-clock-history"></i></span>
+                      <input 
+                        type="time" 
+                        className="form-control bg-light border-0 shadow-none rounded-end-3"
+                        value={horaNuevaSesionFin}
+                        onChange={(e) => setHoraNuevaSesionFin(e.target.value)}
+                        required
+                        style={{ padding: '0.6rem 1rem' }}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-12 mt-4">
+                    <button type="submit" className="btn text-white fw-bold py-2 px-4 rounded-pill shadow-sm hover-shadow w-100" style={{ backgroundColor: colores.indigo, transition: 'all 0.3s' }}>
+                      <i className="bi bi-rocket-takeoff-fill me-2"></i>Publicar Sesión Ahora
+                    </button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
 
-        <h5 className="fw-bold mb-3 text-dark mt-4">
-          <i className="bi bi-list-check text-indigo me-2"></i>Lista de Sesiones Solicitadas por Estudiantes
+        <h5 className="fw-bold mb-3 text-dark">
+          <i className="bi bi-calendar-check-fill text-indigo me-2"></i>Mi Agenda de Sesiones Programadas
         </h5>
+        
         <div className="row">
-          {tutorias.length > 0 ? (
-            tutorias.map((tut, index) => (
-              <div className="col-md-4 mb-4" key={index}>
+          {sesionesCreadas.length > 0 ? (
+            sesionesCreadas.map((sesion) => (
+              <div className="col-md-4 mb-4" key={sesion.id}>
                 <div 
                   className="card border-0 shadow-sm h-100 bg-white"
                   style={cardStyle}
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                    e.currentTarget.style.boxShadow = "0 10px 20px rgba(0,0,0,0.12)";
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 .125rem .25rem rgba(0,0,0,0.075)";
+                  }}
                 >
-                  <div className="card-header text-white d-flex justify-content-between align-items-center py-3" style={{ backgroundColor: colores.indigo, borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
-                    <span className="fw-bold small text-uppercase tracking-wider">Sesión Solicitada # {index + 1}</span>
+                  <div className="card-header text-white py-3 border-0 d-flex justify-content-between align-items-center" style={{ backgroundColor: colores.indigo, borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+                    <span className="fw-bold small text-uppercase tracking-wider">{sesion.curso}</span>
                     <button 
                       className="btn btn-sm text-white p-0 btn-close-white" 
-                      onClick={() => solicitarCancelacion(index)}
-                      style={{ fontSize: '1.2rem', lineHeight: '1', border: 'none', background: 'none' }}
+                      onClick={() => solicitarCancelacion(sesion)}
+                      title="Cancelar sesión"
                     >
                       &times;
                     </button>
                   </div>
                   <div className="card-body p-4 d-flex flex-column justify-content-between">
                     <div>
-                      <h5 className="card-title text-dark fw-bold mb-3">
-                        <i className="bi bi-person-fill text-indigo me-2"></i>{tut.estudiante}
-                      </h5>
-                      <p className="card-text text-muted small">
-                        <strong>Curso Solicitado:</strong> <span className="badge bg-light text-dark border ms-1">{tut.curso}</span> <br /><br />
-                        <strong>Fecha de la Cita:</strong> {formatearFechaEspanol(tut.fecha)}
-                      </p>
+                      <div className="d-flex align-items-center text-muted small mb-2">
+                        <i className="bi bi-calendar-event me-2"></i> {formatearFechaEspanol(sesion.fecha)}
+                      </div>
+                      <div className="d-flex align-items-center text-muted small mb-3">
+                        <i className="bi bi-clock me-2"></i> {sesion.hora} ({courseDurations[sesion.curso] || 1.5}h)
+                      </div>
+                      
+                      <div className="p-3 bg-light rounded text-center mb-3">
+                        <span className="d-block small text-muted text-uppercase fw-bold mb-1">Cupos Ocupados</span>
+                        <div className="fs-4 fw-bold text-dark">
+                          {sesion.inscritos} <span className="text-muted fs-6">/ {sesion.cuposMaximos}</span>
+                        </div>
+                        <div className="progress mt-2" style={{ height: '6px' }}>
+                          <div className="progress-bar" role="progressbar" style={{ width: `${(sesion.inscritos/sesion.cuposMaximos)*100}%`, backgroundColor: colores.violet }}></div>
+                        </div>
+                      </div>
                     </div>
                     
-                    <div className="mt-4">
-                      {!tut.claseTerminada ? (
-                        <button 
-                          className="btn fw-semibold w-100 py-2 shadow-sm text-white d-flex align-items-center justify-content-center gap-2" 
-                          style={{ backgroundColor: colores.indigo, border: 'none' }}
-                          onClick={() => handleIniciarSesionVirtual(index, tut.estudiante)}
-                        >
-                          <i className="bi bi-camera-video-fill"></i> Iniciar Sesión Virtual
-                        </button>
-                      ) : (
-                        <button 
-                          className="btn fw-semibold w-100 py-2 shadow-sm text-white d-flex align-items-center justify-content-center gap-2" 
-                          style={{ backgroundColor: '#28a745', border: 'none' }}
-                          onClick={() => handleAbrirEvaluacion(index, tut.estudiante)}
-                        >
-                          <i className="bi bi-clipboard2-check-fill"></i> Evaluar Alumno
-                        </button>
-                      )}
+                    <div className="mt-2">
+                      <button 
+                        className="btn fw-semibold w-100 py-2 shadow-sm text-white d-flex align-items-center justify-content-center gap-2" 
+                        style={{ backgroundColor: colores.indigo, border: 'none' }}
+                        onClick={() => handleIniciarSesionVirtual(sesion)}
+                      >
+                        <i className="bi bi-camera-video-fill"></i> Iniciar Sesión Virtual
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -371,52 +435,38 @@ const TutoriasProfesor = () => {
             ))
           ) : (
             <div className="col-12 text-center mt-2">
-              <div className="alert alert-light border shadow-sm text-muted">
-                No hay solicitudes de tutorías registradas por ningún estudiante actualmente.
+              <div className="alert alert-light border shadow-sm text-muted py-5 rounded-4">
+                <i className="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+                <h5 className="text-muted mb-0">No tienes ninguna sesión programada actualmente.</h5>
+                <p className="small mt-2">Usa el formulario de arriba para crear una nueva.</p>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* MODAL 1: CONFIRMACIÓN DE CANCELACIÓN CON ICONOS */}
-      {mostrarModalCancelacion && (
+      {/* MODAL CANCELACIÓN */}
+      {mostrarModalCancelacion && sesionACancelar && (
         <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1060 }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
               <div className="modal-header bg-danger text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px' }}>
-                <h5 className="modal-title fw-bold">¿Estás seguro de cancelar esta tutoría?</h5>
+                <h5 className="modal-title fw-bold">¿Estás seguro de cancelar esta sesión?</h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setMostrarModalCancelacion(false)}></button>
               </div>
               <div className="modal-body p-4">
-                <div className="p-3 bg-danger-subtle text-danger rounded mb-3 small d-flex align-items-start gap-2 fw-semibold">
-                  <i className="bi bi-exclamation-octagon-fill fs-5 mt-0"></i>
-                  <span>Esta cancelación se registrará en tu perfil de docente y tu Score de Confiabilidad disminuirá automáticamente.</span>
-                </div>
+                <p>Cancelarás la clase de <strong>{sesionACancelar.curso}</strong> del {sesionACancelar.fecha} a las {sesionACancelar.hora}.</p>
                 <div className="mb-3">
                   <label className="form-label small fw-bold text-secondary">Motivo de la cancelación *</label>
                   <select 
                     className="form-select bg-light border-0" 
                     value={motivoCancelacion} 
                     onChange={(e) => setMotivoCancelacion(e.target.value)}
-                    required
                   >
                     <option value="">-- Selecciona un motivo --</option>
-                    <option value="Cruce de horario académico">Cruce de horario académico</option>
-                    <option value="Problema de salud / Emergencia médica">Problema de salud / Emergencia médica</option>
-                    <option value="Falla técnica / Conectividad internet">Falla técnica / Conectividad internet</option>
-                    <option value="Otros motivos personales">Otros motivos personales</option>
+                    <option value="Problema de salud">Problema de salud</option>
+                    <option value="Cruce de horario">Cruce de horario</option>
                   </select>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label small fw-bold text-secondary">Detalles adicionales (Opcional)</label>
-                  <textarea 
-                    className="form-control bg-light border-0" 
-                    rows="2"
-                    placeholder="Escribe el motivo libre aquí..."
-                    value={comentarioCancelacion}
-                    onChange={(e) => setComentarioCancelacion(e.target.value)}
-                  ></textarea>
                 </div>
               </div>
               <div className="modal-footer border-0">
@@ -428,89 +478,31 @@ const TutoriasProfesor = () => {
         </div>
       )}
 
-      {/* MODAL 2: VALORACIÓN POST-TUTORÍA CON ICONOS */}
+      {/* MODAL EVALUACIÓN */}
       {mostrarModalValoracion && (
         <div className="modal d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', zIndex: 1060 }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg">
+          <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '15px' }}>
-              <div className="modal-header text-white border-0" style={{ borderTopLeftRadius: '15px', borderTopRightRadius: '15px', backgroundColor: colores.indigo }}>
-                <h5 className="modal-title fw-bold">Análisis Académico Post-Tutoría</h5>
+              <div className="modal-header text-white border-0" style={{ backgroundColor: colores.indigo, borderTopLeftRadius: '15px', borderTopRightRadius: '15px' }}>
+                <h5 className="modal-title fw-bold">Reporte de Asistencia y Nivel</h5>
                 <button type="button" className="btn-close btn-close-white" onClick={() => setMostrarModalValoracion(false)}></button>
               </div>
               <form onSubmit={guardarValoracionDocente}>
-                <div className="modal-body p-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                  <p className="text-muted">Estás evaluando el desempeño académico de: <strong className="text-dark">{alumnoAEvaluar}</strong></p>
-                  <div className="row g-3 mb-4">
-                    <div className="col-md-6">
-                      <label className="form-label small fw-bold text-secondary">Calificación General (1-5 Estrellas)</label>
-                      <select className="form-select bg-light border-0" value={estrellas} onChange={(e) => setEstrellas(Number(e.target.value))}>
-                        <option value="5">Excelente</option>
-                        <option value="4">Bueno</option>
-                        <option value="3">Regular</option>
-                        <option value="2">Malo</option>
-                        <option value="1">Muy malo</option>
-                      </select>
-                    </div>
-                  </div>
-                  <h6 className="fw-bold text-dark border-bottom pb-2 mb-3">Evaluación por Categorías Específicas</h6>
-                  <div className="row g-3 mb-4">
-                    <div className="col-md-4">
-                      <label className="form-label small text-muted">Compromiso y preparación</label>
-                      <input type="range" className="form-range" min="1" max="5" value={compromiso} onChange={(e)=>setCompromiso(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
-                      <span className="badge bg-secondary">{compromiso} / 5</span>
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label small text-muted">Respeto y puntualidad</label>
-                      <input type="range" className="form-range" min="1" max="5" value={respeto} onChange={(e)=>setRespeto(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
-                      <span className="badge bg-secondary">{respeto} / 5</span>
-                    </div>
-                    <div className="col-md-4">
-                      <label className="form-label small text-muted">Participación activa</label>
-                      <input type="range" className="form-range" min="1" max="5" value={participacion} onChange={(e)=>setParticipacion(Number(e.target.value))} style={{ accentColor: colores.indigo }} />
-                      <span className="badge bg-secondary">{participacion} / 5</span>
-                    </div>
-                  </div>
+                <div className="modal-body p-4">
+                  <p>Guarda tus comentarios generales sobre cómo fue la sesión de <strong>{sesionAEvaluar?.curso}</strong>.</p>
                   <div className="mb-4">
-                    <label className="form-label small fw-bold text-secondary">Comentario sobre la experiencia</label>
+                    <label className="form-label small fw-bold text-secondary">Comentario General</label>
                     <textarea 
                       className="form-control bg-light border-0" 
                       rows="3" 
-                      placeholder="Describe el desempeño..."
+                      placeholder="Describe el desempeño del grupo..."
                       value={comentarioLibre}
                       onChange={(e) => setComentarioLibre(e.target.value)}
                     ></textarea>
                   </div>
-                  <div className="p-3 bg-light rounded" style={{ borderLeft: '5px solid #D32F2F' }}>
-                    <div className="form-check">
-                      <input 
-                        className="form-check-input" 
-                        type="checkbox" 
-                        id="checkQueja"
-                        checked={quejaFormal}
-                        onChange={(e) => setQuejaFormal(e.target.checked)}
-                      />
-                      <label className="form-check-label fw-bold text-danger d-flex align-items-center gap-2" htmlFor="checkQueja">
-                        <i className="bi bi-shield-fill-x text-danger"></i>Marcar como queja formal
-                      </label>
-                    </div>
-                    {quejaFormal && (
-                      <div className="mt-2">
-                        <label className="form-label small fw-bold text-secondary">Descripción obligatoria del problema *</label>
-                        <textarea 
-                          className="form-control bg-white border-danger-subtle" 
-                          rows="2" 
-                          placeholder="Describe detalladamente la falta..."
-                          value={detalleQueja}
-                          onChange={(e) => setDetalleQueja(e.target.value)}
-                          required={quejaFormal}
-                        ></textarea>
-                      </div>
-                    )}
-                  </div>
                 </div>
                 <div className="modal-footer border-0">
-                  <button type="button" className="btn btn-secondary px-4" onClick={() => setMostrarModalValoracion(false)}>Cerrar</button>
-                  <button type="submit" className="btn text-white px-4 fw-bold" style={{ backgroundColor: colores.indigo }}>Enviar Valoración</button>
+                  <button type="submit" className="btn text-white px-4 fw-bold w-100" style={{ backgroundColor: colores.indigo }}>Guardar Reporte</button>
                 </div>
               </form>
             </div>

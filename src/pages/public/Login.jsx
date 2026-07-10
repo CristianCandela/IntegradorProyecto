@@ -14,6 +14,12 @@ const roleData = {
   estudiante: { path: "/inicio-estudiante", color: "#493774" },
 };
 
+const demoCredentials = {
+  admin: { email: "admin@profematch.com", pass: "admin123" },
+  profesor: { email: "prof@profematch.com", pass: "prof123" },
+  estudiante: { email: "estu@profematch.com", pass: "estu123" },
+};
+
 export default function Login() {
   const navigate = useNavigate(); 
   const [email, setEmail] = useState("");
@@ -23,10 +29,29 @@ export default function Login() {
 
   useEffect(() => {
     const sessionActiva = localStorage.getItem("userSession");
+    
     if (sessionActiva) {
-      const { role: savedRole } = JSON.parse(sessionActiva);
-      if (roleData[savedRole]) {
-        navigate(roleData[savedRole].path);
+      try {
+        const sessionData = JSON.parse(sessionActiva);
+        const token = sessionData.token;
+
+        // Validar expiración del JWT
+        if (token) {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          const expirado = payload.exp * 1000 < Date.now();
+
+          if (expirado) {
+            localStorage.removeItem("userSession");
+            return;
+          }
+        }
+        
+        if (roleData[sessionData.role]) {
+          navigate(roleData[sessionData.role].path);
+        }
+      } catch (e) {
+        // En caso de que el token esté corrupto o haya un error, limpiar sesión
+        localStorage.removeItem("userSession");
       }
     }
   }, [navigate]);
@@ -43,7 +68,7 @@ export default function Login() {
     e.preventDefault();
     
     try {
-      const response = await fetch("http://localhost:3006/api/auth/login", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password })
@@ -105,7 +130,7 @@ export default function Login() {
       console.error("Error en login:", error);
       Swal.fire({ 
         title: "Error de conexión", 
-        text: "No se pudo conectar con el servidor Backend (http://localhost:3006). Asegúrate de que el servidor esté corriendo.", 
+        text: "No se pudo conectar con el servidor Backend. Asegúrate de que el servidor esté corriendo.", 
         icon: "error", 
         confirmButtonColor: roleData[role].color 
       });
@@ -193,9 +218,9 @@ export default function Login() {
             <div className="demo-section p-3 rounded-4">
               <div className="text-center mb-2"><span className="demo-label">CREDENCIALES DEMO</span></div>
               <div className="d-flex justify-content-center gap-2">
-                <button type="button" onClick={() => { setEmail("admin@profematch.com"); setPassword("admin123"); }} className="btn-tag text-capitalize">Admin</button>
-                <button type="button" onClick={() => { setEmail("prof@profematch.com"); setPassword("prof123"); }} className="btn-tag text-capitalize">Profe</button>
-                <button type="button" onClick={() => { setEmail("estu@profematch.com"); setPassword("estu123"); }} className="btn-tag text-capitalize">Estu</button>
+                {Object.keys(demoCredentials).map(r => (
+                  <button key={r} type="button" onClick={() => { setEmail(demoCredentials[r].email); setPassword(demoCredentials[r].pass); }} className="btn-tag text-capitalize">{r.slice(0, 5)}</button>
+                ))}
               </div>
             </div>
           </div>

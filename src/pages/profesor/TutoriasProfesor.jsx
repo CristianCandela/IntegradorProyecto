@@ -121,7 +121,7 @@ const TutoriasProfesor = () => {
       enlace_reunion: enlaceReunion || null
     };
 
-    fetch('http://localhost:3006/api/sessions', {
+    fetch(`${import.meta.env.VITE_API_URL}/sessions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

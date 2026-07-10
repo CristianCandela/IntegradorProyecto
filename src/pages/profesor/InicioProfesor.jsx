@@ -81,7 +81,7 @@ const InicioProfesor = () => {
 
     try {
       // Intentar actualizar en el backend usando el token
-      const res = await fetch(`http://localhost:3006/api/professors/${userSession.id}/profile`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/professors/${userSession.id}/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

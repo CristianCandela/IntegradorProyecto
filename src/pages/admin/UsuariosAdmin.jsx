@@ -30,9 +30,9 @@ export default function UsuariosAdmin() {
     setCargando(true);
     
     // Cambiamos la URL según la pestaña seleccionada
-    let url = "http://localhost:3006/api/usuarios";
-    if (vistaActual === "papelera") url = "http://localhost:3006/api/usuarios/papelera";
-    if (vistaActual === "pendientes") url = "http://localhost:3006/api/usuarios/pendientes";
+    let url = `${import.meta.env.VITE_API_URL}/usuarios`;
+    if (vistaActual === "papelera") url = `${import.meta.env.VITE_API_URL}/usuarios/papelera`;
+    if (vistaActual === "pendientes") url = `${import.meta.env.VITE_API_URL}/usuarios/pendientes`;
 
     try {
       const respuesta = await fetch(url);
@@ -108,8 +108,8 @@ export default function UsuariosAdmin() {
     e.preventDefault();
     
     const url = editandoId 
-      ? `http://localhost:3006/api/usuarios/${editandoId}`
-      : "http://localhost:3006/api/usuarios";
+      ? `${import.meta.env.VITE_API_URL}/usuarios/${editandoId}`
+      : `${import.meta.env.VITE_API_URL}/usuarios`;
       
     const metodo = editandoId ? "PUT" : "POST";
 
@@ -161,7 +161,7 @@ export default function UsuariosAdmin() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const respuesta = await fetch(`http://localhost:3006/api/usuarios/bloquear/${id}`, {
+          const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/bloquear/${id}`, {
             method: "PUT"
           });
 
@@ -205,7 +205,7 @@ export default function UsuariosAdmin() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const respuesta = await fetch(`http://localhost:3006/api/usuarios/restaurar/${id}`, {
+          const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/restaurar/${id}`, {
             method: "PUT"
           });
 
@@ -247,7 +247,7 @@ export default function UsuariosAdmin() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const respuesta = await fetch(`http://localhost:3006/api/usuarios/aprobar/${id}`, {
+          const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/aprobar/${id}`, {
             method: "PUT"
           });
           
